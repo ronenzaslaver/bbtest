@@ -2,6 +2,7 @@
 Base black boxes.
 """
 
+
 class BlackBox():
     """This is an abstract class used to wrap a component in a black box.
     Black boxes can then be used to test the component itself and to verify
@@ -15,17 +16,3 @@ class BlackBox():
 
     def start(self):
         pass
-
-
-class lab(BlackBox):
-    pass
-
-
-class HostBox(BlackBox):
-    pass
-
-
-class EndpointBox(BlackBox):
-
-    def install(self, what):
-        return self.host.install(what)
