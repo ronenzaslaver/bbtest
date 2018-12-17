@@ -1,9 +1,8 @@
-class BlackLab():
+
+class Lab():
+
     boxes = {}
     hosts = {}
-
-    def get_host(self, params):
-        pass
 
     def __init__(self, lab):
         for host_name, host in lab.items():

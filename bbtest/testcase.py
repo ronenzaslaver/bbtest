@@ -1,9 +1,10 @@
+
 from unittest import TestCase
 
 from bbtest import BlackLab
 
 
-class BBTestCase(TestCase, ):
+class BBTestCase(TestCase):
     """A black box test case based on :class:`TestCase` """
 
     def setUp(self):

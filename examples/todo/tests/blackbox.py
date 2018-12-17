@@ -1,4 +1,4 @@
-import yaml
+
 from bbtest import BlackBox, BBTestCase
 
 
@@ -11,7 +11,6 @@ class ToDoBox(BlackBox):
        test writer can't overide the prefix so we keep a clean dictionary
        with less ambiguaty regarding lab's assets.
     """
-    NAME_PREFIX = "todo"
 
     def install(self):
         pass
@@ -29,7 +28,6 @@ class ToDoBox(BlackBox):
     def list (self, todo):
         todos = []
         list_out = self.host.run('list')
-        for i in list_out[:-2]:
+        for line in list_out[:-2]:
             todos.append(line[2:])
         return todos
-

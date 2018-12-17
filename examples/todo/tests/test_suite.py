@@ -13,12 +13,12 @@ class ToDoTest(BBTestCase):
     LAB = {
         'host1': {
             'image': "linux",
-            'boxes': [ ToDoBox, ],
+            'boxes': [ ToDoBox ],
          },
     }
 
     def test_add(self):
-        todo_box = self.boxes[ToDoBox.name]
+        todo_box = self.boxes['todo']
         todo_box.add("Foo")
         todos = todo_box.list()
         assert todos == ["Foo"]

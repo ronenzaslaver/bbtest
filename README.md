@@ -6,7 +6,6 @@ BBTest automation framework for black box testing and a virtual lab. The lab sup
 The test cases themselvs are written using `bbtest.BBTestCase` as a base class.  Inherits from TestCase, so we use `setup` and `destroy` and `test*` methods.
 To run the tests you can use your favorite python tests runner (ours is pytest).
 
-To keep lab configuration simple we use a simple yaml format based on docker-compose.
 We've added a class property `LAB` that holds a dictionary defining the lab enviornment.
 
 Installation
