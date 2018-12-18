@@ -18,3 +18,17 @@ After forking and cloning this repo, open a shell in this folder:
 $ pipenv shell
 $ PYTHONPATH=. pytest
 ```
+
+Documentation
+-------------
+
+We are using Sphinx to publish our documentation. To generate and serve the documentation:
+
+```bash
+
+$ cd docs
+$ make html
+$ cd _build/html
+$ python -m http.server
+
+

@@ -39,7 +39,7 @@ class ToDoBox(BlackBox):
         return self.host.rmtree(self.home)
 
     def clean(self):
-        return self.host.rmtree(self.host.join(self.home, 'todo.txt'))
+        return self.host.os_remove(self.host.join(self.home, 'todo.txt'))
 
     def run(self, *args):
         """Pass on a todo.sh command  such ass add, list, etc """
@@ -51,6 +51,9 @@ class ToDoBox(BlackBox):
 
     def add(self, todo):
         return self.run('add', todo)
+
+    def delete(self, index):
+        return self.run('del', str(index))
 
     def list(self):
         todos = []

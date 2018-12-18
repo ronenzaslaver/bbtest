@@ -36,6 +36,10 @@ class BaseHost(object):
     def rmtree(self, path, ignore_errors=True, onerror=None):
         pass
 
+    def os_remove(self, path):
+        pass
+
+
 class LocalHost(BaseHost):
 
     @property
@@ -55,6 +59,12 @@ class LocalHost(BaseHost):
 
     def put(self, local, remote):
         return shutil.copyfile(local, remote)
+
+    def os_remove(self, path):
+        try:
+            os.remove(path)
+        except OSError:
+            pass
 
 
 class WindowsHost(BaseHost):

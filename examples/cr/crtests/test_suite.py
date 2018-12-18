@@ -33,10 +33,11 @@ class LabTest(CRTestCase):
         # Print the EP IP address.
         print(ep_host.ip)
         # Install sensor on EP.
-        ep_host.install('/path/to/installer/dist/', {'transparency': transparency_url,
-                                                     'registry': registery_url})
-        assert ep_host.path.isfile('file')
+        ep_host.install('/path/to/installer/dist/',
+                        {'transparency': transparency_url,
+                         'registry': registery_url})
+        self.assertTrue(ep_host.path.isfile('file'))
         try:
-            assert ep_host.registry('entry') == 'value'
-        except NotImplemented as _:
+            self.assertEqual(ep_host.registry('entry'), 'value')
+        except NotImplemented:
             pass
