@@ -42,7 +42,7 @@ class Lab():
 
     def remove(self):
         for box in self.flatten_boxes():
-            box.host.rmtree(box.home)
+            box.remove()
 
         for host in self.hosts.values():
             host.remove()
