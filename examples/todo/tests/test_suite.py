@@ -18,6 +18,7 @@ class ToDoTest(BBTestCase):
     }
 
     def setUp(self):
+        """ clean the todo.txt before each test method """
         super().setUp()
         self.todo_box = self.lab.boxes[ToDoBox.NAME][0]
         self.todo_box.clean()

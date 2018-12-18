@@ -19,18 +19,28 @@ class ToDoBox(BlackBox):
     NAME = 'todo'
 
     def install(self):
-        src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src')
-        self.host.put(os.path.join(src_dir, 'todo.sh'), remote=os.path.join(self.host.temp_dir, 'todo.sh'))
-        self.host.put(os.path.join(src_dir, 'todo.cfg'), remote=os.path.join(self.host.temp_dir, 'todo.cfg'))
+        """ installing todo.txt
+        First creates a temp dir on the host and then coppies the assets
+        in. On Linux, we need to make sure `todo.sh` is executable.
+        """
+        self.home = self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
+        src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                               'src')
+        dest_dir = self.home
+
+        for asset in [ 'todo.sh', 'todo.cfg']:
+            self.host.put(os.path.join(src_dir, asset),
+                          remote=self.host.join(dest_dir, asset))
+
         if self.host.os == 'linux':
-            self.host.run('chmod', '777', os.path.join(self.host.temp_dir, "todo.sh"))
+            self.host.run('chmod', '777', self.host.join(self.home, "todo.sh"))
 
     def clean(self):
-        return self.host.run('rm', os.path.join(self.host.temp_dir, 'todo.txt'))
+        return self.host.run('rm', self.host.join(self.home, 'todo.txt'))
 
     def run(self, *args):
         """Pass on a todo.sh command  such ass add, list, etc """
-        todo_sh = os.path.join(self.host.temp_dir, 'todo.sh')
+        todo_sh = self.host.join(self.home, 'todo.sh')
         logger.info(f"ToDoBox Starts: {todo_sh} {args}")
         result = self.host.run(todo_sh, *args)
         logger.info(f"ToDoBox returns: {result}")

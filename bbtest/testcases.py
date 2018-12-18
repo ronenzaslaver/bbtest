@@ -11,13 +11,17 @@ class BBTestCase(TestCase):
 
     address_book = {}
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         """setups a lab for black box testing. """
-        super().setUp()
+        super().setUpClass()
         logger.setLevel(logging.DEBUG)
-        if hasattr(self, 'LAB'):
-            self.lab = Lab(self.LAB, address_book=self.address_book)
+        if hasattr(cls, 'LAB'):
+            cls.lab = Lab(cls.LAB, address_book=cls.address_book)
 
-    def tearDown(self):
-        self.lab.clean()
-        super().tearDown()
+    @classmethod
+    def tearDownClass(cls):
+        if hasattr(cls, 'lab'):
+            cls.lab.remove()
+
+        super().tearDownClass()

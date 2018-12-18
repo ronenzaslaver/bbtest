@@ -1,12 +1,15 @@
 """
 Hosts in the network.
 """
+import os
 import subprocess
 import sys
-from shutil import copyfile
+import shutil
+import tempfile
 
 
-class Host(object):
+class BaseHost(object):
+    _SEP = '/'
 
     def __init__(self, ip=None, username=None, password=None):
         self.ip = ip
@@ -16,24 +19,34 @@ class Host(object):
     def install(self, downloads_dir, **kwargs):
         pass
 
+    def remove(self):
+        """ the opposite of install, completly remove the host """
+        pass
+
     def clean(self):
         pass
 
+    def join(self, *args):
+        return self._SEP.join(args)
 
-class LocalHost(Host):
+    def mkdtemp(self, **kwargs):
+        """ same args as tempfile.mkdtemp """
+        pass
+
+    def rmtree(self, path, ignore_errors=True, onerror=None):
+        pass
+
+class LocalHost(BaseHost):
 
     @property
     def os(self):
         return sys.platform
 
-    @property
-    def temp_dir(self):
-        if self.os == 'win32':
-            return 'c:/temp'
-        elif self.os == 'linux':
-            return '/tmp'
-        else:
-            return None
+    def mkdtemp(self, **kwargs):
+        return tempfile.mkdtemp(**kwargs)
+
+    def rmtree(self, path, ignore_errors=True, onerror=None):
+        return shutil.rmtree(path, ignore_errors, onerror)
 
     def run(self, cmd, *args):
         args_list = list(args) if args else []
@@ -41,22 +54,22 @@ class LocalHost(Host):
         return output.stdout.decode('utf-8').strip().split('\n')
 
     def put(self, local, remote):
-        return copyfile(local, remote)
+        return shutil.copyfile(local, remote)
 
 
-class WindowsHost(Host):
+class WindowsHost(BaseHost):
 
     @property
     def os(self):
         return 'win32'
 
 
-class LinuxHost(Host):
+class LinuxHost(BaseHost):
 
     @property
     def os(self):
         return 'linux'
 
 
-class MacHost(Host):
+class MacHost(BaseHost):
     pass

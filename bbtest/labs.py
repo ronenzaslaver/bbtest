@@ -1,3 +1,4 @@
+import os
 from .exceptions import ImproperlyConfigured
 
 
@@ -33,10 +34,22 @@ class Lab():
                 else:
                     self.boxes[box_name] = [new_box]
 
-    def clean(self):
-        """Restore the lab back to its original condition """
+    def flatten_boxes(self):
+        """ an iterator returning  one box after the other """
         for boxes in self.boxes.values():
             for box in boxes:
-                box.clean()
+                yield box
+
+    def remove(self):
+        for box in self.flatten_boxes():
+            box.host.rmtree(box.home)
+
+        for host in self.hosts.values():
+            host.remove()
+
+    def clean(self):
+        """Restore the lab back to its original condition """
+        for box in self.flatten_boxes():
+            box.clean()
         for host in self.hosts.values():
             host.clean()
