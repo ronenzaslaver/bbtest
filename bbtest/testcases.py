@@ -1,19 +1,23 @@
 import logging
-from unittest import TestCase
+import unittest
 
 from bbtest import Lab
 
 logger = logging.getLogger('bblog')
 
 
-class BBTestCase(TestCase):
-    """A black box test case based on :class:`TestCase` """
+class BBTestCase(unittest.TestCase):
+    """A black box test case based on :class:`unittest.TestCase`
+
+    We've added a class property `LAB` that holds a dictionary defining the lab enviornment.
+    Each test case can define a `LAB` property used to setup a lab and store it in `self.lab`.
+    """
 
     address_book = {}
 
     @classmethod
     def setUpClass(cls):
-        """setups a lab for black box testing. """
+        """Setups a lab for black box testing. """
         super().setUpClass()
         logger.setLevel(logging.DEBUG)
         if hasattr(cls, 'LAB'):

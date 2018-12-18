@@ -1,5 +1,5 @@
 """
-Base black boxes.
+To take part in a test a component needs to be wrapped in a BlackBox.
 """
 
 
@@ -14,5 +14,6 @@ class BlackBox():
         self.host = host
         self.name = name if name else self.__class__.__name__[:-3].lower()
 
-    def start(self):
+    def install(self):
+        """Installing the black box on `self.host`"""
         pass
