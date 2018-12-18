@@ -26,7 +26,7 @@ class ToDoTest(BBTestCase):
     def test_add(self):
         self.todo_box.add("Foo")
         todos = self.todo_box.list()
-        assert todos == ["Foo"]
+        self.assertEqual(todos, ["Foo"])
 
 
 class DoubleToDoTest(BBTestCase):
@@ -43,5 +43,5 @@ class DoubleToDoTest(BBTestCase):
         todo_box2 = self.lab.boxes[ToDoBox.NAME][1]
         todo_box1.add("Foo")
         todos = todo_box1.list()
-        assert todos == ["Foo"]
-        assert not todo_box2.list()
+        self.assertEqual(todos, ["Foo"])
+        self.assertFalse(todo_box2.list())
