@@ -17,10 +17,14 @@ class ToDoTest(BBTestCase):
          },
     }
 
+    def setUp(self):
+        super().setUp()
+        self.todo_box = self.lab.boxes[ToDoBox.NAME][0]
+        self.todo_box.clean()
+
     def test_add(self):
-        todo_box = self.lab.boxes[ToDoBox.NAME][0]
-        todo_box.add("Foo")
-        todos = todo_box.list()
+        self.todo_box.add("Foo")
+        todos = self.todo_box.list()
         assert todos == ["Foo"]
 
 

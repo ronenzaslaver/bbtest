@@ -1,8 +1,10 @@
 import logging
+import os
 
-from bbtest import BlackBox, BBTestCase
+from bbtest import BlackBox
 
 logger = logging.getLogger('bblog')
+
 
 class ToDoBox(BlackBox):
     """A thin wrapper for todo.sh, just pass the message on
@@ -15,24 +17,29 @@ class ToDoBox(BlackBox):
     """
 
     NAME = 'todo'
+
     def install(self):
-        self.host.put("examples/todo/src/todo.sh", remote="/tmp/todo.sh")
-        self.host.put("examples/todo/src/todo.cfg", remote="/tmp/todo.cfg")
+        src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src')
+        self.host.put(os.path.join(src_dir, 'todo.sh'), remote=os.path.join(self.host.temp_dir, 'todo.sh'))
+        self.host.put(os.path.join(src_dir, 'todo.cfg'), remote=os.path.join(self.host.temp_dir, 'todo.cfg'))
+        if self.host.os == 'linux':
+            self.host.run('chmod', '777', os.path.join(self.host.temp_dir, "todo.sh"))
 
-    def clean(self, msg):
-        return self.host.run('rm todo.txt')
+    def clean(self):
+        return self.host.run('rm', os.path.join(self.host.temp_dir, 'todo.txt'))
 
-    def run(self, msg):
+    def run(self, *args):
         """Pass on a todo.sh command  such ass add, list, etc """
-        logger.info(f"ToDoBox Starts: {msg}")
-        result = self.host.run(f'/tmp/todo.sh {msg}')
+        todo_sh = os.path.join(self.host.temp_dir, 'todo.sh')
+        logger.info(f"ToDoBox Starts: {todo_sh} {args}")
+        result = self.host.run(todo_sh, *args)
         logger.info(f"ToDoBox returns: {result}")
         return result
 
     def add(self, todo):
-        return self.run(f'add {todo}')
+        return self.run('add', todo)
 
-    def list (self):
+    def list(self):
         todos = []
         list_out = self.run('list')
         for line in list_out[:-2]:

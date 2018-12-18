@@ -1,5 +1,4 @@
 from .exceptions import ImproperlyConfigured
-from .hosts import Host, LocalHost, LinuxHost, WindowsHost, MacHost
 
 
 class Lab():
@@ -36,7 +35,8 @@ class Lab():
 
     def clean(self):
         """Restore the lab back to its original condition """
-        for box in self.boxes:
-            box.clean()
-        for host in self.hosts:
+        for boxes in self.boxes.values():
+            for box in boxes:
+                box.clean()
+        for host in self.hosts.values():
             host.clean()
