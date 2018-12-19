@@ -36,7 +36,7 @@ class BaseHost(object):
     def rmtree(self, path, ignore_errors=True, onerror=None):
         pass
 
-    def os_remove(self, path):
+    def rmfile(self, path):
         pass
 
 
@@ -46,12 +46,6 @@ class LocalHost(BaseHost):
     def os(self):
         return sys.platform
 
-    def mkdtemp(self, **kwargs):
-        return tempfile.mkdtemp(**kwargs)
-
-    def rmtree(self, path, ignore_errors=True, onerror=None):
-        return shutil.rmtree(path, ignore_errors, onerror)
-
     def run(self, cmd, *args):
         args_list = list(args) if args else []
         output = subprocess.run([cmd] + args_list, stdout=subprocess.PIPE)
@@ -60,7 +54,13 @@ class LocalHost(BaseHost):
     def put(self, local, remote):
         return shutil.copyfile(local, remote)
 
-    def os_remove(self, path):
+    def mkdtemp(self, **kwargs):
+        return tempfile.mkdtemp(**kwargs)
+
+    def rmtree(self, path, ignore_errors=True, onerror=None):
+        return shutil.rmtree(path, ignore_errors, onerror)
+
+    def rmfile(self, path):
         try:
             os.remove(path)
         except OSError:
