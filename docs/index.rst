@@ -15,7 +15,6 @@ pytest).
    :caption: Contents:
    :glob:
 
-   overview
    installation
    examples
    API
