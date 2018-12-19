@@ -17,3 +17,7 @@ class BlackBox():
     def install(self):
         """Installing the black box on `self.host`"""
         pass
+
+    def remove(self):
+        """Removing the black box from `self.host`"""
+        pass
