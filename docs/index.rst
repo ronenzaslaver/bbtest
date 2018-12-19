@@ -9,36 +9,16 @@ so you use `setUp` and `destroy` and `test*` methods.
 To run the tests you can use your favorite python tests runner (ours is
 pytest).
 
-.. automodule:: bbtest.testcases
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-The Black Box
--------------
-
-.. automodule:: bbtest.blackboxes
-    :members:
-
-The Lab
--------
-
-.. automodule:: bbtest.labs
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: bbtest.hosts
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   :glob:
 
+   overview
+   installation
+   examples
+   API
 
 
 Indices and tables
