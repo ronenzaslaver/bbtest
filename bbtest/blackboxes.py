@@ -17,3 +17,7 @@ class BlackBox():
     def install(self):
         """Installing the black box on `self.host`"""
         pass
+
+    def mkdtemp(self, **kwagrs):
+        """Create a temp directory"""
+        self.home = self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")

@@ -1,3 +1,3 @@
-from .blackbox import ToDoBox
+from .todo_box import ToDoBox
 
-__all__ = [ ToDoBox, ]
+__all__ = [ToDoBox, ]

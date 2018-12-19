@@ -15,6 +15,13 @@ class BBTestCase(unittest.TestCase):
 
     address_book = {}
 
+    def setUp(self):
+        super().setUp()
+        if hasattr(self, 'lab'):
+            for box in self.lab.flatten_boxes():
+                box.clean()
+
+
     @classmethod
     def setUpClass(cls):
         """Setups a lab for black box testing. """

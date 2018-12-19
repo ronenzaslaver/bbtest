@@ -7,13 +7,10 @@ logger = logging.getLogger('bblog')
 
 
 class ToDoBox(BlackBox):
-    """A thin wrapper for todo.sh, just pass the message on
-       https://github.com/todotxt/todo.txt-cli
-
-       the first thing the box does is name itself by concatenating the
-       `NAME_PREFIX` and an optional suffix provides the case writer. The
-       test writer can't overide the prefix so we keep a clean dictionary
-       with less ambiguaty regarding lab's assets.
+    """A black box wrapper for todo.sh.
+    Like every black box, the todo box has the `install` and `clean`
+    (TODO: uninstall?) methods. On top of that we have methods to be used
+    by the test coders to poke the box and peek into it.
     """
 
     NAME = 'todo'
@@ -23,7 +20,7 @@ class ToDoBox(BlackBox):
         First creates a temp dir on the host and then coppies the assets
         in. On Linux, we need to make sure `todo.sh` is executable.
         """
-        self.home = self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
+        self.home = self.box.mkdtemp()
         src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                'src')
         dest_dir = self.home
@@ -35,11 +32,10 @@ class ToDoBox(BlackBox):
         if self.host.os == 'linux':
             self.host.run('chmod', '777', self.host.join(self.home, "todo.sh"))
 
-    def clean(self):
-        return self.host.run('rm', self.host.join(self.home, 'todo.txt'))
-
     def run(self, *args):
-        """Pass on a todo.sh command  such ass add, list, etc """
+        """Pass the args to a todo.sh running on the host. See `todo.sh -h`
+        for more details.
+        """
         todo_sh = self.host.join(self.home, 'todo.sh')
         logger.info(f"ToDoBox Starts: {todo_sh} {args}")
         result = self.host.run(todo_sh, *args)
@@ -47,11 +43,22 @@ class ToDoBox(BlackBox):
         return result
 
     def add(self, todo):
+        """Add a to do.
+        Add is a *Porceline method* - one that adds only a shining interface.
+        The same function can be achived by using the low level, aka `plumbing`
+        methods.
+        """
         return self.run('add', todo)
 
     def list(self):
-        todos = []
+        """Return a list of todos."""
+        todos = list()
         list_out = self.run('list')
         for line in list_out[:-2]:
             todos.append(line[2:])
         return todos
+
+    def clean(self):
+        """Clean's job is to wipe all data. In todo's case, it's just a file"""
+        return self.host.run('rm', self.host.join(self.home, 'todo.txt'))
+
