@@ -1,8 +1,9 @@
 BBTest - black box testing
 ==========================
 
-BBTest automation framework for black box testing in a virtual lab. The lab
-supports multiple Hosts & OSs and well as flexible network. 
+BBTest s a python based automation framework for black box testing. Tests are
+executed in a virtual lab, supporting multiple Hosts & OSs and well as
+a flexible network.
 
 Our test case class inherits from :class:`unittest.TestCase`,
 so you use `setUp` and `destroy` and `test*` methods.
