@@ -28,15 +28,18 @@ class ToDoBox(BlackBox):
                                'src')
         dest_dir = self.home
 
-        for asset in [ 'todo.sh', 'todo.cfg']:
+        for asset in ['todo.sh', 'todo.cfg']:
             self.host.put(os.path.join(src_dir, asset),
                           remote=self.host.join(dest_dir, asset))
 
         if self.host.os == 'linux':
             self.host.run('chmod', '777', self.host.join(self.home, "todo.sh"))
 
+    def remove(self):
+        return self.host.rmtree(self.home)
+
     def clean(self):
-        return self.host.run('rm', self.host.join(self.home, 'todo.txt'))
+        return self.host.rmfile(self.host.join(self.home, 'todo.txt'))
 
     def run(self, *args):
         """Pass on a todo.sh command  such ass add, list, etc """

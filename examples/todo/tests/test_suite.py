@@ -38,6 +38,12 @@ class DoubleToDoTest(BBTestCase):
          },
     }
 
+    def setUp(self):
+        """ clean the todo.txt before each test method """
+        super().setUp()
+        for box in self.lab.boxes[ToDoBox.NAME]:
+            box.clean()
+
     def test_add(self):
         todo_box1 = self.lab.boxes[ToDoBox.NAME][0]
         todo_box2 = self.lab.boxes[ToDoBox.NAME][1]

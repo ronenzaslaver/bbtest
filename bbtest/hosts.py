@@ -36,17 +36,15 @@ class BaseHost(object):
     def rmtree(self, path, ignore_errors=True, onerror=None):
         pass
 
+    def rmfile(self, path):
+        pass
+
+
 class LocalHost(BaseHost):
 
     @property
     def os(self):
         return sys.platform
-
-    def mkdtemp(self, **kwargs):
-        return tempfile.mkdtemp(**kwargs)
-
-    def rmtree(self, path, ignore_errors=True, onerror=None):
-        return shutil.rmtree(path, ignore_errors, onerror)
 
     def run(self, cmd, *args):
         args_list = list(args) if args else []
@@ -55,6 +53,18 @@ class LocalHost(BaseHost):
 
     def put(self, local, remote):
         return shutil.copyfile(local, remote)
+
+    def mkdtemp(self, **kwargs):
+        return tempfile.mkdtemp(**kwargs)
+
+    def rmtree(self, path, ignore_errors=True, onerror=None):
+        return shutil.rmtree(path, ignore_errors, onerror)
+
+    def rmfile(self, path):
+        try:
+            os.remove(path)
+        except OSError:
+            pass
 
 
 class WindowsHost(BaseHost):
