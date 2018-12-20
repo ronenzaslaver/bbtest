@@ -20,7 +20,7 @@ class ToDoBox(BlackBox):
         First creates a temp dir on the host and then coppies the assets
         in. On Linux, we need to make sure `todo.sh` is executable.
         """
-        self.home = self.box.mkdtemp()
+        self.home = self.mkdtemp()
         src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                'src')
         dest_dir = self.home
