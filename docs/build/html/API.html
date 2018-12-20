@@ -1,0 +1,320 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API &#8212; BBTest  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Examples" href="examples.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-bbtest.testcases">
+<span id="the-test-case"></span><h2>The Test Case<a class="headerlink" href="#module-bbtest.testcases" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bbtest.testcases.BBTestCase">
+<em class="property">class </em><code class="descclassname">bbtest.testcases.</code><code class="descname">BBTestCase</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>A black box test case based on <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code></p>
+<p>We’ve added a class property <cite>LAB</cite> that holds a dictionary defining the lab enviornment.
+Each test case can define a <cite>LAB</cite> property used to setup a lab and store it in <cite>self.lab</cite>.</p>
+<dl class="attribute">
+<dt id="bbtest.testcases.BBTestCase.address_book">
+<code class="descname">address_book</code><em class="property"> = {}</em><a class="headerlink" href="#bbtest.testcases.BBTestCase.address_book" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.testcases.BBTestCase.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bbtest.testcases.BBTestCase.setUpClass">
+<em class="property">classmethod </em><code class="descname">setUpClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase.setUpClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setups a lab for black box testing.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bbtest.testcases.BBTestCase.tearDownClass">
+<em class="property">classmethod </em><code class="descname">tearDownClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase.tearDownClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase.tearDownClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bbtest.blackboxes">
+<span id="the-black-box"></span><h2>The Black Box<a class="headerlink" href="#module-bbtest.blackboxes" title="Permalink to this headline">¶</a></h2>
+<p>To take part in a test a component needs to be wrapped in a BlackBox.</p>
+<dl class="class">
+<dt id="bbtest.blackboxes.BlackBox">
+<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">BlackBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an abstract class used to wrap a component in a black box.
+Black boxes can then be used to test the component itself and to verify
+it integrates well with other components.
+A blackbox runs on a host and you can communicate with it using <cite>host.run</cite></p>
+<dl class="method">
+<dt id="bbtest.blackboxes.BlackBox.install">
+<code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Installing the black box on <cite>self.host</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.BlackBox.mkdtemp">
+<code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwagrs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox.mkdtemp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a temp directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.BlackBox.uninstall">
+<code class="descname">uninstall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox.uninstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox.uninstall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removing the black box from <cite>self.host</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bbtest.labs">
+<span id="the-lab"></span><h2>The Lab<a class="headerlink" href="#module-bbtest.labs" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="bbtest.labs.Lab">
+<em class="property">class </em><code class="descclassname">bbtest.labs.</code><code class="descname">Lab</code><span class="sig-paren">(</span><em>lab</em>, <em>address_book={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbtest.labs.Lab.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore the lab back to its original condition</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.labs.Lab.flatten_boxes">
+<code class="descname">flatten_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.flatten_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.flatten_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>an iterator returning  one box after the other</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.labs.Lab.uninstall">
+<code class="descname">uninstall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.uninstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.uninstall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bbtest.hosts">
+<span id="the-hosts"></span><h2>The Hosts<a class="headerlink" href="#module-bbtest.hosts" title="Permalink to this headline">¶</a></h2>
+<p>Hosts in the network.</p>
+<dl class="class">
+<dt id="bbtest.hosts.BaseHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">BaseHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.install">
+<code class="descname">install</code><span class="sig-paren">(</span><em>downloads_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.install" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.join">
+<code class="descname">join</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.join" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.mkdtemp">
+<code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
+<dd><p>same args as tempfile.mkdtemp</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.rmfile">
+<code class="descname">rmfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.rmfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.rmfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.rmtree">
+<code class="descname">rmtree</code><span class="sig-paren">(</span><em>path</em>, <em>ignore_errors=True</em>, <em>onerror=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.rmtree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.rmtree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.uninstall">
+<code class="descname">uninstall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.uninstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.uninstall" title="Permalink to this definition">¶</a></dt>
+<dd><p>the opposite of install,  uninstall our tools from the host</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.hosts.LinuxHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LinuxHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LinuxHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LinuxHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
+<dl class="attribute">
+<dt id="bbtest.hosts.LinuxHost.os">
+<code class="descname">os</code><a class="headerlink" href="#bbtest.hosts.LinuxHost.os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.hosts.LocalHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
+<dl class="method">
+<dt id="bbtest.hosts.LocalHost.mkdtemp">
+<code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
+<dd><p>same args as tempfile.mkdtemp</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.LocalHost.os">
+<code class="descname">os</code><a class="headerlink" href="#bbtest.hosts.LocalHost.os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.LocalHost.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>local</em>, <em>remote</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.put" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.LocalHost.rmfile">
+<code class="descname">rmfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.rmfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.rmfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.LocalHost.rmtree">
+<code class="descname">rmtree</code><span class="sig-paren">(</span><em>path</em>, <em>ignore_errors=True</em>, <em>onerror=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.rmtree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.rmtree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.LocalHost.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>cmd</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.hosts.MacHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">MacHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#MacHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.MacHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.hosts.WindowsHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">WindowsHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
+<dl class="attribute">
+<dt id="bbtest.hosts.WindowsHost.os">
+<code class="descname">os</code><a class="headerlink" href="#bbtest.hosts.WindowsHost.os" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">BBTest</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-bbtest.testcases">The Test Case</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bbtest.blackboxes">The Black Box</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bbtest.labs">The Lab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-bbtest.hosts">The Hosts</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="examples.html" title="previous chapter">Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yoram Shamir & Benny Daon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/API.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

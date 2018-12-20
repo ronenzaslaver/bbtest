@@ -1,0 +1,268 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Examples &#8212; BBTest  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API" href="API.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<p>BBTest includes a few working examples, located under the <cite>examples</cite>
+folder in the project’s home.</p>
+<div class="section" id="todo">
+<h2>ToDo<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<p>Based on a tip from Roie, our first example is a to-do component copied from
+<a class="reference external" href="http://todotxt.org/">ToDo.txt</a> . In the example’s code we show how we wrapped it
+as a black box and then use it to test the ToDo’s interface.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ examples/todo/src/todo.sh -h
+
+Usage: todo.sh <span class="o">[</span>-fhpantvV<span class="o">]</span> <span class="o">[</span>-d todo_config<span class="o">]</span> action <span class="o">[</span>task_number<span class="o">]</span> <span class="o">[</span>task_description<span class="o">]</span>
+
+Actions:
+
+  add<span class="p">|</span>a <span class="s2">&quot;THING I NEED TO DO +project @context&quot;</span>
+  addm <span class="s2">&quot;THINGS I NEED TO DO</span>
+<span class="s2">     MORE THINGS I NEED TO DO&quot;</span>
+  addto DEST <span class="s2">&quot;TEXT TO ADD&quot;</span>
+  append<span class="p">|</span>app ITEM# <span class="s2">&quot;TEXT TO APPEND&quot;</span>
+  archive
+  <span class="nb">command</span> <span class="o">[</span>ACTIONS<span class="o">]</span>
+  deduplicate
+  del<span class="p">|</span>rm ITEM# <span class="o">[</span>TERM<span class="o">]</span>
+  depri<span class="p">|</span>dp ITEM#<span class="o">[</span>, ITEM#, ITEM#, ...<span class="o">]</span>
+  <span class="k">do</span> ITEM#<span class="o">[</span>, ITEM#, ITEM#, ...<span class="o">]</span>
+  <span class="nb">help</span> <span class="o">[</span>ACTION...<span class="o">]</span>
+  list<span class="p">|</span>ls <span class="o">[</span>TERM...<span class="o">]</span>
+  listall<span class="p">|</span>lsa <span class="o">[</span>TERM...<span class="o">]</span>
+  listaddons
+  listcon<span class="p">|</span>lsc <span class="o">[</span>TERM...<span class="o">]</span>
+  listfile<span class="p">|</span>lf <span class="o">[</span>SRC <span class="o">[</span>TERM...<span class="o">]]</span>
+  listpri<span class="p">|</span>lsp <span class="o">[</span>PRIORITIES<span class="o">]</span> <span class="o">[</span>TERM...<span class="o">]</span>
+  listproj<span class="p">|</span>lsprj <span class="o">[</span>TERM...<span class="o">]</span>
+  move<span class="p">|</span>mv ITEM# DEST <span class="o">[</span>SRC<span class="o">]</span>
+  prepend<span class="p">|</span>prep ITEM# <span class="s2">&quot;TEXT TO PREPEND&quot;</span>
+  pri<span class="p">|</span>p ITEM# PRIORITY
+  replace ITEM# <span class="s2">&quot;UPDATED TODO&quot;</span>
+  report
+  shorthelp
+
+...
+</pre></div>
+</div>
+<p>To test this component we need to first code a class based on <a class="reference internal" href="API.html#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a> that install,
+removes and runs the script.</p>
+<dl class="class">
+<dt id="examples.todo.tests.todo_box.ToDoBox">
+<em class="property">class </em><code class="descclassname">examples.todo.tests.todo_box.</code><code class="descname">ToDoBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples/todo/tests/todo_box.html#ToDoBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="API.html#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a></p>
+<p>A black box wrapper for todo.sh.
+Like every black box, the todo box has the <cite>install</cite> and <cite>clean</cite>
+(TODO: uninstall?) methods. On top of that we have methods to be used
+by the test coders to poke the box and peek into it.</p>
+<dl class="attribute">
+<dt id="examples.todo.tests.todo_box.ToDoBox.NAME">
+<code class="descname">NAME</code><em class="property"> = 'todo'</em><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="examples.todo.tests.todo_box.ToDoBox.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>todo</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples/todo/tests/todo_box.html#ToDoBox.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a to do.
+Add is a <em>Porceline method</em> - one that adds only a shining interface.
+The same function can be achived by using the low level, aka <cite>plumbing</cite>
+methods.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="examples.todo.tests.todo_box.ToDoBox.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples/todo/tests/todo_box.html#ToDoBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean’s job is to wipe all data. In todo’s case, it’s just a file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="examples.todo.tests.todo_box.ToDoBox.install">
+<code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples/todo/tests/todo_box.html#ToDoBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>installing todo.txt
+First creates a temp dir on the host and then coppies the assets
+in. On Linux, we need to make sure <cite>todo.sh</cite> is executable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="examples.todo.tests.todo_box.ToDoBox.list">
+<code class="descname">list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples/todo/tests/todo_box.html#ToDoBox.list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of todos.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="examples.todo.tests.todo_box.ToDoBox.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples/todo/tests/todo_box.html#ToDoBox.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove our home directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="examples.todo.tests.todo_box.ToDoBox.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples/todo/tests/todo_box.html#ToDoBox.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pass the args to a todo.sh running on the host. See <cite>todo.sh -h</cite>
+for more details.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Using this component, we code a test suite :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; How to test a todo?</span>
+
+<span class="sd">This Module includes the test suite that verifies the todo component using</span>
+<span class="sd">a black box methodology.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">bbtest</span> <span class="k">import</span> <span class="n">BBTestCase</span><span class="p">,</span> <span class="n">LocalHost</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">ToDoBox</span>
+
+
+<span class="k">class</span> <span class="nc">ToDoTest</span><span class="p">(</span><span class="n">BBTestCase</span><span class="p">):</span>
+
+    <span class="n">LAB</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;host1&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">LocalHost</span><span class="p">,</span>
+            <span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">ToDoBox</span><span class="p">],</span>
+         <span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">ToDoBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">box</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Foo&quot;</span><span class="p">)</span>
+        <span class="n">todos</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">todos</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Foo&quot;</span><span class="p">])</span>
+
+
+<span class="k">class</span> <span class="nc">DoubleToDoTest</span><span class="p">(</span><span class="n">BBTestCase</span><span class="p">):</span>
+
+    <span class="n">LAB</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;host1&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">LocalHost</span><span class="p">,</span>
+            <span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">ToDoBox</span><span class="p">,</span> <span class="n">ToDoBox</span><span class="p">],</span>
+         <span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">todo_box1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">ToDoBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">todo_box2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">ToDoBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">todo_box1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Foo&quot;</span><span class="p">)</span>
+        <span class="n">todos</span> <span class="o">=</span> <span class="n">todo_box1</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">todos</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Foo&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">todo_box2</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installer">
+<h2>Installer<a class="headerlink" href="#installer" title="Permalink to this headline">¶</a></h2>
+<p>In the example will take a simple installer and test it in multiple opearating system…</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">BBTest</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#todo">ToDo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installer">Installer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="API.html" title="next chapter">API</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Yoram Shamir & Benny Daon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/examples.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
