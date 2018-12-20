@@ -26,6 +26,7 @@ We are using Sphinx to publish our documentation. To generate and serve the docu
 
 ```bash
 
+$ pipenv install -d
 $ cd docs
 $ make html
 $ cd _build/html
