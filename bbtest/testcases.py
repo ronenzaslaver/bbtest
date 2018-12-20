@@ -5,6 +5,8 @@ from bbtest import Lab
 
 logger = logging.getLogger('bblog')
 
+from pytest import fixture
+
 
 class BBTestCase(unittest.TestCase):
     """A black box test case based on :class:`unittest.TestCase`
