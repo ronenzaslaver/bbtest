@@ -3,15 +3,13 @@ Examples
 
 BBTest includes a few working examples, located under the `examples`
 folder in the project's home. 
-Based on a tip from Roie, our first example is a to-do component copied from
-`ToDo.txt <http://todotxt.org/>`_ . In the example's code we show how we wrapped it
-as a black box and then use it to test the ToDo contract..
-
-Next there's the installer component which [TODO: runs an installation script or binary
-on the host, lunches the application and tests for reg value/conf file changes. ]
 
 ToDo
 ----
+Based on a tip from Roie, our first example is a to-do component copied from
+`ToDo.txt <http://todotxt.org/>`_ . In the example's code we show how we wrapped it
+as a black box and then use it to test the ToDo's interface.
+
 
 .. code-block:: bash
 
@@ -47,12 +45,9 @@ ToDo
     report
     shorthelp
 
-  Actions can be added and overridden using scripts in the actions
-  directory.
+  ...
 
-  See "help" for more details.
-
-To test this component we need to first code a class based on :class:<BBTest.BlackBox> that install,
+To test this component we need to first code a class based on :class:`bbtest.blackboxes.BlackBox` that install,
 removes and runs the script.
 
 .. autoclass:: examples.todo.tests.todo_box.ToDoBox
@@ -67,4 +62,4 @@ Using this component, we code a test suite :
 Installer
 ---------
 
-In the example will take a simple installer and test it in multiple opearating system.
+In the example will take a simple installer and test it in multiple opearating system...
