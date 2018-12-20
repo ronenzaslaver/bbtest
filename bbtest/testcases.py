@@ -34,5 +34,4 @@ class BBTestCase(unittest.TestCase):
     def tearDownClass(cls):
         if hasattr(cls, 'lab'):
             cls.lab.remove()
-
         super().tearDownClass()

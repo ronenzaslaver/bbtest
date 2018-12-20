@@ -25,7 +25,7 @@ class ToDoBox(BlackBox):
                                'src')
         dest_dir = self.home
 
-        for asset in [ 'todo.sh', 'todo.cfg']:
+        for asset in ['todo.sh', 'todo.cfg']:
             self.host.put(os.path.join(src_dir, asset),
                           remote=self.host.join(dest_dir, asset))
 
@@ -58,7 +58,11 @@ class ToDoBox(BlackBox):
             todos.append(line[2:])
         return todos
 
+    def remove(self):
+        """Remove our home directory"""
+        return self.host.rmtree(self.home)
+
     def clean(self):
         """Clean's job is to wipe all data. In todo's case, it's just a file"""
-        return self.host.run('rm', self.host.join(self.home, 'todo.txt'))
+        return self.host.rmfile(self.host.join(self.home, 'todo.txt'))
 

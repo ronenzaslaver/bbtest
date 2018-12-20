@@ -1,11 +1,8 @@
-import os
+
 from .exceptions import ImproperlyConfigured
 
 
 class Lab():
-
-    boxes = {}
-    hosts = {}
 
     def __init__(self, lab, address_book={}):
         """
@@ -14,6 +11,8 @@ class Lab():
         :param address_book: a dictionary where each hostname has
                              a dictionary with ip, username & password
         """
+        self.boxes = {}
+        self.hosts = {}
         for host_name, params in lab.items():
             if 'class' not in params:
                 raise ImproperlyConfigured("A lab's host must have a `class` key")
@@ -42,7 +41,7 @@ class Lab():
 
     def remove(self):
         for box in self.flatten_boxes():
-            box.host.rmtree(box.home)
+            box.remove()
 
         for host in self.hosts.values():
             host.remove()

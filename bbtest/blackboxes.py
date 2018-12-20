@@ -21,3 +21,7 @@ class BlackBox():
     def mkdtemp(self, **kwagrs):
         """Create a temp directory"""
         return self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
+
+    def remove(self):
+        """Removing the black box from `self.host`"""
+        pass
