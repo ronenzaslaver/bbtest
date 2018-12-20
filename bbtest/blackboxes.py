@@ -22,6 +22,6 @@ class BlackBox():
         """Create a temp directory"""
         return self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
 
-    def remove(self):
+    def uninstall(self):
         """Removing the black box from `self.host`"""
         pass

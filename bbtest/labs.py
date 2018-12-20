@@ -39,12 +39,12 @@ class Lab():
             for box in boxes:
                 yield box
 
-    def remove(self):
+    def uninstall(self):
         for box in self.flatten_boxes():
-            box.remove()
+            box.uninstall()
 
         for host in self.hosts.values():
-            host.remove()
+            host.uninstall()
 
     def clean(self):
         """Restore the lab back to its original condition """

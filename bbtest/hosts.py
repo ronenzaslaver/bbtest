@@ -19,8 +19,8 @@ class BaseHost(object):
     def install(self, downloads_dir, **kwargs):
         pass
 
-    def remove(self):
-        """ the opposite of install, completly remove the host """
+    def uninstall(self):
+        """ the opposite of install,  uninstall our tools from the host """
         pass
 
     def clean(self):
