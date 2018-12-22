@@ -1,5 +1,5 @@
 
-from bbtest import BBTestCase, LocalHost, BlackBox
+from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost
 
 
 class EmptyBox(BlackBox):
@@ -12,7 +12,20 @@ class YetAnotherEmptyBox(BlackBox):
 
 class TestNoLab(BBTestCase):
 
-    def test_hello_world(self):
+    def test_no_lab(self):
+        pass
+
+
+class TestBaseHost(BBTestCase):
+
+    LAB = {
+        'host1': {
+            'class': BaseHost,
+            'boxes': []
+         },
+    }
+
+    def test_base_host(self):
         pass
 
 

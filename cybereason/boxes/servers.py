@@ -16,3 +16,7 @@ class TransparencyBox(CRServerBox):
 
 class RegistryBox(CRServerBox):
     pass
+
+
+class PersonalizeBox(CRServerBox):
+    pass
