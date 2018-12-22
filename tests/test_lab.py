@@ -6,6 +6,10 @@ class EmptyBox(BlackBox):
     NAME = 'empty'
 
 
+class YetAnotherEmptyBox(BlackBox):
+    NAME = 'yetanotherempty'
+
+
 class TestNoLab(BBTestCase):
 
     def test_hello_world(self):
@@ -21,7 +25,7 @@ class TestNoBox(BBTestCase):
          },
     }
 
-    def test_hello_world(self):
+    def test_no_box(self):
         pass
 
 
@@ -34,19 +38,24 @@ class TestSingleBox(BBTestCase):
          },
     }
 
-    def test_hello_world(self):
-        pass
+    def test_single_box(self):
+        assert len(self.lab.boxes[EmptyBox.NAME]) == 1
+        assert self.lab.boxes[EmptyBox.NAME][0].host.ip == 'localhost'
 
 
 class MultiBox(BBTestCase):
-    """ Do we allow/need Host without Box? """
 
     LAB = {
         'host1': {
             'class': LocalHost,
             'boxes': [EmptyBox, EmptyBox]
          },
+        'host2': {
+            'class': LocalHost,
+            'boxes': [YetAnotherEmptyBox, YetAnotherEmptyBox]
+         },
     }
 
-    def test_hello_world(self):
-        pass
+    def test_multi_boxes(self):
+        assert len(self.lab.boxes[EmptyBox.NAME]) == 2
+        assert len(self.lab.boxes[YetAnotherEmptyBox.NAME]) == 2

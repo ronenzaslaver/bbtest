@@ -65,4 +65,3 @@ class ToDoBox(BlackBox):
     def clean(self):
         """Clean's job is to wipe all data. In todo's case, it's just a file"""
         return self.host.rmfile(self.host.join(self.home, 'todo.txt'))
-
