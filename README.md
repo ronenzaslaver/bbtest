@@ -15,7 +15,7 @@ After forking and cloning this repo, open a shell in this folder:
 
 ```bash
 $ pipenv shell
-$ pytest examples
+$ pytest
 ```
 
 The examples contain tutorials and how-tos demoing parts of bbtest. You are 

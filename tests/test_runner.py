@@ -5,6 +5,9 @@ from bbtest import BBTestCase, LocalHost, BlackBox
 class EmptyBox(BlackBox):
     NAME = 'empty'
 
+    def clean(self):
+        pass
+
 
 class TestNoLab(BBTestCase):
 
