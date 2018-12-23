@@ -12,7 +12,7 @@ class BlackBox():
 
     def __init__(self, host, name=None):
         self.host = host
-        self.name = name if name else self.__class__.__name__[:-3].lower()
+        self.name = name
 
     def install(self):
         """Installing the black box on `self.host`"""

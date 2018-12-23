@@ -1,0 +1,49 @@
+2018-12-23 13:58:04,174 [INFO] root: perspective.ip = 3.86.19.247
+2018-12-23 15:18:02,736 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 15:19:43,383 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 15:20:02,656 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 15:20:16,294 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 15:20:16,294 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 15:54:34,312 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 15:54:34,312 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 16:20:42,200 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 16:20:42,200 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 16:27:54,852 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 16:27:54,852 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 16:27:54,852 [INFO] root: config sensor policy
+2018-12-23 16:30:34,289 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 16:30:34,289 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 16:30:57,809 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 16:30:57,809 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 16:30:57,809 [INFO] root: config sensor policy
+2018-12-23 17:28:05,912 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 17:28:05,912 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 17:28:05,912 [INFO] root: config sensor policy
+2018-12-23 17:28:05,912 [INFO] root: download personalizer and installer version version from <class 'cybereason.boxes.servers.DownloadBox'>
+2018-12-23 17:29:28,536 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 17:29:28,536 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 17:29:28,536 [INFO] root: config sensor policy
+2018-12-23 17:29:28,536 [INFO] root: download personalizer and installer version version from <class 'cybereason.boxes.servers.DownloadBox'>
+2018-12-23 17:41:25,529 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 17:41:25,529 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 17:41:25,529 [INFO] root: config sensor policy
+2018-12-23 17:41:25,529 [INFO] root: download personalizer and installer version version from <class 'cybereason.boxes.servers.DownloadBox'>
+2018-12-23 17:41:25,529 [INFO] root: personalize
+2018-12-23 17:43:03,358 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 17:43:03,358 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 17:43:03,358 [INFO] root: config sensor policy
+2018-12-23 17:43:03,358 [INFO] root: download personalizer and installer version version from <class 'cybereason.boxes.servers.DownloadBox'>
+2018-12-23 17:43:03,358 [INFO] root: personalize
+2018-12-23 17:43:03,358 [INFO] root: install sensor on endpoint
+2018-12-23 17:54:13,088 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 17:54:13,088 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 17:54:13,088 [INFO] root: config sensor policy
+2018-12-23 17:54:13,088 [INFO] root: download personalizer and installer version version from <class 'cybereason.boxes.servers.DownloadBox'>
+2018-12-23 17:54:13,088 [INFO] root: personalize
+2018-12-23 17:55:09,848 [INFO] root: perspective_host.ip = 3.86.19.247
+2018-12-23 17:55:09,848 [INFO] root: perspective.host.ip = 3.86.19.247
+2018-12-23 17:55:09,848 [INFO] root: config sensor policy
+2018-12-23 17:55:09,848 [INFO] root: download personalizer and installer version version from <class 'cybereason.boxes.servers.DownloadBox'>
+2018-12-23 17:55:09,848 [INFO] root: personalize
+2018-12-23 17:55:09,848 [INFO] root: download from personalization server <cybereason.boxes.servers.PersonalizationBox object at 0x0000013FBB2B8A58>
+2018-12-23 17:55:09,848 [INFO] root: install sensor on endpoint
