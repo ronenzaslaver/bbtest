@@ -51,6 +51,9 @@ class ServerSpyBox(BlackBox):
 
     NAME = 'serverspy'
 
+    # TODO: we need to be smarter than this and log the POSTed data
+    log = ['Hello Sara!']
+
     def install(self):
         self.url = "http://example.com"
 
