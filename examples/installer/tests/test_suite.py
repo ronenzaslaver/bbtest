@@ -22,24 +22,24 @@ class InstallerTest(bbtest.BBTestCase):
          },
         'server': {
             'class': bbtest.LocalHost,
-            'boxes': [bbtest.ServerSpyBox],
+            'boxes': [bbtest.SpyServerBox],
          },
     }
 
+    FILENAME = 'installer.sh'
+
     def test_install(self):
-        src_dir = os.path.dirname(os.path.dirname(__file__))
-        home_box = self.lab.boxes[bbtest.HomeBox.NAME][0]
-        host = home_box.host
-        installer_path = host.join(home_box.path, 'installer.bash')
+        server_box  = self.lab.boxes[bbtest.SpyServerBox.NAME][0]
+        home_box    = self.lab.boxes[bbtest.HomeBox.NAME][0]
+        host        = home_box.host
+        dest_path   = host.join(home_box.path, self.FILENAME)
+        src_path    = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                    self.FILENAME)
+        host.put(src_path, dest_path)
 
-        server_box = self.lab.boxes[bbtest.ServerSpyBox.NAME][0]
-        registration_url = server_box.url
+        home_box.run('chmod', '777', dest_path)
+        home_box.run(dest_path, server_box.url)
 
-        # Next lines were copied from the ToDoBox sample code
-        host.put(os.path.join(src_dir, 'installer.sh'), installer_path)
-
-        home_box.run('chmod', '777', installer_path)
-        home_box.run(installer_path, registration_url)
         exec_path = host.join(home_box.path, 'bbtest.installer.example.sh')
         self.assertTrue(host.isfile(exec_path))
         home_box.run(exec_path)

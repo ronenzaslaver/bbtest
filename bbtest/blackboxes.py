@@ -28,7 +28,7 @@ class BlackBox():
 
 
 class HomeBox(BlackBox):
-    """A black box with a home folder """
+    """A black box with a home folder"""
 
     NAME = 'home'
 
@@ -36,22 +36,29 @@ class HomeBox(BlackBox):
         self.host.run(*args, cwd=self.path, **kwargs)
 
     def install(self):
+        """Create a temp dir and store it in `self.path`"""
         self.path = self.mkdtemp()
 
     def clean(self):
+        """Remove all files from home"""
         if self.host and self.path:
             self.host.rm(self.path+'/*', recursive=True)
 
     def remove(self):
-        """Clean's job is to wipe all data. In todo's case, it's just a file"""
+        """Remove the home path"""
         return self.host.rmtree(self.path)
 
 
-class ServerSpyBox(BlackBox):
+class SpyServerBox(BlackBox):
+    """A box that exposes a `url` and a `log` so that any messages POSTed to
+    url is appended to the log.
+
+    .. important:: It still doesn't work and the log never changes
+    """
 
     NAME = 'serverspy'
 
-    # TODO: we need to be smarter than this and log the POSTed data
+    # TODO:
     log = ['Hello Sara!']
 
     def install(self):

@@ -59,6 +59,48 @@
 <div class="viewcode-block" id="BlackBox.uninstall"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.BlackBox.uninstall">[docs]</a>    <span class="k">def</span> <span class="nf">uninstall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Removing the black box from `self.host`&quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="HomeBox"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.HomeBox">[docs]</a><span class="k">class</span> <span class="nc">HomeBox</span><span class="p">(</span><span class="n">BlackBox</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A black box with a home folder&quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;home&#39;</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HomeBox.install"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.HomeBox.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a temp dir and store it in `self.path`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HomeBox.clean"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.HomeBox.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove all files from home&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">+</span><span class="s1">&#39;/*&#39;</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HomeBox.remove"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.HomeBox.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the home path&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SpyServerBox"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.SpyServerBox">[docs]</a><span class="k">class</span> <span class="nc">SpyServerBox</span><span class="p">(</span><span class="n">BlackBox</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A box that exposes a `url` and a `log` so that any messages POSTed to</span>
+<span class="sd">    url is appended to the log.</span>
+
+<span class="sd">    .. important:: It still doesn&#39;t work and the log never changes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;serverspy&#39;</span>
+
+    <span class="c1"># TODO:</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Hello Sara!&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SpyServerBox.install"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.SpyServerBox.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://example.com&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
 </pre></div>
 
           </div>
@@ -77,10 +119,9 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
 </ul>
 
