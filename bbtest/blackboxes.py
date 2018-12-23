@@ -25,3 +25,35 @@ class BlackBox():
     def uninstall(self):
         """Removing the black box from `self.host`"""
         pass
+
+
+class HomeBox(BlackBox):
+    """A black box with a home folder """
+
+    NAME = 'home'
+
+    def run(self, *args, **kwargs):
+        self.host.run(*args, cwd=self.path, **kwargs)
+
+    def install(self):
+        self.path = self.mkdtemp()
+
+    def clean(self):
+        if self.host and self.path:
+            self.host.rm(self.path+'/*', recursive=True)
+
+    def remove(self):
+        """Clean's job is to wipe all data. In todo's case, it's just a file"""
+        return self.host.rmtree(self.path)
+
+
+class ServerSpyBox(BlackBox):
+
+    NAME = 'serverspy'
+
+    def install(self):
+        self.url = "http://example.com"
+
+    def clean(self):
+        pass
+

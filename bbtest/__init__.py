@@ -1,6 +1,8 @@
 from .labs import Lab
-from .blackboxes import BlackBox
-from .hosts import LocalHost
+from .blackboxes import *
+from .hosts import *
 from .testcases import BBTestCase
 
-__all__ = ['BBTestCase', 'BlackBox', 'Lab', 'LocalHost']
+__all__ = ['BBTestCase', 'Lab',
+           'Host', 'WindowsHost', 'LinuxHost', 'OSXHost', 'LocalHost',
+           'BlackBox', 'HomeBox', 'ServerSpyBox']

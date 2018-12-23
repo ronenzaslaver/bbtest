@@ -10,34 +10,38 @@ import bbtest
 
 
 class InstallerTest(bbtest.BBTestCase):
+    """This test case test a simple installer.
 
+    Our sample installer gets one parameter - the server address - and
+    installs a scripts that posts the message "Hello Sara" to the server.
+    """
     LAB = {
         'client': {
-            'class': bbtest.OSXHost,
+            'class': bbtest.LocalHost,
             'boxes': [bbtest.HomeBox],
          },
         'server': {
-            'class': bbtest.LinuxHost,
+            'class': bbtest.LocalHost,
             'boxes': [bbtest.ServerSpyBox],
          },
     }
 
     def test_install(self):
-        src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                               'src')
+        src_dir = os.path.dirname(os.path.dirname(__file__))
         home_box = self.lab.boxes[bbtest.HomeBox.NAME][0]
         host = home_box.host
-        installer_path = host.join(home_box.path, 'installer.sh')
+        installer_path = host.join(home_box.path, 'installer.bash')
 
         server_box = self.lab.boxes[bbtest.ServerSpyBox.NAME][0]
         registration_url = server_box.url
 
         # Next lines were copied from the ToDoBox sample code
-        home_box.put(os.path.join(src_dir, 'installer.sh'), installer_path)
+        host.put(os.path.join(src_dir, 'installer.sh'), installer_path)
 
-        host.run('chmod', '777', installer_path)
-        host.run(installer_path, {'server_url': registration_url})
-        self.assertTrue(host.path.isfile('/tmp/bbtest.installer.example.sh'))
-        host.run('/tmp/bbtest.installer.example.sh')
+        home_box.run('chmod', '777', installer_path)
+        home_box.run(installer_path, registration_url)
+        exec_path = host.join(home_box.path, 'bbtest.installer.example.sh')
+        self.assertTrue(host.isfile(exec_path))
+        home_box.run(exec_path)
         self.assertEqual(server_box.log,
-                         ["Hello Sara"])
+                         ["Hello Sara!"])
