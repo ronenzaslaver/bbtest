@@ -13,6 +13,8 @@ The Black Box
 
 .. automodule:: bbtest.blackboxes
     :members:
+    :undoc-members:
+    :show-inheritance:
 
 The Lab
 -------

@@ -20,5 +20,9 @@ POSTed messages so we can assert a message was recieved.
 
 .. literalinclude:: /../examples/installer/tests/test_suite.py
 
+The Installer
+-------------
+It is just a simple shell script:
+
 .. literalinclude:: /../examples/installer/installer.sh
 

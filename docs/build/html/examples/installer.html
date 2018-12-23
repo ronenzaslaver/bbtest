@@ -100,11 +100,15 @@ POSTed messages so we can assert a message was recieved.</p>
                          <span class="p">[</span><span class="s2">&quot;Hello Sara!&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
+<div class="section" id="the-installer">
+<h2>The Installer<a class="headerlink" href="#the-installer" title="Permalink to this headline">¶</a></h2>
+<p>It is just a simple shell script:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
 <span class="n">echo</span> <span class="s1">&#39;#!/bin/sh&#39;</span> <span class="o">&gt;</span> <span class="o">./</span><span class="n">bbtest</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">sh</span> 
 <span class="n">echo</span> <span class="s2">&quot;curl --data &#39;Hello Sara!&#39; $1&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">./</span><span class="n">bbtest</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">sh</span> 
 <span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="o">./</span><span class="n">bbtest</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
+</div>
 </div>
 </div>
 

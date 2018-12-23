@@ -58,8 +58,8 @@ class SpyServerBox(BlackBox):
 
     NAME = 'serverspy'
 
-    # TODO:
     log = ['Hello Sara!']
+    """log is an array of log messages where Each POSTed message is appended"""
 
     def install(self):
         self.url = "http://example.com"

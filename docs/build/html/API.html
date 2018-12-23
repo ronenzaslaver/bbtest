@@ -74,7 +74,8 @@ Each test case can define a <cite>LAB</cite> property used to setup a lab and st
 <dl class="class">
 <dt id="bbtest.blackboxes.BlackBox">
 <em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">BlackBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is an abstract class used to wrap a component in a black box.
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is an abstract class used to wrap a component in a black box.
 Black boxes can then be used to test the component itself and to verify
 it integrates well with other components.
 A blackbox runs on a host and you can communicate with it using <cite>host.run</cite></p>
@@ -101,7 +102,13 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.blackboxes.HomeBox">
 <em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">HomeBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>A black box with a home folder</p>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a></p>
+<p>A black box with a home folder</p>
+<dl class="attribute">
+<dt id="bbtest.blackboxes.HomeBox.NAME">
+<code class="descname">NAME</code><em class="property"> = 'home'</em><a class="headerlink" href="#bbtest.blackboxes.HomeBox.NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="bbtest.blackboxes.HomeBox.clean">
 <code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.clean" title="Permalink to this definition">¶</a></dt>
@@ -120,21 +127,43 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dd><p>Remove the home path</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="bbtest.blackboxes.SpyServerBox">
 <em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">SpyServerBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>A box that exposes a <cite>url</cite> and a <cite>log</cite> so that any messages POSTed to
+<dd><p>Bases: <a class="reference internal" href="#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a></p>
+<p>A box that exposes a <cite>url</cite> and a <cite>log</cite> so that any messages POSTed to
 url is appended to the log.</p>
 <div class="admonition important">
 <p class="first admonition-title">Important</p>
 <p class="last">It still doesn’t work and the log never changes</p>
 </div>
+<dl class="attribute">
+<dt id="bbtest.blackboxes.SpyServerBox.NAME">
+<code class="descname">NAME</code><em class="property"> = 'serverspy'</em><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.SpyServerBox.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="bbtest.blackboxes.SpyServerBox.install">
 <code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Installing the black box on <cite>self.host</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.blackboxes.SpyServerBox.log">
+<code class="descname">log</code><em class="property"> = ['Hello Sara!']</em><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>log is an array of log messages where Each POSTed message is appended</p>
 </dd></dl>
 
 </dd></dl>

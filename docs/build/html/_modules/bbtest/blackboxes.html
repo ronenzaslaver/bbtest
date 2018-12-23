@@ -66,8 +66,8 @@
 
     <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;home&#39;</span>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<div class="viewcode-block" id="HomeBox.run"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.HomeBox.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="HomeBox.install"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.HomeBox.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a temp dir and store it in `self.path`&quot;&quot;&quot;</span>
@@ -92,14 +92,14 @@
 
     <span class="n">NAME</span> <span class="o">=</span> <span class="s1">&#39;serverspy&#39;</span>
 
-    <span class="c1"># TODO:</span>
     <span class="n">log</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Hello Sara!&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;log is an array of log messages where Each POSTed message is appended&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SpyServerBox.install"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.SpyServerBox.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;http://example.com&quot;</span></div>
 
-    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="SpyServerBox.clean"><a class="viewcode-back" href="../../API.html#bbtest.blackboxes.SpyServerBox.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
 
 </pre></div>
 
