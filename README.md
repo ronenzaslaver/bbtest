@@ -14,10 +14,14 @@ Installation
 After forking and cloning this repo, open a shell in this folder:
 
 ```bash
-
 $ pipenv shell
-$ PYTHONPATH=. pytest
+$ pipenv install -d
+$ PYTHONPATH=.
+$ pytest examples
 ```
+
+The examples contain tutorials and how-tos demoing parts of bbtest. You are 
+welcome to browse the [docs](https://daonb.github.io/bbtest/build/html/examples.html).
 
 Documentation
 -------------
@@ -26,10 +30,10 @@ We are using Sphinx to publish our documentation. To generate and serve the docu
 
 ```bash
 
+$ pipenv shell
 $ pipenv install -d
 $ cd docs
 $ make html
 $ cd _build/html
 $ python -m http.server
-
-
+```
