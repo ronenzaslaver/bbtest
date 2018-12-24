@@ -34,7 +34,7 @@ class InstallerTest(bbtest.BBTestCase):
         host        = home_box.host
         src_path    = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                     self.FILENAME)
-        home_box.run_file(src_path)
+        home_box.run_file(src_path, params=[server_box.url])
 
         exec_path = host.join(home_box.path, 'bbtest.installer.example.sh')
         self.assertTrue(host.isfile(exec_path))

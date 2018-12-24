@@ -1,12 +1,12 @@
 import logging
 import os
 
-from bbtest import BlackBox
+from bbtest import HomeBox
 
 logger = logging.getLogger('bblog')
 
 
-class ToDoBox(BlackBox):
+class ToDoBox(HomeBox):
     """A black box wrapper for todo.sh.
     Like every black box, the todo box has the `install` and `clean`
     (TODO: uninstall?) methods. On top of that we have methods to be used
@@ -20,25 +20,19 @@ class ToDoBox(BlackBox):
         First creates a temp dir on the host and then coppies the assets
         in. On Linux, we need to make sure `todo.sh` is executable.
         """
-        self.home = self.mkdtemp()
+        super().install()
         src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                'src')
-        dest_dir = self.home
-
-        for asset in ['todo.sh', 'todo.cfg']:
-            self.host.put(os.path.join(src_dir, asset),
-                          self.host.join(dest_dir, asset))
-
-        if self.host.os == 'linux':
-            self.host.run('chmod', '777', self.host.join(self.home, "todo.sh"))
+        self.put(os.path.join(src_dir, 'todo.py'), 'todo.py')
+        # need to run t once so it creates its config file
+        self.run()
 
     def run(self, *args):
         """Pass the args to a todo.sh running on the host. See `todo.sh -h`
         for more details.
         """
-        todo_sh = self.host.join(self.home, 'todo.sh')
-        logger.info(f"ToDoBox Starts: {todo_sh} {args}")
-        result = self.host.run(todo_sh, *args)
+        logger.info(f"ToDoBox Starts: {args}")
+        result = super().run('python', 'todo.py', '-d', self.path, *args)
         logger.info(f"ToDoBox returns: {result}")
         return result
 
@@ -64,5 +58,5 @@ class ToDoBox(BlackBox):
 
     def clean(self):
         """Clean's job is to wipe all data. In todo's case, it's just a file"""
-        return self.host.rmfile(self.host.join(self.home, 'todo.txt'))
+        return self.host.rmfile(self.host.join(self.path, 'todo.txt'))
 
