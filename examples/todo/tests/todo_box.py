@@ -27,7 +27,7 @@ class ToDoBox(BlackBox):
 
         for asset in ['todo.sh', 'todo.cfg']:
             self.host.put(os.path.join(src_dir, asset),
-                          remote=self.host.join(dest_dir, asset))
+                          self.host.join(dest_dir, asset))
 
         if self.host.os == 'linux':
             self.host.run('chmod', '777', self.host.join(self.home, "todo.sh"))

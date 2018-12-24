@@ -20,6 +20,10 @@ class EpMessages(CRService):
 
 
 class SensorPolicy(CRService):
+    """ Service to configure Sensor Policy on the Transparency.
+
+    Configuration can be performed via: Perspective, direct access to Transparency, TBD way of transparency Mock...
+    """
 
     def __init__(self, server):
         """

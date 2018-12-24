@@ -49,7 +49,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">host_name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">lab</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="s1">&#39;class&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s2">&quot;A lab&#39;s host must have a `class` key&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Host &#39;</span><span class="si">{host_name}</span><span class="s2">&#39; must have a `class` key&quot;</span><span class="p">)</span>
             <span class="n">host_class</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">host</span> <span class="o">=</span> <span class="n">host_class</span><span class="p">(</span><span class="o">**</span><span class="n">address_book</span><span class="p">[</span><span class="n">host_name</span><span class="p">])</span>
@@ -104,10 +104,9 @@
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
 </ul>
 

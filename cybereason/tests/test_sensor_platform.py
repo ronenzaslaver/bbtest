@@ -4,7 +4,7 @@
 from bbtest import WindowsHost, LinuxHost
 from bbtest import BBTestCase
 
-from cybereason.boxes.servers import TransparencyBox, RegistryBox, PerspectiveBox, PersonalizationBox, DownloadBox
+from cybereason.boxes.servers import TransparencyBox, RegistrationBox, PerspectiveBox, PersonalizationBox, IreleaseBox
 from cybereason.boxes.sensor import SensorBox
 from cybereason.services.abstracted import SensorPolicy
 
@@ -32,21 +32,16 @@ class InstallTest(CRTestCase):
          },
         'transparency': {
             'class': LinuxHost,
-            'boxes': [TransparencyBox, RegistryBox, PersonalizationBox],
+            'boxes': [TransparencyBox],
+         },
+        'registration': {
+            'class': LinuxHost,
+            'boxes': [RegistrationBox, PersonalizationBox],
          },
         'download': {
             'class': LinuxHost,
-            'boxes': [DownloadBox],
+            'boxes': [IreleaseBox],
         }
-    }
-
-    RLAB = {
-        'hosts': {'endpoint': {'class': WindowsHost}},
-        'boxes': [PerspectiveBox,
-                  TransparencyBox,
-                  RegistryBox,
-                  PersonalizationBox,
-                  10*[SensorBox]]
     }
 
     address_book = {
@@ -54,10 +49,23 @@ class InstallTest(CRTestCase):
             {'ip': '3.86.19.247', 'username': 'admin@cybereason.com', 'password': 'jPUoWCg8Pok='}
     }
 
+    # FFU
+
+    RLAB = {
+        'hosts': {'endpoint': {'class': WindowsHost}},
+        'boxes': [PerspectiveBox,
+                  TransparencyBox,
+                  RegistrationBox,
+                  PersonalizationBox,
+                  10*[SensorBox]]
+    }
+
     raddress_book = {
         PerspectiveBox:
             {'ip': '3.86.19.247', 'username': 'admin@cybereason.com', 'password': 'jPUoWCg8Pok='}
     }
+
+    # End FFU
 
     def test_install(self):
         perspective_host = self.lab.hosts['perspective']
@@ -75,12 +83,13 @@ class InstallTest(CRTestCase):
         sensor_policy = SensorPolicy(server=perspective)
         sensor_policy.config(None)
 
-        # CYBR-15879 - Add Porxy configuration to Porxy BB to allow Porxy configurations
+        # CYBR-15879 - Add Proxy configuration to Proxy BB to allow Proxy configurations.
 
         # CYBR-15883 - Add to Personaliztion BB the functionality to Download package from Packages Server and Personalize it
 
         personalization = self.lab.boxes[PersonalizationBox.NAME][0]
-        personalization.download(DownloadBox, 'version')
+        irelease = self.lab.boxes[IreleaseBox.NAME][0]
+        personalization.download(irelease, 'version')
         personalization.personalize()
 
         # CYBR-15886 - Add functionality to Endpoint Host to download package from the Personalization server

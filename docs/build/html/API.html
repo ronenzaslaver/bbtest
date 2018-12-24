@@ -15,7 +15,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Examples" href="examples.html" />
+    <link rel="prev" title="Test a simple Installer" href="examples/installer.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -74,7 +74,8 @@ Each test case can define a <cite>LAB</cite> property used to setup a lab and st
 <dl class="class">
 <dt id="bbtest.blackboxes.BlackBox">
 <em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">BlackBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is an abstract class used to wrap a component in a black box.
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is an abstract class used to wrap a component in a black box.
 Black boxes can then be used to test the component itself and to verify
 it integrates well with other components.
 A blackbox runs on a host and you can communicate with it using <cite>host.run</cite></p>
@@ -94,6 +95,75 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dt id="bbtest.blackboxes.BlackBox.uninstall">
 <code class="descname">uninstall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox.uninstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox.uninstall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removing the black box from <cite>self.host</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.blackboxes.HomeBox">
+<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">HomeBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a></p>
+<p>A black box with a home folder</p>
+<dl class="attribute">
+<dt id="bbtest.blackboxes.HomeBox.NAME">
+<code class="descname">NAME</code><em class="property"> = 'home'</em><a class="headerlink" href="#bbtest.blackboxes.HomeBox.NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all files from home</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.install">
+<code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a temp dir and store it in <cite>self.path</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the home path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.blackboxes.SpyServerBox">
+<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">SpyServerBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a></p>
+<p>A box that exposes a <cite>url</cite> and a <cite>log</cite> so that any messages POSTed to
+url is appended to the log.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last">It still doesn’t work and the log never changes</p>
+</div>
+<dl class="attribute">
+<dt id="bbtest.blackboxes.SpyServerBox.NAME">
+<code class="descname">NAME</code><em class="property"> = 'serverspy'</em><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.SpyServerBox.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.SpyServerBox.install">
+<code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Installing the black box on <cite>self.host</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.blackboxes.SpyServerBox.log">
+<code class="descname">log</code><em class="property"> = ['Hello Sara!']</em><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>log is an array of log messages where Each POSTed message is appended</p>
 </dd></dl>
 
 </dd></dl>
@@ -143,6 +213,11 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="bbtest.hosts.BaseHost.isfile">
+<code class="descname">isfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.isfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.isfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="bbtest.hosts.BaseHost.join">
 <code class="descname">join</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.join" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -152,6 +227,11 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
 <dd><p>same args as tempfile.mkdtemp</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.rm">
+<code class="descname">rm</code><span class="sig-paren">(</span><em>path</em>, <em>recursive=False</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.rm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.rm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="bbtest.hosts.BaseHost.rmfile">
@@ -187,6 +267,11 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
 <dl class="method">
+<dt id="bbtest.hosts.LocalHost.isfile">
+<code class="descname">isfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.isfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.isfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="bbtest.hosts.LocalHost.mkdtemp">
 <code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
 <dd><p>same args as tempfile.mkdtemp</p>
@@ -203,6 +288,11 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="bbtest.hosts.LocalHost.rm">
+<code class="descname">rm</code><span class="sig-paren">(</span><em>path</em>, <em>recursive=False</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.rm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.rm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="bbtest.hosts.LocalHost.rmfile">
 <code class="descname">rmfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.rmfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.rmfile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -214,14 +304,14 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 
 <dl class="method">
 <dt id="bbtest.hosts.LocalHost.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>cmd</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><em>cmd</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="bbtest.hosts.MacHost">
-<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">MacHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#MacHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.MacHost" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.OSXHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">OSXHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#OSXHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.OSXHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
 </dd></dl>
 
@@ -256,10 +346,9 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 
 
 <h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-bbtest.testcases">The Test Case</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-bbtest.blackboxes">The Black Box</a></li>
@@ -273,7 +362,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="examples.html" title="previous chapter">Examples</a></li>
+      <li>Previous: <a href="examples/installer.html" title="previous chapter">Test a simple Installer</a></li>
   </ul></li>
 </ul>
 </div>

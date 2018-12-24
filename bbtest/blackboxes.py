@@ -12,7 +12,7 @@ class BlackBox():
 
     def __init__(self, host, name=None):
         self.host = host
-        self.name = name
+        self.name = name if name else self.__class__.__name__[:-3].lower()
 
     def install(self):
         """Installing the black box on `self.host`"""
@@ -20,12 +20,53 @@ class BlackBox():
 
     def mkdtemp(self, **kwagrs):
         """Create a temp directory"""
-        return self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_", **kwagrs)
+        return self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
 
     def uninstall(self):
         """Removing the black box from `self.host`"""
         pass
 
     def clean(self):
-        """Cleaning box data. """
         pass
+
+
+class HomeBox(BlackBox):
+    """A black box with a home folder"""
+
+    NAME = 'home'
+
+    def run(self, *args, **kwargs):
+        self.host.run(*args, cwd=self.path, **kwargs)
+
+    def install(self):
+        """Create a temp dir and store it in `self.path`"""
+        self.path = self.mkdtemp()
+
+    def clean(self):
+        """Remove all files from home"""
+        if self.host and self.path:
+            self.host.rm(self.path+'/*', recursive=True)
+
+    def remove(self):
+        """Remove the home path"""
+        return self.host.rmtree(self.path)
+
+
+class SpyServerBox(BlackBox):
+    """A box that exposes a `url` and a `log` so that any messages POSTed to
+    url is appended to the log.
+
+    .. important:: It still doesn't work and the log never changes
+    """
+
+    NAME = 'serverspy'
+
+    log = ['Hello Sara!']
+    """log is an array of log messages where Each POSTed message is appended"""
+
+    def install(self):
+        self.url = "http://example.com"
+
+    def clean(self):
+        pass
+

@@ -4,15 +4,16 @@ This Module includes the test suite that verifies the todo component using
 a black box methodology.
 
 """
-from bbtest import BBTestCase, LocalHost
+import bbtest
+
 from . import ToDoBox
 
 
-class ToDoTest(BBTestCase):
+class ToDoTest(bbtest.BBTestCase):
 
     LAB = {
         'host1': {
-            'class': LocalHost,
+            'class': bbtest.LocalHost,
             'boxes': [ToDoBox],
          },
     }
@@ -24,11 +25,11 @@ class ToDoTest(BBTestCase):
         self.assertEqual(todos, ["Foo"])
 
 
-class DoubleToDoTest(BBTestCase):
+class DoubleToDoTest(bbtest.BBTestCase):
 
     LAB = {
         'host1': {
-            'class': LocalHost,
+            'class': bbtest.LocalHost,
             'boxes': [ToDoBox, ToDoBox],
          },
     }
