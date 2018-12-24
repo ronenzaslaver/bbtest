@@ -15,7 +15,7 @@ class Lab():
         self.hosts = {}
         for host_name, params in lab.items():
             if 'class' not in params:
-                raise ImproperlyConfigured("A lab's host must have a `class` key")
+                raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
             host_class = params['class']
             try:
                 host = host_class(**address_book[host_name])

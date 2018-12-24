@@ -25,3 +25,45 @@ class BlackBox():
     def uninstall(self):
         """Removing the black box from `self.host`"""
         pass
+
+
+class HomeBox(BlackBox):
+    """A black box with a home folder"""
+
+    NAME = 'home'
+
+    def run(self, *args, **kwargs):
+        self.host.run(*args, cwd=self.path, **kwargs)
+
+    def install(self):
+        """Create a temp dir and store it in `self.path`"""
+        self.path = self.mkdtemp()
+
+    def clean(self):
+        """Remove all files from home"""
+        if self.host and self.path:
+            self.host.rm(self.path+'/*', recursive=True)
+
+    def remove(self):
+        """Remove the home path"""
+        return self.host.rmtree(self.path)
+
+
+class SpyServerBox(BlackBox):
+    """A box that exposes a `url` and a `log` so that any messages POSTed to
+    url is appended to the log.
+
+    .. important:: It still doesn't work and the log never changes
+    """
+
+    NAME = 'serverspy'
+
+    log = ['Hello Sara!']
+    """log is an array of log messages where Each POSTed message is appended"""
+
+    def install(self):
+        self.url = "http://example.com"
+
+    def clean(self):
+        pass
+

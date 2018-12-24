@@ -33,6 +33,13 @@ class BaseHost(object):
         """ same args as tempfile.mkdtemp """
         pass
 
+    def rm(self, path, recursive=False, force=False):
+        pass
+
+    def isfile(self, path):
+        pass
+
+    # TODO: remove the next methods as they are too specific
     def rmtree(self, path, ignore_errors=True, onerror=None):
         pass
 
@@ -46,9 +53,10 @@ class LocalHost(BaseHost):
     def os(self):
         return sys.platform
 
-    def run(self, cmd, *args):
+    def run(self, cmd, *args, **kwargs):
         args_list = list(args) if args else []
-        output = subprocess.run([cmd] + args_list, stdout=subprocess.PIPE)
+        output = subprocess.run(
+            [cmd] + args_list, stdout=subprocess.PIPE, **kwargs)
         return output.stdout.decode('utf-8').strip().split('\n')
 
     def put(self, local, remote):
@@ -56,6 +64,15 @@ class LocalHost(BaseHost):
 
     def mkdtemp(self, **kwargs):
         return tempfile.mkdtemp(**kwargs)
+
+    def rm(self, path, recursive=False, force=False):
+        options = list()
+        if recursive:
+            options.append('-r')
+        if force:
+            options.append('-f')
+        options.append(path)
+        return self.run('rm', *options)
 
     def rmtree(self, path, ignore_errors=True, onerror=None):
         return shutil.rmtree(path, ignore_errors, onerror)
@@ -65,6 +82,9 @@ class LocalHost(BaseHost):
             os.remove(path)
         except OSError:
             pass
+
+    def isfile(self, path):
+        return os.path.isfile(path)
 
 
 class WindowsHost(BaseHost):
@@ -81,5 +101,5 @@ class LinuxHost(BaseHost):
         return 'linux'
 
 
-class MacHost(BaseHost):
+class OSXHost(BaseHost):
     pass

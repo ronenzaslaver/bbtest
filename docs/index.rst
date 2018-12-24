@@ -1,7 +1,7 @@
 BBTest - black box testing
 ==========================
 
-BBTest s a python based automation framework for black box testing. Tests are
+BBTest is a python based automation framework for black box testing. Tests are
 executed in a virtual lab, supporting multiple Hosts & OSs and well as
 a flexible network.
 
@@ -13,11 +13,10 @@ pytest).
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
    :glob:
 
    installation
-   examples
+   Examples <examples/index>
    API
 
 

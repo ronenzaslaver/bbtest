@@ -1,11 +1,5 @@
-Examples
-========
-
-BBTest includes a few working examples, located under the `examples`
-folder in the project's home. 
-
 ToDo
-----
+====
 Based on a tip from Roie, our first example is a to-do component copied from
 `ToDo.txt <http://todotxt.org/>`_ . In the example's code we show how we wrapped it
 as a black box and then use it to test the ToDo's interface.
@@ -58,8 +52,3 @@ removes and runs the script.
 Using this component, we code a test suite :
  
 .. literalinclude:: /../examples/todo/tests/test_suite.py
-
-Installer
----------
-
-In the example will take a simple installer and test it in multiple opearating system...
