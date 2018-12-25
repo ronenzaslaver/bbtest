@@ -35,12 +35,12 @@
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">bbtest</span> <span class="k">import</span> <span class="n">BlackBox</span>
+<span class="kn">from</span> <span class="nn">bbtest</span> <span class="k">import</span> <span class="n">HomeBox</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;bblog&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ToDoBox"><a class="viewcode-back" href="../../../../examples/todo.html#examples.todo.tests.todo_box.ToDoBox">[docs]</a><span class="k">class</span> <span class="nc">ToDoBox</span><span class="p">(</span><span class="n">BlackBox</span><span class="p">):</span>
+<div class="viewcode-block" id="ToDoBox"><a class="viewcode-back" href="../../../../examples/todo.html#examples.todo.tests.todo_box.ToDoBox">[docs]</a><span class="k">class</span> <span class="nc">ToDoBox</span><span class="p">(</span><span class="n">HomeBox</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A black box wrapper for todo.sh.</span>
 <span class="sd">    Like every black box, the todo box has the `install` and `clean`</span>
 <span class="sd">    (TODO: uninstall?) methods. On top of that we have methods to be used</span>
@@ -54,25 +54,19 @@
 <span class="sd">        First creates a temp dir on the host and then coppies the assets</span>
 <span class="sd">        in. On Linux, we need to make sure `todo.sh` is executable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
         <span class="n">src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
                                <span class="s1">&#39;src&#39;</span><span class="p">)</span>
-        <span class="n">dest_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">home</span>
-
-        <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;todo.sh&#39;</span><span class="p">,</span> <span class="s1">&#39;todo.cfg&#39;</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="n">asset</span><span class="p">),</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">,</span> <span class="n">asset</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">os</span> <span class="o">==</span> <span class="s1">&#39;linux&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;chmod&#39;</span><span class="p">,</span> <span class="s1">&#39;777&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">,</span> <span class="s2">&quot;todo.sh&quot;</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">),</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">)</span>
+        <span class="c1"># need to run t once so it creates its config file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ToDoBox.run"><a class="viewcode-back" href="../../../../examples/todo.html#examples.todo.tests.todo_box.ToDoBox.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Pass the args to a todo.sh running on the host. See `todo.sh -h`</span>
 <span class="sd">        for more details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">todo_sh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">,</span> <span class="s1">&#39;todo.sh&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;ToDoBox Starts: </span><span class="si">{todo_sh}</span><span class="s2"> </span><span class="si">{args}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">todo_sh</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;ToDoBox Starts: </span><span class="si">{args}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;ToDoBox returns: </span><span class="si">{result}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
@@ -98,7 +92,7 @@
 
 <div class="viewcode-block" id="ToDoBox.clean"><a class="viewcode-back" href="../../../../examples/todo.html#examples.todo.tests.todo_box.ToDoBox.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Clean&#39;s job is to wipe all data. In todo&#39;s case, it&#39;s just a file&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">rmfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">,</span> <span class="s1">&#39;todo.txt&#39;</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">rmfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;todo.txt&#39;</span><span class="p">))</span></div></div>
 
 </pre></div>
 
