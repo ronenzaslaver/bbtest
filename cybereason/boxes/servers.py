@@ -1,7 +1,7 @@
 
 from cybereason.services.ecosystem import logger
 
-from cybereason.boxes.boxes import CRBox
+from . import CRBox
 
 
 class CRServerBox(CRBox):
