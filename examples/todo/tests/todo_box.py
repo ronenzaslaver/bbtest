@@ -17,14 +17,14 @@ class ToDoBox(HomeBox):
 
     def install(self):
         """ installing todo.txt
-        First creates a temp dir on the host and then coppies the assets
+        First creates a temp dir on the host and then copies the assets
         in. On Linux, we need to make sure `todo.sh` is executable.
         """
         super().install()
         src_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                'src')
-        self.put(os.path.join(src_dir, 'todo.py'), 'todo.py')
-        # need to run t once so it creates its config file
+        self.todopy = self.put(os.path.join(src_dir, 'todo.py'), 'todo.py')
+        # need to run once so it creates its config file
         self.run()
 
     def run(self, *args):
@@ -32,7 +32,7 @@ class ToDoBox(HomeBox):
         for more details.
         """
         logger.info(f"ToDoBox Starts: {args}")
-        result = super().run('python', 'todo.py', '-d', self.path, *args)
+        result = super().run('python', self.todopy, '-d', self.path, *args)
         logger.info(f"ToDoBox returns: {result}")
         return result
 
@@ -59,4 +59,3 @@ class ToDoBox(HomeBox):
     def clean(self):
         """Clean's job is to wipe all data. In todo's case, it's just a file"""
         return self.host.rmfile(self.host.join(self.path, 'todo.txt'))
-

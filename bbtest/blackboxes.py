@@ -49,7 +49,7 @@ class HomeBox(BlackBox):
             self.host.rm(self.path+'/*', recursive=True)
 
     def put(self, src, dest, *args, **kwargs):
-        """Put a file in thost's home directory """
+        """Put a file in the host's home directory """
         return self.host.put(
             src, self.host.join(self.path, dest), *args, **kwargs)
 

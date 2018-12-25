@@ -1,7 +1,7 @@
 
 from bbtest.blackboxes import BlackBox
 
-__all__ = ["CRBox"]
+__all__ = ['CRBox']
 
 
 class CRBox(BlackBox):
@@ -10,4 +10,4 @@ class CRBox(BlackBox):
 
     def __init__(self, host, name=None):
         self.__class__.NAME = self.__class__.__name__[:-3].lower()
-        super().__init__(host, name=None)
+        super().__init__(host, name=name)
