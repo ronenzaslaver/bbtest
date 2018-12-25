@@ -50,6 +50,9 @@ class BaseHost(object):
 
 class LocalHost(BaseHost):
 
+    def __init__(self):
+        super().__init__('localhost')
+
     @property
     def os(self):
         return sys.platform
@@ -58,7 +61,7 @@ class LocalHost(BaseHost):
         args_list = list(args) if args else []
         output = subprocess.run(
             [cmd] + args_list, stdout=subprocess.PIPE, **kwargs)
-        return output.stdout.decode('utf-8').strip().split('\n')
+        return output.stdout.decode('utf-8').strip().split('\n') if output.stdout else []
 
     def put(self, local, remote):
         return shutil.copyfile(local, remote)

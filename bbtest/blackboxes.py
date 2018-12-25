@@ -27,6 +27,9 @@ class BlackBox():
         """Removing the black box from `self.host`"""
         pass
 
+    def clean(self):
+        pass
+
 
 class HomeBox(BlackBox):
     """A black box with a home folder"""

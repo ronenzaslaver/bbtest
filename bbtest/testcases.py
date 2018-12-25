@@ -21,7 +21,6 @@ class BBTestCase(unittest.TestCase):
             for box in self.lab.flatten_boxes():
                 box.clean()
 
-
     @classmethod
     def setUpClass(cls):
         """Setups a lab for black box testing. """
