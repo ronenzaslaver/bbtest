@@ -15,7 +15,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="An Installer" href="installer.html" />
+    <link rel="next" title="Test a simple Installer" href="installer.html" />
     <link rel="prev" title="Examples" href="index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -158,24 +158,6 @@ for more details.</p>
         <span class="n">box</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Foo&quot;</span><span class="p">)</span>
         <span class="n">todos</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">todos</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Foo&quot;</span><span class="p">])</span>
-
-
-<span class="k">class</span> <span class="nc">DoubleToDoTest</span><span class="p">(</span><span class="n">bbtest</span><span class="o">.</span><span class="n">BBTestCase</span><span class="p">):</span>
-
-    <span class="n">LAB</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;host1&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="p">,</span>
-            <span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">ToDoBox</span><span class="p">,</span> <span class="n">ToDoBox</span><span class="p">],</span>
-         <span class="p">},</span>
-    <span class="p">}</span>
-
-    <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">todo_box1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">ToDoBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">todo_box2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">ToDoBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">todo_box1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Foo&quot;</span><span class="p">)</span>
-        <span class="n">todos</span> <span class="o">=</span> <span class="n">todo_box1</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">todos</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Foo&quot;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">todo_box2</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -213,7 +195,7 @@ for more details.</p>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="index.html">Examples</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Examples</a></li>
-      <li>Next: <a href="installer.html" title="next chapter">An Installer</a></li>
+      <li>Next: <a href="installer.html" title="next chapter">Test a simple Installer</a></li>
   </ul></li>
   </ul></li>
 </ul>

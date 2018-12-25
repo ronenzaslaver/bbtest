@@ -1,6 +1,7 @@
 """
 To take part in a test a component needs to be wrapped in a BlackBox.
 """
+from os import path
 
 
 class BlackBox():
@@ -36,7 +37,7 @@ class HomeBox(BlackBox):
     NAME = 'home'
 
     def run(self, *args, **kwargs):
-        self.host.run(*args, cwd=self.path, **kwargs)
+        return self.host.run(*args, cwd=self.path, **kwargs)
 
     def install(self):
         """Create a temp dir and store it in `self.path`"""
@@ -47,9 +48,23 @@ class HomeBox(BlackBox):
         if self.host and self.path:
             self.host.rm(self.path+'/*', recursive=True)
 
+    def put(self, src, dest, *args, **kwargs):
+        """Put a file in thost's home directory """
+        return self.host.put(
+            src, self.host.join(self.path, dest), *args, **kwargs)
+
     def remove(self):
         """Remove the home path"""
         return self.host.rmtree(self.path)
+
+    def run_file(self, src_path, background=False, params=None):
+        """Copy the source to the box, run it, and return its output."""
+        basename = path.basename(src_path)
+        self.put(src_path, basename)
+
+        self.run('chmod', '777', basename)
+        self.run(f'./{basename}', *params)
+
 
 
 class SpyServerBox(BlackBox):

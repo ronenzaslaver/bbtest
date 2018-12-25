@@ -32,16 +32,12 @@ class InstallerTest(bbtest.BBTestCase):
         server_box  = self.lab.boxes[bbtest.SpyServerBox.NAME][0]
         home_box    = self.lab.boxes[bbtest.HomeBox.NAME][0]
         host        = home_box.host
-        dest_path   = host.join(home_box.path, self.FILENAME)
         src_path    = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                     self.FILENAME)
-        host.put(src_path, dest_path)
-
-        home_box.run('chmod', '777', dest_path)
-        home_box.run(dest_path, server_box.url)
+        home_box.run_file(src_path, params=[server_box.url])
 
         exec_path = host.join(home_box.path, 'bbtest.installer.example.sh')
         self.assertTrue(host.isfile(exec_path))
+
         home_box.run(exec_path)
-        self.assertEqual(server_box.log,
-                         ["Hello Sara!"])
+        self.assertEqual(server_box.log, ["Hello Sara!"])
