@@ -80,6 +80,11 @@ Black boxes can then be used to test the component itself and to verify
 it integrates well with other components.
 A blackbox runs on a host and you can communicate with it using <cite>host.run</cite></p>
 <dl class="method">
+<dt id="bbtest.blackboxes.BlackBox.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox.clean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="bbtest.blackboxes.BlackBox.install">
 <code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox.install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Installing the black box on <cite>self.host</cite></p>
@@ -200,8 +205,8 @@ url is appended to the log.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbtest.labs.Lab.uninstall">
-<code class="descname">uninstall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.uninstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.uninstall" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.labs.Lab.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.tearDown" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -220,9 +225,10 @@ url is appended to the log.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.BaseHost.install">
-<code class="descname">install</code><span class="sig-paren">(</span><em>downloads_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.install" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="bbtest.hosts.BaseHost.destroy">
+<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release the host</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbtest.hosts.BaseHost.isfile">
@@ -276,7 +282,7 @@ url is appended to the log.</p>
 
 <dl class="class">
 <dt id="bbtest.hosts.LocalHost">
-<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalHost</code><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
 <dl class="method">
 <dt id="bbtest.hosts.LocalHost.isfile">
@@ -329,8 +335,14 @@ url is appended to the log.</p>
 
 <dl class="class">
 <dt id="bbtest.hosts.WindowsHost">
-<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">WindowsHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">WindowsHost</code><span class="sig-paren">(</span><em>image='Window7 SP2'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
+<dl class="method">
+<dt id="bbtest.hosts.WindowsHost.destroy">
+<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release the host</p>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="bbtest.hosts.WindowsHost.os">
 <code class="descname">os</code><a class="headerlink" href="#bbtest.hosts.WindowsHost.os" title="Permalink to this definition">¶</a></dt>

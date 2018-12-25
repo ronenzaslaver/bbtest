@@ -1,6 +1,6 @@
 ToDo
 ====
-Based on a tip from Roie, our first example is a to-do component copied from
+Based on a tip from Roy, our first example is a to-do component copied from
 `ToDo.txt <http://todotxt.org/>`_ . In the example's code we show how we wrapped it
 as a black box and then use it to test the ToDo's interface.
 
