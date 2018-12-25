@@ -1,9 +1,18 @@
 
-from bbtest import BBTestCase, LocalHost
+from bbtest import BBTestCase, LocalHost, LinuxHost
 from .mytodo_box import MyToDoBox
 
 
-class ToDoTest(BBTestCase):
+class BaseToDoTest(BBTestCase):
+
+    def _test_operations(self):
+        box = self.lab.boxes[MyToDoBox.NAME][0]
+        box.add("Foo")
+        todos = box.list()
+        self.assertEqual(todos, ['Foo'])
+
+
+class ToDoTestLocalHost(BaseToDoTest):
 
     LAB = {
         'host1': {
@@ -13,25 +22,17 @@ class ToDoTest(BBTestCase):
     }
 
     def test_operations(self):
-        box = self.lab.boxes[MyToDoBox.NAME][0]
-        box.add("Foo")
-        todos = box.list()
-        self.assertEqual(todos, ['Foo'])
+        self._test_operations()
 
 
-class DoubleToDoTest(BBTestCase):
+class ToDoTestLinuxHost(BaseToDoTest):
 
     LAB = {
         'host1': {
-            'class': LocalHost,
-            'boxes': [MyToDoBox, MyToDoBox],
+            'class': LinuxHost,
+            'boxes': [MyToDoBox],
          },
     }
 
-    def test_add(self):
-        todo_box1 = self.lab.boxes[MyToDoBox.NAME][0]
-        todo_box2 = self.lab.boxes[MyToDoBox.NAME][1]
-        todo_box1.add('Foo')
-        todos = todo_box1.list()
-        self.assertEqual(todos, ['Foo'])
-        self.assertFalse(todo_box2.list())
+    def _test_operations(self):
+        self._test_operations()

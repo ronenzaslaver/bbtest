@@ -6,6 +6,7 @@ import subprocess
 import sys
 import shutil
 import tempfile
+import glob
 
 
 class BaseHost(object):
@@ -84,6 +85,16 @@ class LocalHost(BaseHost):
     def rmfile(self, path):
         try:
             os.remove(path)
+        except OSError:
+            pass
+
+    def rmfiles(self, path):
+        try:
+            for root, dirs, files in os.walk(path):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    self.rmtree(os.path.join(root, dir))
         except OSError:
             pass
 

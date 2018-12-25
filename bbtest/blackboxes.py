@@ -46,7 +46,7 @@ class HomeBox(BlackBox):
     def clean(self):
         """Remove all files from home"""
         if self.host and self.path:
-            self.host.rm(self.path+'/*', recursive=True)
+            self.host.rmfiles(self.path)
 
     def put(self, src, dest, *args, **kwargs):
         """Put a file in the host's home directory """
