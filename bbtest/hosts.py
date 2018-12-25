@@ -16,7 +16,8 @@ class BaseHost(object):
         self.username = username
         self.password = password
 
-    def install(self, downloads_dir, **kwargs):
+    def destroy(self):
+        """Release the host"""
         pass
 
     def uninstall(self):
@@ -88,6 +89,13 @@ class LocalHost(BaseHost):
 
 
 class WindowsHost(BaseHost):
+    def __init__(self, image='Window7 SP2'):
+        """Deploy a host and store its address and credentials"""
+        pass
+
+    def destroy(self):
+        """Release the host"""
+        pass
 
     @property
     def os(self):
