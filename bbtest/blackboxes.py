@@ -66,7 +66,6 @@ class HomeBox(BlackBox):
         self.run(f'./{basename}', *params)
 
 
-
 class SpyServerBox(BlackBox):
     """A box that exposes a `url` and a `log` so that any messages POSTed to
     url is appended to the log.
@@ -84,4 +83,3 @@ class SpyServerBox(BlackBox):
 
     def clean(self):
         pass
-
