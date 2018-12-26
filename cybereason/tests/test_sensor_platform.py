@@ -1,10 +1,10 @@
 """
 """
 
-from bbtest import WindowsHost, LinuxHost
+from bbtest import WindowsHost, LinuxHost, LocalHost, Windows64Host
 from bbtest import BBTestCase
 
-from cybereason.boxes.servers import TransparencyBox, RegistrationBox, PerspectiveBox, PersonalizationBox, IreleaseBox
+from cybereason.boxes.servers import TransparencyBox, RegistrationBox, PerspectiveBox, PersonalizationBox, ArtifactoryBox
 from cybereason.boxes.sensor import SensorBox
 from cybereason.services.abstracted import SensorPolicy
 
@@ -19,7 +19,7 @@ class InstallTest(CRTestCase):
 
     LAB = {
         'endpoint': {
-            'class': WindowsHost,
+            'class': Windows64Host,
             'boxes': [],
          },
         'repository': {
@@ -36,11 +36,15 @@ class InstallTest(CRTestCase):
          },
         'registration': {
             'class': LinuxHost,
-            'boxes': [RegistrationBox, PersonalizationBox],
+            'boxes': [RegistrationBox],
          },
         'download': {
             'class': LinuxHost,
-            'boxes': [IreleaseBox],
+            'boxes': [ArtifactoryBox],
+        },
+        'local': {
+            'class': LocalHost,
+            'boxes': [PersonalizationBox],
         }
     }
 
@@ -74,6 +78,7 @@ class InstallTest(CRTestCase):
         logger.info(f'perspective.host.ip = {perspective.host.ip}')
 
         transparency = self.lab.boxes[TransparencyBox.NAME][0]
+        endpoint = self.lab.hosts['endpoint']
 
         # CYBR-15877 - Add SensorPolicy configuration to SensorPolicy BB to allow Sensor Policy configurations
 
@@ -88,13 +93,13 @@ class InstallTest(CRTestCase):
         # CYBR-15883 - Add to Personaliztion BB the functionality to Download package from Packages Server and Personalize it
 
         personalization = self.lab.boxes[PersonalizationBox.NAME][0]
-        irelease = self.lab.boxes[IreleaseBox.NAME][0]
-        personalization.download(irelease, 'version')
+        artifactory = self.lab.boxes[ArtifactoryBox.NAME][0]
+        package_downloaded = personalization.download(artifactory, 'rc-18.1.40', endpoint)
+        assert personalization.host.isfile(package_downloaded)
         personalization.personalize()
 
         # CYBR-15886 - Add functionality to Endpoint Host to download package from the Personalization server
 
-        endpoint = self.lab.hosts['endpoint']
         sensor = SensorBox(endpoint)
         sensor.download(personalization)
         sensor.install_wo_download()

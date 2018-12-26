@@ -1,10 +1,10 @@
 
-from bbtest.blackboxes import BlackBox
+from bbtest.blackboxes import HomeBox
 
 __all__ = ['CRBox']
 
 
-class CRBox(BlackBox):
+class CRBox(HomeBox):
     """Base box for all Cybereason boxes.
     """
 
