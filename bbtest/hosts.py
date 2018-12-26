@@ -11,6 +11,8 @@ import glob
 
 class BaseHost(object):
     _SEP = '/'
+    PACKAGE_TYPE = None
+    BIT = None
 
     def __init__(self, ip=None, username=None, password=None):
         self.ip = ip
@@ -103,6 +105,11 @@ class LocalHost(BaseHost):
 
 
 class WindowsHost(BaseHost):
+
+    OS = 'win'
+    BIT = None
+    PACKAGE_TYPE = 'msi'
+
     def __init__(self, image='Window7 SP2'):
         """Deploy a host and store its address and credentials"""
         pass
@@ -111,17 +118,33 @@ class WindowsHost(BaseHost):
         """Release the host"""
         pass
 
-    @property
-    def os(self):
-        return 'win32'
+
+class Windows32Host(WindowsHost):
+
+    BIT = '32'
+
+
+class Windows64Host(WindowsHost):
+
+    BIT = '64'
 
 
 class LinuxHost(BaseHost):
 
-    @property
-    def os(self):
-        return 'linux'
+    OS = 'linux'
+
+
+class CentOSHost(LinuxHost):
+
+    PACKAGE_TYPE = 'rpm'
+
+
+class DebianHost(LinuxHost):
+
+    PACKAGE_TYPE = 'deb'
 
 
 class OSXHost(BaseHost):
-    pass
+
+    OS = 'osx'
+    PACKAGE_TYPE = 'pkg'
