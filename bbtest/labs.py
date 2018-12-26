@@ -39,9 +39,14 @@ class Lab():
             for box in boxes:
                 yield box
 
-    def tearDown(self):
+    def destroy(self):
+        """Destroy lab altogether """
+        for box in self.flatten_boxes():
+            box.uninstall()
         for host in self.hosts.values():
             host.destroy()
+        self.boxes = {}
+        self.hosts = {}
 
     def clean(self):
         """Restore the lab back to its original condition """

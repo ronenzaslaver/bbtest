@@ -64,7 +64,7 @@ class PersonalizationBox(CRServerBox):
 
             # download installer package artifact
             logger.info(f'Downloading personalizer from: {package_artifact_path}')
-            package_dest_file_path = self.path + endpoint._SEP + os.path.basename(package_artifact_path)
+            package_dest_file_path = self.path + endpoint.SEP + os.path.basename(package_artifact_path)
             with package_artifact_path.open() as fd:
                 with open(package_dest_file_path, "wb") as out:
                     out.write(fd.read())
@@ -77,7 +77,7 @@ class PersonalizationBox(CRServerBox):
 
             # download personalizer artifact
             logger.info(f'Downloading personalizer from: {personalizer_artifact_path}')
-            personalizer_dest_file_path = self.path + endpoint._SEP + os.path.basename(personalizer_artifact_path)
+            personalizer_dest_file_path = self.path + endpoint.SEP + os.path.basename(personalizer_artifact_path)
             with personalizer_artifact_path.open() as fd:
                 with open(personalizer_dest_file_path, "wb") as out:
                     out.write(fd.read())
@@ -119,11 +119,11 @@ class PersonalizationBox(CRServerBox):
             port_flag = '-p'
 
 
-        personalization_script_path = os.path.dirname(personalizer_tar) + self.host._SEP + 'personalizePackage.py'
+        personalization_script_path = os.path.dirname(personalizer_tar) + self.host.SEP + 'personalizePackage.py'
         personalization_command = [personalization_script_path, server_flag, registration_or_transparency.host.ip, port_flag, '8443',
                                    '-org', 'cybereason', '-c', 'True', '-f', installer_package, '-u', os.path.dirname(personalizer_tar)]
 
-        result = self.host.run('C:\\python27\python.exe', *personalization_command)
+        result = self.host.run('C:\\python27\\python.exe', *personalization_command)
 
 
 
