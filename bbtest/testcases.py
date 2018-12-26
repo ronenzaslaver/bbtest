@@ -21,6 +21,12 @@ class BBTestCase(unittest.TestCase):
             for box in self.lab.flatten_boxes():
                 box.clean()
 
+    def tearDown(self):
+        super().tearDown()
+        if hasattr(self, 'lab'):
+            for box in self.lab.flatten_boxes():
+                box.clean()
+
     @classmethod
     def setUpClass(cls):
         """Setups a lab for black box testing. """
@@ -32,5 +38,5 @@ class BBTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'lab'):
-            cls.lab.tearDown()
+            cls.lab.destroy()
         super().tearDownClass()

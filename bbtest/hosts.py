@@ -6,13 +6,14 @@ import subprocess
 import sys
 import shutil
 import tempfile
-import glob
 
 
 class BaseHost(object):
-    _SEP = '/'
-    PACKAGE_TYPE = None
+
+    SEP = '/'
     BIT = None
+    OS = None
+    PACKAGE_TYPE = None
 
     def __init__(self, ip=None, username=None, password=None):
         self.ip = ip
@@ -31,7 +32,7 @@ class BaseHost(object):
         pass
 
     def join(self, *args):
-        return self._SEP.join(args)
+        return self.SEP.join(args)
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """

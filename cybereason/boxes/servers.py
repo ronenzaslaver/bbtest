@@ -58,7 +58,7 @@ class PersonalizationBox(CRServerBox):
 
             # download the artifact
             logger.info(f'Downloading package from: {artifact_path}')
-            package_dest_file_path = self.path + endpoint._SEP + os.path.basename(artifact_path)
+            package_dest_file_path = self.path + endpoint.SEP + os.path.basename(artifact_path)
             with artifact_path.open() as fd:
                 with open(package_dest_file_path, "wb") as out:
                     out.write(fd.read())
