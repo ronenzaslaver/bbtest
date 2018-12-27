@@ -38,8 +38,8 @@ class HomeBox(BlackBox):
 
     def install(self):
         """Create a temp dir and store it in `self.path`"""
-        self.path = self.mkdtemp()
         super().install()
+        self.path = self.mkdtemp()
 
     def uninstall(self):
         """Remove the home path"""

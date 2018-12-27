@@ -1,11 +1,13 @@
 """
 Hosts in the network.
 """
+
 import os
 import subprocess
 import sys
 import shutil
 import tempfile
+import wmi
 
 
 class BaseHost(object):
@@ -111,9 +113,10 @@ class WindowsHost(BaseHost):
     BIT = None
     PACKAGE_TYPE = 'msi'
 
-    def __init__(self, image='Window7 SP2'):
+    def __init__(self, ip, username, password):
         """Deploy a host and store its address and credentials"""
-        pass
+        super().__init__(ip, username, password)
+        self.connection = wmi.WMI()
 
     def destroy(self):
         """Release the host"""
