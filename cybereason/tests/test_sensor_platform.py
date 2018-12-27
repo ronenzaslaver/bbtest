@@ -45,7 +45,11 @@ class InstallTest(CRTestCase):
         'local': {
             'class': LocalHost,
             'boxes': [PersonalizationBox],
-        }
+        },
+        # 'shared_folder': {
+        #     'class': LocalHost,
+        #     'boxes': [SharedFolderBox],
+        # }
     }
 
     address_book = {
@@ -100,7 +104,8 @@ class InstallTest(CRTestCase):
         assert personalization.host.isfile(package_downloaded)
         assert personalization.host.isfile(personalizer_downloaded)
 
-        personalization.personalize(package_downloaded, personalizer_downloaded, transparency)
+        installer_package_path = personalization.personalize(package_downloaded, personalizer_downloaded, transparency)
+        assert personalization.host.isfile(installer_package_path)
 
         # CYBR-15886 - Add functionality to Endpoint Host to download package from the Personalization server
 

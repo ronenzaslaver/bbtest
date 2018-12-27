@@ -33,7 +33,7 @@ class PersonalizationBox(CRServerBox):
     Access the download server
     Untar the personalizer script
     Run python 2.7
-    Send files to other machines
+    Copy files to a drive shared with EPs under test (e.g. \\cyberdev\data\ep_automation_shared)
     """
 
     def __init__(self, host, name=None):
@@ -119,13 +119,18 @@ class PersonalizationBox(CRServerBox):
             port_flag = '-p'
 
 
-        personalization_script_path = os.path.dirname(personalizer_tar) + self.host.SEP + 'personalizePackage.py'
-        personalization_command = [personalization_script_path, server_flag, registration_or_transparency.host.ip, port_flag, '8443',
-                                   '-org', 'cybereason', '-c', 'True', '-f', installer_package, '-u', os.path.dirname(personalizer_tar)]
+        personalization_script_path = self.path + self.host.SEP + 'personalizePackage.py'
+        personalization_command = [personalization_script_path, server_flag, registration_or_transparency.host.ip,
+                                   port_flag, '8443', '-org', 'cybereason', '-c', 'True', '-f', installer_package,
+                                   '-u', self.path]
 
-        result = self.host.run('C:\\python27\\python.exe', *personalization_command)
-
-
+        # TODO
+        # for win:  ['py', '-2']
+        # for linux: ['python2']
+        l= ['py', '-2']
+        personalization_output = self.host.run(*l, *personalization_command)
+        personalization_file_name = personalization_output[-1].replace('\\', '/').split('/')[-1]
+        return self.path + self.host.SEP + personalization_file_name.replace('.', '_')  + '.zip'
 
     @staticmethod
     def _find_artifact(latest_build_path, package_prefix):
