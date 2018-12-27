@@ -34,7 +34,7 @@ class ToDoTestWindowsHost(BaseToDoTest):
          },
     }
 
-    def test_operations(self):
+    def _test_operations(self):
         self._test_operations()
 
 

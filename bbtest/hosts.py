@@ -7,12 +7,13 @@ import subprocess
 import sys
 import shutil
 import tempfile
-import wmi
 
 
 class BaseHost(object):
 
     SEP = '/'
+
+    # todo - after moving to PYrC replace all bellow to dynamically calculated properties.
     BIT = None
     OS = None
     PACKAGE_TYPE = None
@@ -116,7 +117,6 @@ class WindowsHost(BaseHost):
     def __init__(self, ip, username, password):
         """Deploy a host and store its address and credentials"""
         super().__init__(ip, username, password)
-        self.connection = wmi.WMI()
 
     def destroy(self):
         """Release the host"""
