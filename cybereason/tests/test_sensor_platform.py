@@ -50,7 +50,9 @@ class InstallTest(CRTestCase):
 
     address_book = {
         'perspective':
-            {'ip': '3.86.19.247', 'username': 'admin@cybereason.com', 'password': 'jPUoWCg8Pok='}
+            {'ip': '3.86.19.247', 'username': 'admin@cybereason.com', 'password': 'jPUoWCg8Pok='},
+        'transparency':
+            {'ip': '3.85.179.129'},
     }
 
     # FFU
@@ -94,9 +96,11 @@ class InstallTest(CRTestCase):
 
         personalization = self.lab.boxes[PersonalizationBox.NAME][0]
         artifactory = self.lab.boxes[ArtifactoryBox.NAME][0]
-        package_downloaded = personalization.download(artifactory, 'rc-18.1.40', endpoint)
+        package_downloaded, personalizer_downloaded = personalization.download(artifactory, 'rc-18.1.40', endpoint)
         assert personalization.host.isfile(package_downloaded)
-        personalization.personalize()
+        assert personalization.host.isfile(personalizer_downloaded)
+
+        personalization.personalize(package_downloaded, personalizer_downloaded, transparency)
 
         # CYBR-15886 - Add functionality to Endpoint Host to download package from the Personalization server
 
