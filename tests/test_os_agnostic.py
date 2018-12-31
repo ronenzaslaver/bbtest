@@ -1,5 +1,5 @@
 
-from bbtest import BBTestCase, LocalHost, LinuxHost
+from bbtest import BBTestCase, LocalHost, LinuxHost, WindowsHost
 from .mytodo_box import MyToDoBox
 
 
@@ -22,6 +22,19 @@ class ToDoTestLocalHost(BaseToDoTest):
     }
 
     def test_operations(self):
+        self._test_operations()
+
+
+class ToDoTestWindowsHost(BaseToDoTest):
+
+    LAB = {
+        'host1': {
+            'class': WindowsHost,
+            'boxes': [MyToDoBox],
+         },
+    }
+
+    def _test_operations(self):
         self._test_operations()
 
 

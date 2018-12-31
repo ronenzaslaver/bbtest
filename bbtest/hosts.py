@@ -4,7 +4,6 @@ Hosts in the network.
 import os
 import platform
 import subprocess
-import sys
 import shutil
 import tempfile
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
