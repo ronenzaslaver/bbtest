@@ -2,23 +2,45 @@
 Hosts in the network.
 """
 import os
+import platform
 import subprocess
 import sys
 import shutil
 import tempfile
+from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
+
+import psutil
+from psutil import NoSuchProcess
 
 
 class BaseHost(object):
+    """"A base host class
 
+    :param SEP: The path separator character
+    :type SEP: str
+
+    """
     SEP = '/'
-    BIT = None
-    OS = None
-    PACKAGE_TYPE = None
 
     def __init__(self, ip=None, username=None, password=None):
         self.ip = ip
         self.username = username
         self.password = password
+
+    @property
+    def os(self):
+        return platform.platform()
+
+    @property
+    def bit(self):
+        return platform.architecture()[0][0:2]
+
+    @property
+    def package_type(self):
+        if 'windows' in self.os.lower():
+            return 'msi'
+        else:
+            raise NotImplementedError('Non Windows OS')
 
     def destroy(self):
         """Release the host"""
@@ -51,6 +73,10 @@ class BaseHost(object):
     def rmfile(self, path):
         pass
 
+    def run_python2(self, *args, **kwargs):
+        """Call run command with python2 as the process"""
+        pass
+
 
 class LocalHost(BaseHost):
 
@@ -59,7 +85,18 @@ class LocalHost(BaseHost):
 
     @property
     def os(self):
-        return sys.platform
+        return platform.platform()
+
+    @property
+    def bit(self):
+        return platform.architecture()[0][0:2]
+
+    @property
+    def package_type(self):
+        if 'windows' in self.os.lower():
+            return 'msi'
+        else:
+            raise NotImplementedError('Non Windows OS')
 
     def run(self, cmd, *args, **kwargs):
         args_list = list(args) if args else []
@@ -104,12 +141,50 @@ class LocalHost(BaseHost):
     def isfile(self, path):
         return os.path.isfile(path)
 
+    def run_python2(self, *args, **kwargs):
+        if 'win' in self.os.lower():
+            python_executable = ['py', '-2']
+        else:
+            python_executable = ['python2']
+        return self.run(*python_executable, *args, **kwargs)
+
+    @staticmethod
+    def is_process_running(process_name):
+        for process in psutil.process_iter():
+            if process.name() == process_name:
+                return True
+        return False
+
+    def is_service_running(self, service_name):
+        if 'win' in self.os.lower():
+            try:
+                return psutil.win_service_get(service_name).status() == 'running'
+            except NoSuchProcess:
+                return False
+        else:
+            raise NotImplementedError('Non Windows os')
+
+    @staticmethod
+    def is_package_installed(package_name):
+        key_val = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall'
+        products = OpenKey(HKEY_LOCAL_MACHINE, key_val)
+        try:
+            i = 0
+            while True:
+                product_key_name = EnumKey(products, i)
+                product_values = OpenKey(products, product_key_name)
+                try:
+                    product_display_name = QueryValueEx(product_values, 'DisplayName')[0]
+                    if product_display_name == package_name:
+                        return True
+                except FileNotFoundError:  # product has no 'DisplayName' attribute
+                    pass
+                i = i+1
+        except WindowsError:
+            return False
+
 
 class WindowsHost(BaseHost):
-
-    OS = 'win'
-    BIT = None
-    PACKAGE_TYPE = 'msi'
 
     def __init__(self, image='Window7 SP2'):
         """Deploy a host and store its address and credentials"""
@@ -120,32 +195,9 @@ class WindowsHost(BaseHost):
         pass
 
 
-class Windows32Host(WindowsHost):
-
-    BIT = '32'
-
-
-class Windows64Host(WindowsHost):
-
-    BIT = '64'
-
-
 class LinuxHost(BaseHost):
-
-    OS = 'linux'
-
-
-class CentOSHost(LinuxHost):
-
-    PACKAGE_TYPE = 'rpm'
-
-
-class DebianHost(LinuxHost):
-
-    PACKAGE_TYPE = 'deb'
+    pass
 
 
 class OSXHost(BaseHost):
-
-    OS = 'osx'
-    PACKAGE_TYPE = 'pkg'
+    pass

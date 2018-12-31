@@ -1,14 +1,13 @@
 """
 """
 
-from bbtest import WindowsHost, LinuxHost, LocalHost, Windows64Host
+from bbtest import WindowsHost, LinuxHost, LocalHost
 from bbtest import BBTestCase
 
-from cybereason.boxes.servers import TransparencyBox, RegistrationBox, PerspectiveBox, PersonalizationBox, ArtifactoryBox
+from cybereason.boxes.servers import (TransparencyBox, RegistrationBox, PerspectiveBox, PersonalizationBox,
+                                      ArtifactoryBox)
 from cybereason.boxes.sensor import SensorBox
 from cybereason.services.abstracted import SensorPolicy
-
-from cybereason.services.ecosystem import logger
 
 
 class CRTestCase(BBTestCase):
@@ -19,7 +18,7 @@ class InstallTest(CRTestCase):
 
     LAB = {
         'endpoint': {
-            'class': Windows64Host,
+            'class': LocalHost,
             'boxes': [],
          },
         'repository': {
@@ -46,9 +45,9 @@ class InstallTest(CRTestCase):
             'class': LocalHost,
             'boxes': [PersonalizationBox],
         },
-        # 'shared_folder': {
-        #     'class': LocalHost,
-        #     'boxes': [SharedFolderBox],
+        # 'file_server': {
+        #     'class': BaseHost,
+        #     'boxes': [],
         # }
     }
 
@@ -57,6 +56,9 @@ class InstallTest(CRTestCase):
             {'ip': '3.86.19.247', 'username': 'admin@cybereason.com', 'password': 'jPUoWCg8Pok='},
         'transparency':
             {'ip': '3.85.179.129'},
+        'file_server':
+            {'ip': 'cyber-venvs.cyberdomain.local', 'username': 'CYBERDOMAIN\\Automation',
+             'password': '$yberAut0Acc3ss', 'root_directory': '\\\\cyber-venvs\\deployments'},
     }
 
     # FFU
@@ -78,13 +80,10 @@ class InstallTest(CRTestCase):
     # End FFU
 
     def test_install(self):
-        perspective_host = self.lab.hosts['perspective']
-        logger.info(f'perspective_host.ip = {perspective_host.ip}')
         perspective = self.lab.boxes[PerspectiveBox.NAME][0]
-        logger.info(f'perspective.host.ip = {perspective.host.ip}')
-
         transparency = self.lab.boxes[TransparencyBox.NAME][0]
         endpoint = self.lab.hosts['endpoint']
+        # file_server = FileServer(self.lab.hosts['file_server'], self.address_book['file_server']['root_directory'])
 
         # CYBR-15877 - Add SensorPolicy configuration to SensorPolicy BB to allow Sensor Policy configurations
 
@@ -108,7 +107,24 @@ class InstallTest(CRTestCase):
         assert personalization.host.isfile(installer_package_path)
 
         # CYBR-15886 - Add functionality to Endpoint Host to download package from the Personalization server
-
         sensor = SensorBox(endpoint)
         sensor.download(personalization)
         sensor.install_wo_download()
+
+        # Install
+
+    def test_validate(self):
+        endpoint = self.lab.hosts['endpoint']
+
+        # CYBR-15908 - Add functionality to Sensor BB to get Sensor Process Status
+        assert endpoint.is_process_running('ActiveConsole.exe'), "Process is not running"
+        assert endpoint.is_process_running('PylumLoader.exe'), "Process is not running"
+        assert endpoint.is_process_running('minionhost.exe'), "Process is not running"
+
+        # CYBR-15907 - Add functionality to Sensor BB to get Sensor Service Status
+        assert endpoint.is_service_running('CybereasonActiveProbe'), "Service is not running"
+
+        # CYBR-15909 - Add functionality to Sensor BB to get Sensor Packages info
+        assert endpoint.is_package_installed('Cybereason Sensor'), "Package is not installed"
+
+

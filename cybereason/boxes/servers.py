@@ -33,7 +33,7 @@ class PersonalizationBox(CRServerBox):
     Access the download server
     Untar the personalizer script
     Run python 2.7
-    Copy files to a drive shared with EPs under test (e.g. \\cyberdev\data\ep_automation_shared)
+    Copy files to a drive shared with EPs under test (e.g. \\cyberdev\\data\\ep_automation_shared)
     """
 
     def __init__(self, host, name=None):
@@ -42,8 +42,7 @@ class PersonalizationBox(CRServerBox):
             raise NotImplementedError(f'Box {self.NAME} is not support on host type: {self.host}')
 
     def download(self, download_server, version, endpoint):
-        """
-
+        """ Download installer package and personalizer from download server
         :param download_server:
         :param version:
         :param endpoint:
@@ -51,52 +50,37 @@ class PersonalizationBox(CRServerBox):
         :return:
         """
 
-        os_to_prefix = {WindowsHost.OS: 'CybereasonSensor' + endpoint.BIT,
-                        LinuxHost.OS: 'cybereason-sensor-',
-                        OSXHost.OS: 'ActiveProbe_'}
+        if 'windows' in endpoint.os.lower():
+            os_to_prefix = 'CybereasonSensor' + endpoint.bit
+        if "linux" in endpoint.os.lower():
+            os_to_prefix = 'cybereason-sensor-'
+        if "mac" in endpoint.os.lower():  # todo get correct 'mac' string
+            os_to_prefix = 'ActiveProbe_'
 
         if type(download_server) == ArtifactoryBox:
-            # find installer package artifact url
-            branch_builds = ArtifactoryPath(f'{ARTIFACTORY_SENSOR_REPO_URL}/{version}/{endpoint.PACKAGE_TYPE}')
-            latest_build_path = max(branch_builds, key=self._extract_build_number)
-            package_prefix = os_to_prefix[endpoint.OS]
-            package_artifact_path = self._find_artifact(latest_build_path, package_prefix)
+            # download installer package
+            package_artifact_path = self._find_artifact_url(
+                f'{ARTIFACTORY_SENSOR_REPO_URL}/{version}/{endpoint.package_type}', os_to_prefix)
+            package_dest_file_path = self._download_file(package_artifact_path)
 
-            # download installer package artifact
-            logger.info(f'Downloading personalizer from: {package_artifact_path}')
-            package_dest_file_path = self.path + endpoint.SEP + os.path.basename(package_artifact_path)
-            with package_artifact_path.open() as fd:
-                with open(package_dest_file_path, "wb") as out:
-                    out.write(fd.read())
-            logger.info(f'Downloaded file path on disk: {package_dest_file_path}')
-
-            # find personalizer artifact url
-            personalizer_builds = ArtifactoryPath(f'{ARTIFACTORY_SENSOR_REPO_URL}/{version}/personalization')
-            latest_build_path = max(personalizer_builds, key=self._extract_build_number)
-            personalizer_artifact_path = self._find_artifact(latest_build_path, "personalizer-")
-
-            # download personalizer artifact
-            logger.info(f'Downloading personalizer from: {personalizer_artifact_path}')
-            personalizer_dest_file_path = self.path + endpoint.SEP + os.path.basename(personalizer_artifact_path)
-            with personalizer_artifact_path.open() as fd:
-                with open(personalizer_dest_file_path, "wb") as out:
-                    out.write(fd.read())
-            logger.info(f'Downloaded file path on disk: {personalizer_dest_file_path}')
-
+            # download personalizer package
+            personalizer_artifact_path = self._find_artifact_url(
+                f'{ARTIFACTORY_SENSOR_REPO_URL}/{version}/personalization', "personalizer-")
+            personalizer_dest_file_path = self._download_file(personalizer_artifact_path)
         else:
             raise NotImplementedError(f'Personalization does not support download from {download_server.NAME} server')
 
         return package_dest_file_path, personalizer_dest_file_path
 
-    def personalize(self, installer_package, personalizer_tar, registration_or_transparency, **kwargs):
-        """
+    def personalize(self, installer_package_path, personalizer_tar, registration_or_transparency):
+        """ Personalize the installer package
         User must provide Transparency or Registration.
-        in the future we'll need to add support to get them by logic from LAB object.
-        :param installer_package:
+        :todo in the future we'll need to add support to get them by logic from LAB object.
+        :todo support kwargs param for all personalization features/flags
+        :param installer_package_path:
         :param personalizer_tar:
         :param registration:
         :param transparency:
-        :param kwargs:
         :return:
         """
 
@@ -118,19 +102,18 @@ class PersonalizationBox(CRServerBox):
             server_flag = '-s'
             port_flag = '-p'
 
-
-        personalization_script_path = self.path + self.host.SEP + 'personalizePackage.py'
+        personalization_script_path = self.host.SEP.join([self.path, 'personalizePackage.py'])
         personalization_command = [personalization_script_path, server_flag, registration_or_transparency.host.ip,
-                                   port_flag, '8443', '-org', 'cybereason', '-c', 'True', '-f', installer_package,
+                                   port_flag, '8443', '-org', 'cybereason', '-c', 'True', '-f', installer_package_path,
                                    '-u', self.path]
 
         # TODO
         # for win:  ['py', '-2']
         # for linux: ['python2']
-        l= ['py', '-2']
-        personalization_output = self.host.run(*l, *personalization_command)
+        # l= ['py', '-2']
+        personalization_output = self.host.run_python2(*personalization_command)
         personalization_file_name = personalization_output[-1].replace('\\', '/').split('/')[-1]
-        return self.path + self.host.SEP + personalization_file_name.replace('.', '_')  + '.zip'
+        return self.host.SEP.join([self.path, personalization_file_name.replace('.', '_') + '.zip'])
 
     @staticmethod
     def _find_artifact(latest_build_path, package_prefix):
@@ -142,6 +125,22 @@ class PersonalizationBox(CRServerBox):
     @staticmethod
     def _extract_build_number(f):
         return int(os.path.basename(f))
+
+    def _find_artifact_url(self, artifactory_url, file_prefix):
+        branch_builds = ArtifactoryPath(artifactory_url)
+        latest_build_path = max(branch_builds, key=self._extract_build_number)
+        package_artifact_path = self._find_artifact(latest_build_path, file_prefix)
+        return package_artifact_path
+
+    def _download_file(self, file_path):
+        logger.info(f'Downloading file from: {file_path}')
+        dest_file_path = self.host.SEP.join([self.path, os.path.basename(file_path)])
+        with file_path.open() as fd:
+            with open(dest_file_path, "wb") as out:
+                out.write(fd.read())
+        logger.info(f'Downloaded file path on disk: {dest_file_path}')
+        return dest_file_path
+
 
 class ProxyBox(CRServerBox):
     pass
@@ -157,3 +156,6 @@ class IreleaseBox(DownloadBox):
 
 class ArtifactoryBox(DownloadBox):
     pass
+
+
+# class SharedFolderBox(BB):
