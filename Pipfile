@@ -13,6 +13,9 @@ pytest-pythonpath = "*"
 pyvmomi = "*"
 dohq-artifactory = "*"
 psutil = "*"
+rpyc = "*"
+winrm = "*"
+pywinrm = "*"
 
 [requires]
 python_version = "3.7"

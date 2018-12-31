@@ -7,6 +7,9 @@ import subprocess
 import shutil
 import tempfile
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
+from ftplib import FTP
+import rpyc
+import winrm
 
 import psutil
 from psutil import NoSuchProcess
@@ -25,6 +28,12 @@ class BaseHost(object):
         self.ip = ip
         self.username = username
         self.password = password
+        # todo maybe add RemoteHost and derive all remote hosts from it. BaseHost will be parent of Local/RemoteHost.
+        if type(self) != LocalHost:
+            self.ftp = FTP(ip)
+            self.ftp.login()
+            self.rpyc = rpyc.classic.connect("localhost")
+            self.winrm = winrm.Session('localhost', auth=('cyberdomain\\yoram.shamir', 'yud1024@cr'), transport='ntlm')
 
     @property
     def os(self):
@@ -57,7 +66,7 @@ class BaseHost(object):
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
-        pass
+        return self.rpyc.modules.tempfile.mkdtemp(dir='c:\\temp')
 
     def rm(self, path, recursive=False, force=False):
         pass
@@ -72,9 +81,26 @@ class BaseHost(object):
     def rmfile(self, path):
         pass
 
+    def run(self, cmd, *args, **kwargs):
+        """ Run any CLI command.
+
+        :todo implement over winrm and ssh.
+        :param cmd:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        args_list = list(args) if args else []
+        output = self.winrm.run_cmd(cmd, args_list)
+        return output.std_out.decode('utf-8').strip().split('\n')
+
     def run_python2(self, *args, **kwargs):
         """Call run command with python2 as the process"""
         pass
+
+    def put(self, local, remote):
+        ftp_remote = self.SEP.join(remote.replace('\\', '/').split('/')[2:])
+        self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
 
 
 class LocalHost(BaseHost):
@@ -107,6 +133,7 @@ class LocalHost(BaseHost):
         return shutil.copyfile(local, remote)
 
     def mkdtemp(self, **kwargs):
+        """ same args as tempfile.mkdtemp """
         return tempfile.mkdtemp(**kwargs)
 
     def rm(self, path, recursive=False, force=False):
@@ -184,10 +211,6 @@ class LocalHost(BaseHost):
 
 
 class WindowsHost(BaseHost):
-
-    def __init__(self, image='Window7 SP2'):
-        """Deploy a host and store its address and credentials"""
-        pass
 
     def destroy(self):
         """Release the host"""

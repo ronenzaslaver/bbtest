@@ -34,7 +34,9 @@ class ToDoTestWindowsHost(BaseToDoTest):
          },
     }
 
-    def _test_operations(self):
+    address_book = {'host1': {'ip': 'localhost'}}
+
+    def test_operations(self):
         self._test_operations()
 
 
