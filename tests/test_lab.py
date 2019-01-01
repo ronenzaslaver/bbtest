@@ -53,7 +53,7 @@ class TestSingleBox(BBTestCase):
 
     def test_single_box(self):
         assert len(self.lab.boxes[EmptyBox.NAME]) == 1
-        assert self.lab.boxes[EmptyBox.NAME][0].host.ip == 'localhost'
+        assert self.lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'
 
 
 class MultiBox(BBTestCase):

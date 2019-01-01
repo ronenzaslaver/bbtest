@@ -34,7 +34,9 @@ class ToDoTestWindowsHost(BaseToDoTest):
          },
     }
 
-    address_book = {'host1': {'ip': 'localhost'}}
+    address_book = {'host1': {'ip': '127.0.0.1',
+                              'auth': ('test', '8ik,9ol.0p;/')},
+    }
 
     def test_operations(self):
         self._test_operations()

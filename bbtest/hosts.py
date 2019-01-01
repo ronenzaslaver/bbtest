@@ -1,6 +1,7 @@
 """
 Hosts in the network.
 """
+import logging
 import os
 import platform
 import subprocess
@@ -14,6 +15,7 @@ import winrm
 import psutil
 from psutil import NoSuchProcess
 
+logger = logging.getLogger('bblog')
 
 class BaseHost(object):
     """"A base host class
@@ -23,6 +25,13 @@ class BaseHost(object):
 
     """
     SEP = '/'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        try:
+            self.root_path = self.ROOT_PATH
+        except AttributeError:
+            self.root_path = tempfile.gettempdir()
 
     @property
     def os(self):
@@ -38,7 +47,7 @@ class BaseHost(object):
 
     def destroy(self):
         """Release the host"""
-        raise NotImplementedError('Missing method implmentation')
+        pass
 
     def uninstall(self):
         """ the opposite of install,  uninstall our tools from the host """
@@ -64,12 +73,7 @@ class LocalHost(BaseHost):
 
     For now, supports only Win32 and Win64
     """
-    def __init__(self):
-        super().__init__()
-        try:
-            self.root_path = self.ROOT_PATH
-        except AttributeError:
-            self.root_path = tempfile.gettempdir()
+    ip = '127.0.0.1'
 
     @property
     def os(self):
@@ -94,26 +98,31 @@ class LocalHost(BaseHost):
     def put(self, local, remote):
         return shutil.copyfile(local, remote)
 
-    def mkdtemp(self, **kwargs):
+    @staticmethod
+    def mkdtemp(**kwargs):
         """ same args as tempfile.mkdtemp """
         return tempfile.mkdtemp(**kwargs)
 
-    def rmtree(self, path, ignore_errors=True, onerror=None):
+    @staticmethod
+    def rmtree(path, ignore_errors=True, onerror=None):
         return shutil.rmtree(path, ignore_errors, onerror)
 
-    def rmfile(self, path):
+    @staticmethod
+    def rmfile(path):
         try:
             os.remove(path)
         except OSError:
             pass
 
-    def rmfiles(self, path):
+    @staticmethod
+    def rmfiles(path):
+        logger.debug(f"rmfiles with '{path}'")
         try:
             for root, dirs, files in os.walk(path):
                 for file in files:
                     os.remove(os.path.join(root, file))
                 for dir in dirs:
-                    self.rmtree(os.path.join(root, dir))
+                    LocalHost.rmtree(os.path.join(root, dir))
         except OSError:
             pass
 
@@ -134,7 +143,7 @@ class LocalHost(BaseHost):
                 return True
         return False
 
-class LocalWindowHost(LocalHost):
+class LocalWindowsHost(LocalHost):
     """A collection of windows utilities and validators """
     ROOT_PATH = 'c:/temp'
     package_type = 'msi'
@@ -174,6 +183,7 @@ class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
     def __init__(self, ip=None, auth=None):
+        super().__init__()
         self.ip = ip
         self.auth = auth
         self.ftp = FTP(ip)
@@ -212,12 +222,13 @@ class RemoteHost(BaseHost):
         pass
 
     def put(self, local, remote):
-        ftp_remote = remote.replace('\\', '/')[len(self.root_path):]
+        ftp_remote = remote.replace('\\', '/')[len(self.root_path)+1:]
         self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
 
 
 class WindowsHost(RemoteHost):
     """ A remote windows host """
+    ROOT_PATH = 'c:/temp'
 
     def __init__(self, ip="localhost", auth=("user", "pass")):
         super().__init__(ip, auth)
@@ -231,6 +242,19 @@ class WindowsHost(RemoteHost):
 
     def is_package_installed(self, name):
         return self.modules.bbtest.LocalWindowsHost.is_package_installed(name)
+
+    @property
+    def os(self):
+        return self.modules.bbtest.LocalHost.os
+
+    def rmtree(self, *args, **kwargs):
+        return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
+
+    def rmfile(self, path):
+        return self.modules.bbtest.LocalHost.rmfile(path)
+
+    def rmfiles(self, name):
+        return self.modules.bbtest.LocalHost.rmfiles(name)
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """

@@ -3,7 +3,6 @@ import os
 import filecmp
 
 from bbtest import BBTestCase, LocalHost, HomeBox, BaseHost
-from cybereason.services.ecosystem import FileServer
 
 
 class TestHomeBox(BBTestCase):

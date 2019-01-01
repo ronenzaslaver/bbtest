@@ -13,8 +13,7 @@ from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 version = 0.1
 
 
-todo_file = os.path.join(os.path.dirname(__file__), 'todo.txt')
-
+todo_file = None
 
 def main(args=None):
 
@@ -79,4 +78,5 @@ def list_todos(parsed_args):
 
 
 if __name__ == "__main__":
+    todo_file = os.path.join(os.path.dirname(__file__), 'todo.txt')
     sys.exit(main((sys.argv[1:])))
