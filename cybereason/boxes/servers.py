@@ -61,12 +61,12 @@ class PersonalizationBox(CRServerBox):
             # download installer package
             package_artifact_path = self._find_artifact_url(
                 f'{ARTIFACTORY_SENSOR_REPO_URL}/{version}/{endpoint.package_type}', os_to_prefix)
-            package_dest_file_path = self._download_file(package_artifact_path)
+            package_dest_file_path = self.download_file(package_artifact_path)
 
             # download personalizer package
             personalizer_artifact_path = self._find_artifact_url(
                 f'{ARTIFACTORY_SENSOR_REPO_URL}/{version}/personalization', "personalizer-")
-            personalizer_dest_file_path = self._download_file(personalizer_artifact_path)
+            personalizer_dest_file_path = self.download_file(personalizer_artifact_path)
         else:
             raise NotImplementedError(f'Personalization does not support download from {download_server.NAME} server')
 
@@ -132,7 +132,7 @@ class PersonalizationBox(CRServerBox):
         package_artifact_path = self._find_artifact(latest_build_path, file_prefix)
         return package_artifact_path
 
-    def _download_file(self, file_path):
+    def download_file(self, file_path):
         logger.info(f'Downloading file from: {file_path}')
         dest_file_path = self.host.SEP.join([self.path, os.path.basename(file_path)])
         with file_path.open() as fd:

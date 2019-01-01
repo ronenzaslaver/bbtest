@@ -24,104 +24,66 @@ class BaseHost(object):
     """
     SEP = '/'
 
-    def __init__(self, ip=None, username=None, password=None):
-        self.ip = ip
-        self.username = username
-        self.password = password
-        # todo maybe add RemoteHost and derive all remote hosts from it. BaseHost will be parent of Local/RemoteHost.
-        if type(self) != LocalHost:
-            self.ftp = FTP(ip)
-            self.ftp.login()
-            self.rpyc = rpyc.classic.connect("localhost")
-            self.winrm = winrm.Session('localhost', auth=('cyberdomain\\yoram.shamir', 'yud1024@cr'), transport='ntlm')
-
     @property
     def os(self):
-        return platform.platform()
+        raise NotImplementedError('Missing method implmentation')
 
     @property
     def bit(self):
-        return platform.architecture()[0][0:2]
+        raise NotImplementedError('Missing method implmentation')
 
     @property
     def package_type(self):
-        if 'windows' in self.os.lower():
-            return 'msi'
-        else:
-            raise NotImplementedError('Non Windows OS')
+        raise NotImplementedError('Non Windows OS')
 
     def destroy(self):
         """Release the host"""
-        pass
+        raise NotImplementedError('Missing method implmentation')
 
     def uninstall(self):
         """ the opposite of install,  uninstall our tools from the host """
-        pass
+        raise NotImplementedError('Missing method implmentation')
 
     def clean(self):
-        pass
+        raise NotImplementedError('Missing method implmentation')
+
+    def isfile(self, path):
+        raise NotImplementedError('Missing method implmentation')
+
+    def rmtree(self, path, ignore_errors=True, onerror=None):
+        raise NotImplementedError('Missing method implmentation')
+
+    def rmfile(self, path):
+        raise NotImplementedError('Missing method implmentation')
 
     def join(self, *args):
         return self.SEP.join(args)
 
-    def mkdtemp(self, **kwargs):
-        """ same args as tempfile.mkdtemp """
-        return self.rpyc.modules.tempfile.mkdtemp(dir='c:\\temp')
-
-    def rm(self, path, recursive=False, force=False):
-        pass
-
-    def isfile(self, path):
-        pass
-
-    # TODO: remove the next methods as they are too specific
-    def rmtree(self, path, ignore_errors=True, onerror=None):
-        pass
-
-    def rmfile(self, path):
-        pass
-
-    def run(self, cmd, *args, **kwargs):
-        """ Run any CLI command.
-
-        :todo implement over winrm and ssh.
-        :param cmd:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        args_list = list(args) if args else []
-        output = self.winrm.run_cmd(cmd, args_list)
-        return output.std_out.decode('utf-8').strip().split('\n')
-
-    def run_python2(self, *args, **kwargs):
-        """Call run command with python2 as the process"""
-        pass
-
-    def put(self, local, remote):
-        ftp_remote = self.SEP.join(remote.replace('\\', '/').split('/')[2:])
-        self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
-
-
 class LocalHost(BaseHost):
+    """Suppose to be an os-agnostic local host.
 
+    For now, supports only Win32 and Win64
+    """
     def __init__(self):
-        super().__init__('localhost')
+        super().__init__()
+        try:
+            self.root_path = self.ROOT_PATH
+        except AttributeError:
+            self.root_path = tempfile.gettempdir()
 
     @property
     def os(self):
-        return platform.platform()
+        """Returns a lower case string identifying the OS"""
+        return platform.platform().lower()
 
     @property
     def bit(self):
+        #TODO: use a regex to extract 23|64
         return platform.architecture()[0][0:2]
 
     @property
     def package_type(self):
-        if 'windows' in self.os.lower():
-            return 'msi'
-        else:
-            raise NotImplementedError('Non Windows OS')
+        raise NotImplementedError('Non Windows OS')
 
     def run(self, cmd, *args, **kwargs):
         args_list = list(args) if args else []
@@ -135,15 +97,6 @@ class LocalHost(BaseHost):
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
         return tempfile.mkdtemp(**kwargs)
-
-    def rm(self, path, recursive=False, force=False):
-        options = list()
-        if recursive:
-            options.append('-r')
-        if force:
-            options.append('-f')
-        options.append(path)
-        return self.run('rm', *options)
 
     def rmtree(self, path, ignore_errors=True, onerror=None):
         return shutil.rmtree(path, ignore_errors, onerror)
@@ -181,17 +134,13 @@ class LocalHost(BaseHost):
                 return True
         return False
 
-    def is_service_running(self, service_name):
-        if 'win' in self.os.lower():
-            try:
-                return psutil.win_service_get(service_name).status() == 'running'
-            except NoSuchProcess:
-                return False
-        else:
-            raise NotImplementedError('Non Windows os')
+class LocalWindowHost(LocalHost):
+    """A collection of windows utilities and validators """
+    ROOT_PATH = 'c:/temp'
+    package_type = 'msi'
 
     @staticmethod
-    def is_package_installed(package_name):
+    def is_package_installed(name):
         key_val = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall'
         products = OpenKey(HKEY_LOCAL_MACHINE, key_val)
         try:
@@ -200,26 +149,98 @@ class LocalHost(BaseHost):
                 product_key_name = EnumKey(products, i)
                 product_values = OpenKey(products, product_key_name)
                 try:
-                    product_display_name = QueryValueEx(product_values, 'DisplayName')[0]
-                    if product_display_name == package_name:
+                    if QueryValueEx(product_values, 'DisplayName')[0] == name:
                         return True
-                except FileNotFoundError:  # product has no 'DisplayName' attribute
+                except FileNotFoundError:
+                    # product has no 'DisplayName' attribute
                     pass
                 i = i+1
         except WindowsError:
             return False
 
+    @staticmethod
+    def is_service_running(service_name):
+        try:
+            return psutil.win_service_get(service_name).status() == 'running'
+        except NoSuchProcess:
+            return False
 
-class WindowsHost(BaseHost):
+    @staticmethod
+    def mkdtemp(**kwargs):
+        return tempfile.mkdtemp(**kwargs)
 
-    def destroy(self):
-        """Release the host"""
+
+class RemoteHost(BaseHost):
+    """A remote host using RPyC
+    """
+    def __init__(self, ip=None, auth=None):
+        self.ip = ip
+        self.auth = auth
+        self.ftp = FTP(ip)
+        self.ftp.login()
+        self._rpyc = rpyc.classic.connect("localhost")
+        self.modules = self._rpyc.modules
+
+    def mkdtemp(self, **kwargs):
+        """ same args as tempfile.mkdtemp """
+        return self.modules.tempfile.mkdtemp()
+
+    def isfile(self, path):
+        return self.modules.os.path.isfile(path)
+
+    def run(self, cmd, *args, **kwargs):
+        """ Run any CLI command.
+
+        :todo implement over winrm and ssh.
+        :param cmd:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        args_list = list(args) if args else []
+        if isinstance(self, WindowsHost):
+            output = self.winrm.run_cmd(cmd, args_list)
+            ret = output.std_out.decode('utf-8').strip().split('\n')
+        else:
+            #TODO: use ssh
+            raise NotImplementedError("Run still doesn't work on Linux")
+
+        return ret
+
+    def run_python2(self, *args, **kwargs):
+        """Call run command with python2 as the process"""
         pass
 
+    def put(self, local, remote):
+        ftp_remote = remote.replace('\\', '/')[len(self.root_path):]
+        self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
 
-class LinuxHost(BaseHost):
+
+class WindowsHost(RemoteHost):
+    """ A remote windows host """
+
+    def __init__(self, ip="localhost", auth=("user", "pass")):
+        super().__init__(ip, auth)
+        self.winrm = winrm.Session(ip, auth=auth, transport='ntlm')
+
+    def is_service_running(self, service_name):
+        try:
+            return self.modules.psutil.win_service_get(service_name).status() == 'running'
+        except NoSuchProcess:
+            return False
+
+    def is_package_installed(self, name):
+        return self.modules.bbtest.LocalWindowsHost.is_package_installed(name)
+
+    def mkdtemp(self, **kwargs):
+        """ same args as tempfile.mkdtemp """
+        if not 'dir' in kwargs:
+            kwargs['dir'] = self.root_path
+        return self.modules.bbtest.LocalWindowsHost.mkdtemp(**kwargs)
+
+class LinuxHost(RemoteHost):
     pass
 
 
-class OSXHost(BaseHost):
+class OSXHost(RemoteHost):
     pass

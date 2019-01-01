@@ -46,28 +46,3 @@ class TestHomeBox(BBTestCase):
         assert not os.path.exists(empty_file_0)
         empty_box_0.uninstall()
         assert not os.path.isdir(empty_box_0.path)
-
-
-# FileServer is currently outside bbtest so ignore this tests.
-class TestFileServer(BBTestCase):
-    """ Test basic methods - put and get.
-
-    This test can run only on LocalHost.
-    """
-
-    def setUp(self):
-        host = BaseHost('127.0.0.1')
-        self.file_server = FileServer(host=host, root_dir='/tmp/')
-
-    def _test_basic_operations(self):
-        source = os.path.join(os.path.dirname(__file__), 'src', 'mytodo.py')
-        temp_mytodo = '/tmp/mytodo.py'
-        destination = self.file_server.put(source, 'mytodo.py')
-        assert os.path.exists(destination)
-        self.file_server.get('mytodo.py', temp_mytodo)
-        assert filecmp.cmp(source, temp_mytodo)
-        os.remove(temp_mytodo)
-        content = self.file_server.get('mytodo.py')
-        with open(temp_mytodo, 'w') as f:
-            f.write(content)
-        assert filecmp.cmp(source, temp_mytodo)
