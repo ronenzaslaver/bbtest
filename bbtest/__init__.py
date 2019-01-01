@@ -4,5 +4,5 @@ from .hosts import *
 from .testcases import BBTestCase
 
 __all__ = ['BBTestCase', 'Lab',
-           'Host', 'WindowsHost', 'LinuxHost', 'OSXHost', 'LocalHost',
-           'BlackBox', 'HomeBox', 'ServerSpyBox']
+           'BaseHost', 'WindowsHost', 'LinuxHost', 'OSXHost', 'LocalWindowsHost',
+           'BlackBox', 'HomeBox']

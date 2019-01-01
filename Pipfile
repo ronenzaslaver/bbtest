@@ -11,6 +11,10 @@ pytest-pythonpath = "*"
 
 [packages]
 pyvmomi = "*"
+dohq-artifactory = "*"
+psutil = "*"
+rpyc = "*"
+pywinrm = "*"
 
 [requires]
 python_version = "3.7"

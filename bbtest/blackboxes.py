@@ -1,7 +1,10 @@
 """
 To take part in a test a component needs to be wrapped in a BlackBox.
 """
+import logging
 from os import path
+
+logger = logging.getLogger('bblog')
 
 
 class BlackBox():
@@ -19,10 +22,6 @@ class BlackBox():
         """Installing the black box on `self.host`"""
         pass
 
-    def mkdtemp(self, **kwagrs):
-        """Create a temp directory"""
-        return self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
-
     def uninstall(self):
         """Removing the black box from `self.host`"""
         pass
@@ -30,32 +29,39 @@ class BlackBox():
     def clean(self):
         pass
 
+    def mkdtemp(self, **kwagrs):
+        """Create a temp directory"""
+        return self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
+
 
 class HomeBox(BlackBox):
     """A black box with a home folder"""
 
     NAME = 'home'
 
-    def run(self, *args, **kwargs):
-        return self.host.run(*args, cwd=self.path, **kwargs)
-
     def install(self):
         """Create a temp dir and store it in `self.path`"""
+        super().install()
         self.path = self.mkdtemp()
+        logger.debug(f"HomeBox.install made a home in {self.path}")
+
+    def uninstall(self):
+        """Remove the home path"""
+        self.host.rmtree(self.path)
+        super().uninstall()
 
     def clean(self):
         """Remove all files from home"""
         if self.host and self.path:
-            self.host.rm(self.path+'/*', recursive=True)
+            self.host.rmfiles(self.path)
+
+    def run(self, *args, **kwargs):
+        return self.host.run(*args, cwd=self.path, **kwargs)
 
     def put(self, src, dest, *args, **kwargs):
-        """Put a file in thost's home directory """
+        """Put a file in the host's home directory """
         return self.host.put(
             src, self.host.join(self.path, dest), *args, **kwargs)
-
-    def remove(self):
-        """Remove the home path"""
-        return self.host.rmtree(self.path)
 
     def run_file(self, src_path, background=False, params=None):
         """Copy the source to the box, run it, and return its output."""
