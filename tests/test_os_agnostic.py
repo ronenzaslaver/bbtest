@@ -9,7 +9,8 @@ class BaseToDoTest(BBTestCase):
         box = self.lab.boxes[MyToDoBox.NAME][0]
         box.add("Foo")
         todos = box.list()
-        self.assertEqual(todos, ['Foo'])
+        self.assertEquals(len(todos), 1)
+        self.assertEquals(todos[0], "Foo")
 
 
 class ToDoTestLocalHost(BaseToDoTest):
@@ -35,7 +36,7 @@ class ToDoTestWindowsHost(BaseToDoTest):
     }
 
     address_book = {'host1': {'ip': '127.0.0.1',
-                              'auth': ('test', '8ik,9ol.0p;/')},
+                              'auth': ('user', 'pass')},
     }
 
     def test_operations(self):

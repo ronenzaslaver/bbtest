@@ -8,9 +8,9 @@ pytest = "*"
 sphinx = "*"
 ipython = "*"
 pytest-pythonpath = "*"
+pyvmomi = "*"
 
 [packages]
-pyvmomi = "*"
 dohq-artifactory = "*"
 psutil = "*"
 rpyc = "*"
