@@ -36,7 +36,7 @@ class ToDoTestWindowsHost(BaseToDoTest):
     }
 
     address_book = {'host1': {'ip': '127.0.0.1',
-                              'auth': ('user', 'pass')},
+                              'auth': ('Administrator', 'Password1')},
     }
 
     def test_operations(self):

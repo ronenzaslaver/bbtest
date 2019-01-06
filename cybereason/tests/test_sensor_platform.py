@@ -74,4 +74,4 @@ class InstallTest(BBTestCase):
         assert endpoint.is_service_running('CybereasonActiveProbe'), "CybereasonActiveProbe Service is not running"
 
         # CYBR-15936 - Add functionality to Sensor BB to get PylumId
-        assert (sensor.calc_pylumid() == sensor.open_key('Identifier'), "PylumId not exists or incorrect")
+        assert sensor.calc_pylumid() == sensor.open_key('Identifier'), "PylumId not exists or incorrect"

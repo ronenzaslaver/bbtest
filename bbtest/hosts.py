@@ -96,7 +96,7 @@ class LocalHost(BaseHost):
         kwargs ['stdout'] = subprocess.PIPE
         kwargs ['shell'] = True
         logger.debug(f'running a subprocess {args} {kwargs}')
-        output = subprocess.run(*args, **kwargs)
+        output = subprocess.run(list(args), **kwargs)
         logger.debug(f'  returned: {output.stdout}')
         return output.stdout.decode('utf-8').strip().split('\n')
 
@@ -133,13 +133,6 @@ class LocalHost(BaseHost):
 
     def isfile(self, path):
         return os.path.isfile(path)
-
-    def run_python2(self, *args, **kwargs):
-        if 'win' in self.os.lower():
-            python_executable = ['py', '-2']
-        else:
-            python_executable = ['python2']
-        return self.run(*python_executable, *args, **kwargs)
 
     @staticmethod
     def is_process_running(process_name):
@@ -192,15 +185,16 @@ class LocalWindowsHost(LocalHost):
         """
         :return: list of MACs of all active NICs sorted by DeviceID
         """
-        app = "powershell.exe"
-        command = """Get-WmiObject win32_networkadapter | 
-        Where-Object -Property NetConnectionStatus -eq -Value '2' | 
-        Sort-Object -Property DeviceId | 
-        Select-Object -ExpandProperty MACAddress"""
-        return self.run(app, *[command])
+        args = ['powershell.exe']
+        args.append('Get-WmiObject win32_networkadapter | ' \
+                    'Where-Object -Property NetConnectionStatus -eq -Value "2" | ' \
+                    'Sort-Object -Property DeviceId | ' \
+                    'Select-Object -ExpandProperty MACAddress')
+        return self.run(*args)
 
 
 class LocalLinuxHost(LocalHost):
+
     def run_python2(self, *args_in, **kwargs):
         args = ['python2']
         args.extend(args_in)
@@ -250,8 +244,8 @@ class WindowsHost(RemoteHost):
         except NoSuchProcess:
             return False
 
-    def is_package_installed(self, name):
-        return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, )
+    def is_version_installed(self, name, version):
+        return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
 
     @property
     def os(self):
@@ -261,7 +255,7 @@ class WindowsHost(RemoteHost):
         return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
 
     def run(self, *args, **kwargs):
-        return self.modules.bbtest.LocalHost.run(*args,**kwargs)
+        return self.modules.bbtest.LocalHost.run(*args, **kwargs)
 
     def rmfile(self, path):
         return self.modules.bbtest.LocalHost.rmfile(path)
