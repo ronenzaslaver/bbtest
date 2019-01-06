@@ -4,6 +4,7 @@ Hosts in the network.
 import logging
 import os
 import platform
+import socket
 import subprocess
 import shutil
 import tempfile
@@ -35,11 +36,15 @@ class BaseHost(object):
 
     @property
     def os(self):
-        raise NotImplementedError('Missing method implmentation')
+        raise NotImplementedError('Missing method implementation')
 
     @property
     def bit(self):
-        raise NotImplementedError('Missing method implmentation')
+        return platform.machine()[-2:]
+
+    @property
+    def name(self):
+        return socket.gethostname()
 
     @property
     def package_type(self):
@@ -51,22 +56,23 @@ class BaseHost(object):
 
     def uninstall(self):
         """ the opposite of install,  uninstall our tools from the host """
-        raise NotImplementedError('Missing method implmentation')
+        raise NotImplementedError('Missing method implementation')
 
     def clean(self):
-        raise NotImplementedError('Missing method implmentation')
+        raise NotImplementedError('Missing method implementation')
 
     def isfile(self, path):
-        raise NotImplementedError('Missing method implmentation')
+        raise NotImplementedError('Missing method implementation')
 
     def rmtree(self, path, ignore_errors=True, onerror=None):
-        raise NotImplementedError('Missing method implmentation')
+        raise NotImplementedError('Missing method implementation')
 
     def rmfile(self, path):
-        raise NotImplementedError('Missing method implmentation')
+        raise NotImplementedError('Missing method implementation')
 
     def join(self, *args):
         return self.SEP.join(args)
+
 
 class LocalHost(BaseHost):
     """Suppose to be an os-agnostic local host.
@@ -81,11 +87,6 @@ class LocalHost(BaseHost):
         return platform.platform().lower()
 
     @property
-    def bit(self):
-        #TODO: use a regex to extract 23|64
-        return platform.architecture()[0][0:2]
-
-    @property
     def package_type(self):
         raise NotImplementedError('Non Windows OS')
 
@@ -95,7 +96,7 @@ class LocalHost(BaseHost):
         kwargs ['stdout'] = subprocess.PIPE
         kwargs ['shell'] = True
         logger.debug(f'running a subprocess {args} {kwargs}')
-        output = subprocess.run(*args, **kwargs)
+        output = subprocess.run(list(args), **kwargs)
         logger.debug(f'  returned: {output.stdout}')
         return output.stdout.decode('utf-8').strip().split('\n')
 
@@ -133,13 +134,6 @@ class LocalHost(BaseHost):
     def isfile(self, path):
         return os.path.isfile(path)
 
-    def run_python2(self, *args, **kwargs):
-        if 'win' in self.os.lower():
-            python_executable = ['py', '-2']
-        else:
-            python_executable = ['python2']
-        return self.run(*python_executable, *args, **kwargs)
-
     @staticmethod
     def is_process_running(process_name):
         for process in psutil.process_iter():
@@ -147,15 +141,15 @@ class LocalHost(BaseHost):
                 return True
         return False
 
+
 class LocalWindowsHost(LocalHost):
     """A collection of windows utilities and validators """
     ROOT_PATH = 'c:/temp'
     package_type = 'msi'
 
     @staticmethod
-    def is_package_installed(name):
-        key_val = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall'
-        products = OpenKey(HKEY_LOCAL_MACHINE, key_val)
+    def is_version_installed(name, version):
+        products = OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
         try:
             i = 0
             while True:
@@ -163,13 +157,18 @@ class LocalWindowsHost(LocalHost):
                 product_values = OpenKey(products, product_key_name)
                 try:
                     if QueryValueEx(product_values, 'DisplayName')[0] == name:
-                        return True
+                        return QueryValueEx(product_values, 'DisplayVersion')[0] == version
                 except FileNotFoundError:
                     # product has no 'DisplayName' attribute
                     pass
                 i = i+1
         except WindowsError:
             return False
+
+    def run_python2(self, *args_in, **kwargs):
+        args = ['py', '-2']
+        args.extend(args_in)
+        return self.run(*args, **kwargs)
 
     @staticmethod
     def is_service_running(service_name):
@@ -181,6 +180,25 @@ class LocalWindowsHost(LocalHost):
     @staticmethod
     def mkdtemp(**kwargs):
         return tempfile.mkdtemp(**kwargs)
+
+    def get_active_macs(self):
+        """
+        :return: list of MACs of all active NICs sorted by DeviceID
+        """
+        args = ['powershell.exe']
+        args.append('Get-WmiObject win32_networkadapter | ' \
+                    'Where-Object -Property NetConnectionStatus -eq -Value "2" | ' \
+                    'Sort-Object -Property DeviceId | ' \
+                    'Select-Object -ExpandProperty MACAddress')
+        return self.run(*args)
+
+
+class LocalLinuxHost(LocalHost):
+
+    def run_python2(self, *args_in, **kwargs):
+        args = ['python2']
+        args.extend(args_in)
+        return self.run(*args, **kwargs)
 
 
 class RemoteHost(BaseHost):
@@ -226,8 +244,8 @@ class WindowsHost(RemoteHost):
         except NoSuchProcess:
             return False
 
-    def is_package_installed(self, name):
-        return self.modules.bbtest.LocalWindowsHost.is_package_installed(name)
+    def is_version_installed(self, name, version):
+        return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
 
     @property
     def os(self):
@@ -237,7 +255,7 @@ class WindowsHost(RemoteHost):
         return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
 
     def run(self, *args, **kwargs):
-        return self.modules.bbtest.LocalHost.run(*args,**kwargs)
+        return self.modules.bbtest.LocalHost.run(*args, **kwargs)
 
     def rmfile(self, path):
         return self.modules.bbtest.LocalHost.rmfile(path)
