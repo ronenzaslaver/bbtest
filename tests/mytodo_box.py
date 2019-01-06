@@ -20,11 +20,12 @@ class MyToDoBox(HomeBox):
         if self.host.os == 'linux':
             self.host.run('chmod', '777', self.host.join(self.path, 'mytodo.py'))
 
-    def run(self, *args):
+    def run(self, *args_in, **kwargs):
+
         mytodo_py = self.host.join(self.path, 'mytodo.py')
-        mytodo_py_and_args = [mytodo_py] + list(args)
-        logger.info(f"PyToDoBox command: python {mytodo_py_and_args}")
-        result = self.host.run('python', *mytodo_py_and_args)
+        args = ['python', mytodo_py ] + list(args_in)
+        logger.info(f"PyToDoBox command: host.run({args} {kwargs})")
+        result = self.host.run(args, **kwargs)
         logger.info(f"PyToDoBox returns: {result}")
         return result
 

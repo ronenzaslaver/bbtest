@@ -90,11 +90,15 @@ class LocalHost(BaseHost):
     def package_type(self):
         raise NotImplementedError('Non Windows OS')
 
-    def run(self, cmd, *args, **kwargs):
-        args_list = list(args) if args else []
-        output = subprocess.run(
-            [cmd] + args_list, stdout=subprocess.PIPE, **kwargs)
-        return output.stdout.decode('utf-8').strip().split('\n') if output.stdout else []
+    @staticmethod
+    def run(*args, **kwargs_in):
+        kwargs = kwargs_in.copy()
+        kwargs ['stdout'] = subprocess.PIPE
+        kwargs ['shell'] = True
+        logger.debug(f'running a subprocess {args} {kwargs}')
+        output = subprocess.run(*args, **kwargs)
+        logger.debug(f'  returned: {output.stdout}')
+        return output.stdout.decode('utf-8').strip().split('\n')
 
     def put(self, local, remote):
         return shutil.copyfile(local, remote)
@@ -222,24 +226,6 @@ class RemoteHost(BaseHost):
     def isfile(self, path):
         return self.modules.os.path.isfile(path)
 
-    def run(self, cmd, *args, **kwargs):
-        """ Run any CLI command.
-
-        :todo implement over winrm and ssh.
-        :param cmd:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-        args_list = list(args) if args else []
-        if isinstance(self, WindowsHost):
-            output = self.winrm.run_cmd(cmd, args_list)
-            ret = output.std_out.decode('utf-8').strip().split('\n')
-        else:
-            #TODO: use ssh
-            raise NotImplementedError("Run still doesn't work on Linux")
-
-        return ret
 
     def run_python2(self, *args, **kwargs):
         """Call run command with python2 as the process"""
@@ -273,6 +259,9 @@ class WindowsHost(RemoteHost):
 
     def rmtree(self, *args, **kwargs):
         return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
+
+    def run(self, *args, **kwargs):
+        return self.modules.bbtest.LocalHost.run(*args,**kwargs)
 
     def rmfile(self, path):
         return self.modules.bbtest.LocalHost.rmfile(path)
