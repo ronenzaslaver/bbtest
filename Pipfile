@@ -9,12 +9,13 @@ sphinx = "*"
 ipython = "*"
 pytest-pythonpath = "*"
 pyvmomi = "*"
+pipenv = "*"
 
 [packages]
 dohq-artifactory = "*"
 psutil = "*"
 rpyc = "*"
-pywinrm = "*"
+pipenv = "*"
 
 [requires]
 python_version = "3.7"

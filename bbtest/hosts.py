@@ -11,7 +11,7 @@ import tempfile
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
 from ftplib import FTP
 import rpyc
-import winrm
+import glob
 
 import psutil
 from psutil import NoSuchProcess
@@ -23,8 +23,8 @@ class BaseHost(object):
 
     :param SEP: The path separator character
     :type SEP: str
-
     """
+
     SEP = '/'
 
     def __init__(self, *args, **kwargs):
@@ -33,6 +33,20 @@ class BaseHost(object):
             self.root_path = self.ROOT_PATH
         except AttributeError:
             self.root_path = tempfile.gettempdir()
+
+    def install(self):
+        """ install host for bbtest
+
+        We separate install from init so we can create an install hosts in different order.
+        """
+        pass
+
+    def uninstall(self):
+        """ the opposite of install,  uninstall bbtest from host """
+        pass
+
+    def clean(self):
+        raise NotImplementedError('Missing method implementation')
 
     @property
     def os(self):
@@ -50,17 +64,6 @@ class BaseHost(object):
     def package_type(self):
         raise NotImplementedError('Non Windows OS')
 
-    def destroy(self):
-        """Release the host"""
-        pass
-
-    def uninstall(self):
-        """ the opposite of install,  uninstall our tools from the host """
-        raise NotImplementedError('Missing method implementation')
-
-    def clean(self):
-        raise NotImplementedError('Missing method implementation')
-
     def isfile(self, path):
         raise NotImplementedError('Missing method implementation')
 
@@ -68,6 +71,10 @@ class BaseHost(object):
         raise NotImplementedError('Missing method implementation')
 
     def rmfile(self, path):
+        raise NotImplementedError('Missing method implementation')
+
+    def run_python2(self, *args, **kwargs):
+        """Call run command with python2 as the process"""
         raise NotImplementedError('Missing method implementation')
 
     def join(self, *args):
@@ -204,6 +211,7 @@ class LocalLinuxHost(LocalHost):
 class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
+
     def __init__(self, ip=None, auth=None):
         super().__init__()
         self.ip = ip
@@ -213,21 +221,30 @@ class RemoteHost(BaseHost):
         self._rpyc = rpyc.classic.connect("localhost")
         self.modules = self._rpyc.modules
 
-    def mkdtemp(self, **kwargs):
-        """ same args as tempfile.mkdtemp """
-        return self.modules.tempfile.mkdtemp()
+    def install(self, bbtest_version=None):
+        """ Install bbtest package on remote host.
 
-    def isfile(self, path):
-        return self.modules.os.path.isfile(path)
-
-
-    def run_python2(self, *args, **kwargs):
-        """Call run command with python2 as the process"""
-        pass
+        :param bbtest_version: bbtest version to install.
+        """
+        super().install()
+        root_dir = os.path.dirname(os.path.dirname(os.path.join(os.path.dirname(__file__), 'src')))
+        dist_dir = os.path.join(root_dir, 'dist')
+        if not bbtest_version:
+            def _extract_version(f):
+                return float(f.split('-')[1].split('.tar.gz')[0])
+            bbtest_packages = glob.glob(os.path.join(dist_dir, 'bbtest-*.tar.gz'))
+            bbtest_package = max(bbtest_packages, key=_extract_version)
+        bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
+        args = ['python', '-m', 'pip', 'install', '-U', bbtest_remote]
+        stdout = self.modules.subprocess.run(args, shell=True, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
-        ftp_remote = remote.replace('\\', '/')[len(self.root_path)+1:]
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')
         self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
+        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
+
+    def run(self, *args, **kwargs):
+        return self.modules.bbtest.LocalHost.run(*args, **kwargs)
 
 
 class WindowsHost(RemoteHost):
@@ -236,7 +253,6 @@ class WindowsHost(RemoteHost):
 
     def __init__(self, ip="localhost", auth=("user", "pass")):
         super().__init__(ip, auth)
-        self.winrm = winrm.Session(ip, auth=auth, transport='ntlm')
 
     def is_service_running(self, service_name):
         try:
@@ -254,9 +270,6 @@ class WindowsHost(RemoteHost):
     def rmtree(self, *args, **kwargs):
         return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
 
-    def run(self, *args, **kwargs):
-        return self.modules.bbtest.LocalHost.run(*args, **kwargs)
-
     def rmfile(self, path):
         return self.modules.bbtest.LocalHost.rmfile(path)
 
@@ -268,6 +281,10 @@ class WindowsHost(RemoteHost):
         if not 'dir' in kwargs:
             kwargs['dir'] = self.root_path
         return self.modules.bbtest.LocalWindowsHost.mkdtemp(**kwargs)
+
+    def isfile(self, path):
+        return self.modules.bbtest.LocalWindowsHost.isfile(path)
+
 
 class LinuxHost(RemoteHost):
     pass

@@ -11,10 +11,16 @@ We've added a class property `LAB` that holds a dictionary defining the lab envi
 Installation
 ------------
 
-After forking and cloning this repo, open a shell in this folder:
+Fork and clone this repo.
+
+Testing
+-------
+In order to run all tests, you beed to have python environment with all packages installed and RPyC server running.
+Open a shell in the cloned repo folder:
 
 ```bash
 $ pipenv shell
+$ rpyc_classic.py &
 $ pytest
 ```
 
