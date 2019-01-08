@@ -7,7 +7,10 @@ import platform
 import subprocess
 import shutil
 import tempfile
-from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
+try:
+    from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
+except Exception:
+    pass
 from ftplib import FTP
 import rpyc
 import winrm
@@ -148,6 +151,7 @@ class LocalHost(BaseHost):
         return False
 
 class LocalWindowsHost(LocalHost):
+
     """A collection of windows utilities and validators """
     ROOT_PATH = 'c:/temp'
     package_type = 'msi'
