@@ -1,5 +1,4 @@
 
-import sys
 import pytest
 
 from bbtest import BBTestCase, LocalHost, LinuxHost, WindowsHost
@@ -16,50 +15,27 @@ class BaseToDoTest(BBTestCase):
         self.assertEquals(todos[0], "Foo")
 
 
-class ToDoTestLocalHost(BaseToDoTest):
+class BaseToDoTest(BaseToDoTest):
 
     LAB = {
         'host1': {
-            'class': LocalHost,
+            'class': None,
             'boxes': [MyToDoBox],
          },
     }
 
-    def test_operations(self):
-        self._test_operations()
+    address_book = {'host1': {'ip': None, 'auth': None}}
 
+    os_2_class = {'local': LocalHost,
+                  'win': WindowsHost,
+                  'linux': LinuxHost}
 
-class ToDoTestWindowsHost(BaseToDoTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.LAB['host1']['class'] = BaseToDoTest.os_2_class[pytest.config.getoption('--os')]
+        cls.address_book['host1']['ip'] = pytest.config.getoption('--ip')
+        cls.address_book['host1']['auth'] = (pytest.config.getoption('--user'), pytest.config.getoption('--pw'))
+        super().setUpClass()
 
-    LAB = {
-        'host1': {
-            'class': WindowsHost,
-            'boxes': [MyToDoBox],
-         },
-    }
-
-    address_book = {'host1': {'ip': 'localhost',
-                              'auth': ('Administrator', 'Password1')}}
-
-    @pytest.mark.skipif('win' not in sys.platform,
-                        reason='Windows Test')
-    def test_operations(self):
-        self._test_operations()
-
-
-class ToDoTestLinuxHost(BaseToDoTest):
-
-    LAB = {
-        'host1': {
-            'class': LinuxHost,
-            'boxes': [MyToDoBox],
-         },
-    }
-
-    address_book = {'host1': {'ip': '127.0.0.1',
-                              'auth': ('root', 'Password1')}}
-
-    @pytest.mark.skipif(sys.platform != 'linux',
-                        reason='Windows Test')
     def test_operations(self):
         self._test_operations()

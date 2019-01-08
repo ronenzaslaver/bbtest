@@ -8,8 +8,7 @@ import socket
 import subprocess
 import shutil
 import tempfile
-from builtins import FileNotFoundError
-from pip._vendor.distlib._backport.shutil import WindowsError
+
 try:
     from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
 except Exception:
@@ -219,12 +218,27 @@ class RemoteHost(BaseHost):
     """
 
     def __init__(self, ip=None, auth=None):
+        """ Initialise remote host - open FTP and rpyc connections.
+
+        :param ip:
+        :param auth:
+        """
         super().__init__()
         self.ip = ip
         self.auth = auth
-        self.ftp = FTP(ip)
-        self.ftp.login()
-        self._rpyc = rpyc.classic.connect("localhost")
+        try:
+            self.ftp = FTP(ip)
+        except Exception as e:
+            raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
+        if auth:
+            self.ftp.login(auth[0], auth[1])
+        else:
+            # Assume anonymous
+            self.ftp.login()
+        try:
+            self._rpyc = rpyc.classic.connect(ip)
+        except Exception as e:
+            raise ConnectionError(f'Failed to connect to RPyC server on host {ip} - {e}')
         self.modules = self._rpyc.modules
 
     def install(self, bbtest_version=None):
