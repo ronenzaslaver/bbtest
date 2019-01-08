@@ -1,4 +1,7 @@
 
+import sys
+import pytest
+
 from bbtest import BBTestCase, LocalHost, LinuxHost, WindowsHost
 from .mytodo_box import MyToDoBox
 
@@ -35,10 +38,11 @@ class ToDoTestWindowsHost(BaseToDoTest):
          },
     }
 
-    address_book = {'host1': {'ip': '127.0.0.1',
-                              'auth': ('Administrator', 'Password1')},
-    }
+    address_book = {'host1': {'ip': 'localhost',
+                              'auth': ('Administrator', 'Password1')}}
 
+    @pytest.mark.skipif('win' not in sys.platform,
+                        reason='Windows Test')
     def test_operations(self):
         self._test_operations()
 
@@ -52,5 +56,10 @@ class ToDoTestLinuxHost(BaseToDoTest):
          },
     }
 
-    def _test_operations(self):
+    address_book = {'host1': {'ip': '127.0.0.1',
+                              'auth': ('root', 'Password1')}}
+
+    @pytest.mark.skipif(sys.platform != 'linux',
+                        reason='Windows Test')
+    def test_operations(self):
         self._test_operations()

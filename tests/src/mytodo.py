@@ -15,6 +15,7 @@ version = 0.1
 
 todo_file = None
 
+
 def main(args=None):
 
     """ A simple and extensible script for managing your todo.txt file. """

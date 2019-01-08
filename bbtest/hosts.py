@@ -8,7 +8,12 @@ import socket
 import subprocess
 import shutil
 import tempfile
-from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
+from builtins import FileNotFoundError
+from pip._vendor.distlib._backport.shutil import WindowsError
+try:
+    from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
+except Exception:
+    pass
 from ftplib import FTP
 import rpyc
 import glob
@@ -17,6 +22,7 @@ import psutil
 from psutil import NoSuchProcess
 
 logger = logging.getLogger('bblog')
+
 
 class BaseHost(object):
     """"A base host class
@@ -100,8 +106,8 @@ class LocalHost(BaseHost):
     @staticmethod
     def run(*args, **kwargs_in):
         kwargs = kwargs_in.copy()
-        kwargs ['stdout'] = subprocess.PIPE
-        kwargs ['shell'] = True
+        kwargs['stdout'] = subprocess.PIPE
+        kwargs['shell'] = True
         logger.debug(f'running a subprocess {args} {kwargs}')
         output = subprocess.run(list(args), **kwargs)
         logger.debug(f'  returned: {output.stdout}')
@@ -193,9 +199,9 @@ class LocalWindowsHost(LocalHost):
         :return: list of MACs of all active NICs sorted by DeviceID
         """
         args = ['powershell.exe']
-        args.append('Get-WmiObject win32_networkadapter | ' \
-                    'Where-Object -Property NetConnectionStatus -eq -Value "2" | ' \
-                    'Sort-Object -Property DeviceId | ' \
+        args.append('Get-WmiObject win32_networkadapter | '
+                    'Where-Object -Property NetConnectionStatus -eq -Value "2" | '
+                    'Sort-Object -Property DeviceId | '
                     'Select-Object -ExpandProperty MACAddress')
         return self.run(*args)
 
@@ -278,7 +284,7 @@ class WindowsHost(RemoteHost):
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
-        if not 'dir' in kwargs:
+        if 'dir' not in kwargs:
             kwargs['dir'] = self.root_path
         return self.modules.bbtest.LocalWindowsHost.mkdtemp(**kwargs)
 
