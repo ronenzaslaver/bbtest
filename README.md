@@ -15,13 +15,19 @@ Fork and clone this repo.
 
 Testing
 -------
-In order to run all tests, you beed to have python environment with all packages installed and RPyC server running.
+In order to run all tests, you need to have python environment with all packages installed.
 Open a shell in the cloned repo folder:
 
 ```bash
 $ pipenv shell
-$ rpyc_classic.py &
+$ pipenv install
 $ pytest
+```
+
+In addition, to run tests on remote machine, run RPyC server on remote machine and create bbtest package
+```bash
+$ python setup.py sdist
+$ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
 ```
 
 The examples contain tutorials and how-tos demoing parts of bbtest. You are 

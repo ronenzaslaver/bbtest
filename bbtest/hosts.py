@@ -189,10 +189,6 @@ class LocalWindowsHost(LocalHost):
         except NoSuchProcess:
             return False
 
-    @staticmethod
-    def mkdtemp(**kwargs):
-        return tempfile.mkdtemp(**kwargs)
-
     def get_active_macs(self):
         """
         :return: list of MACs of all active NICs sorted by DeviceID
@@ -207,6 +203,8 @@ class LocalWindowsHost(LocalHost):
 
 class LocalLinuxHost(LocalHost):
 
+    ROOT_PATH = '/tmp'
+
     def run_python2(self, *args_in, **kwargs):
         args = ['python2']
         args.extend(args_in)
@@ -216,6 +214,10 @@ class LocalLinuxHost(LocalHost):
 class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
+
+    @property
+    def os(self):
+        return self.modules.bbtest.LocalHost.os
 
     def __init__(self, ip=None, auth=None):
         """ Initialise remote host - open FTP and rpyc connections.
@@ -228,13 +230,13 @@ class RemoteHost(BaseHost):
         self.auth = auth
         try:
             self.ftp = FTP(ip)
+            if auth:
+                self.ftp.login(auth[0], auth[1])
+            else:
+                # Assume anonymous
+                self.ftp.login()
         except Exception as e:
             raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
-        if auth:
-            self.ftp.login(auth[0], auth[1])
-        else:
-            # Assume anonymous
-            self.ftp.login()
         try:
             self._rpyc = rpyc.classic.connect(ip)
         except Exception as e:
@@ -253,18 +255,33 @@ class RemoteHost(BaseHost):
             def _extract_version(f):
                 return float(f.split('-')[1].split('.tar.gz')[0])
             bbtest_packages = glob.glob(os.path.join(dist_dir, 'bbtest-*.tar.gz'))
-            bbtest_package = max(bbtest_packages, key=_extract_version)
+            try:
+                bbtest_package = max(bbtest_packages, key=_extract_version)
+            except Exception as e:
+                raise Exception(f'Failed to find bbtest package - {e}')
         bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
         args = ['python', '-m', 'pip', 'install', '-U', bbtest_remote]
-        stdout = self.modules.subprocess.run(args, shell=True, stdout=subprocess.PIPE)
+        stdout = self.modules.subprocess.run(' '.join(args), shell=True, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')[1:]
         self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def run(self, *args, **kwargs):
         return self.modules.bbtest.LocalHost.run(*args, **kwargs)
+
+    def mkdtemp(self, **kwargs):
+        """ same args as tempfile.mkdtemp """
+        if 'dir' not in kwargs:
+            kwargs['dir'] = self.root_path
+        return self.modules.bbtest.LocalHost.mkdtemp(**kwargs)
+
+    def rmtree(self, *args, **kwargs):
+        return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
+
+    def rmfile(self, path):
+        return self.modules.bbtest.LocalHost.rmfile(path)
 
 
 class WindowsHost(RemoteHost):
@@ -283,31 +300,20 @@ class WindowsHost(RemoteHost):
     def is_version_installed(self, name, version):
         return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
 
-    @property
-    def os(self):
-        return self.modules.bbtest.LocalHost.os
-
-    def rmtree(self, *args, **kwargs):
-        return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
-
-    def rmfile(self, path):
-        return self.modules.bbtest.LocalHost.rmfile(path)
 
     def rmfiles(self, name):
         return self.modules.bbtest.LocalHost.rmfiles(name)
 
-    def mkdtemp(self, **kwargs):
-        """ same args as tempfile.mkdtemp """
-        if 'dir' not in kwargs:
-            kwargs['dir'] = self.root_path
-        return self.modules.bbtest.LocalWindowsHost.mkdtemp(**kwargs)
 
     def isfile(self, path):
         return self.modules.bbtest.LocalWindowsHost.isfile(path)
 
 
 class LinuxHost(RemoteHost):
-    pass
+    ROOT_PATH = '/tmp'
+
+    def run(self, *args, **kwargs_in):
+        return super().run(' '.join(args), **kwargs_in)
 
 
 class OSXHost(RemoteHost):
