@@ -68,8 +68,9 @@ class HomeBox(BlackBox):
         basename = path.basename(src_path)
         self.put(src_path, basename)
 
-        self.run('chmod', '777', basename)
-        self.run(f'./{basename}', *params)
+        if self.host.os.startswith('linux'):
+            self.run(f'chmod 777 {basename}')
+        self.run(f'./{basename} ' + ' '.join(params))
 
 
 class SpyServerBox(BlackBox):
