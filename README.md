@@ -11,13 +11,27 @@ We've added a class property `LAB` that holds a dictionary defining the lab envi
 Installation
 ------------
 
-After forking and cloning this repo, open a shell in this folder:
+Fork and clone this repo.
 
+Testing
+-------
+In order to run all tests, you need to have python environment with all packages installed.
+Open a shell in the cloned repo folder:
 ```bash
 $ pipenv shell
-$ pytest
+$ pipenv install
+$ pipenv install --dev
 ```
-
+Then take a look at pytest custom options and run tests: 
+```bash
+$ pytest --help
+$ pytest [custom options] tests
+```
+In addition, to run tests on remote machine, run RPyC server on remote machine and create bbtest package
+```bash
+$ python setup.py sdist
+$ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
+```
 The examples contain tutorials and how-tos demoing parts of bbtest. You are 
 welcome to browse the
 [docs](https://daonb.github.io/bbtest/build/html/examples.html).  

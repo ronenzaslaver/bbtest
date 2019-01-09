@@ -32,13 +32,13 @@ class PersonalizationBox(CRServerBox):
     Can run on any machine that can:
     Access the download server
     Untar the personalizer script
-    Run python 2.7
+    Run python 2.7 with 'pip install protobuf' and 'pip install google'
     Copy files to a drive shared with EPs under test (e.g. \\cyberdev\\data\\ep_automation_shared)
     """
 
     def __init__(self, host, name=None):
         super().__init__(host, name=name)
-        if type(self.host) is not LocalHost:
+        if not issubclass(type(self.host), LocalHost):
             raise NotImplementedError(f'Box {self.NAME} is not support on host type: {self.host}')
 
     def download(self, download_server, version, endpoint):
@@ -104,16 +104,12 @@ class PersonalizationBox(CRServerBox):
 
         personalization_script_path = self.host.SEP.join([self.path, 'personalizePackage.py'])
         personalization_command = [personalization_script_path, server_flag, registration_or_transparency.host.ip,
-                                   port_flag, '8443', '-org', 'cybereason', '-c', 'True', '-f', installer_package_path,
-                                   '-u', self.path]
+                                   port_flag, '8443', '-org', 'cybereason', '-f', installer_package_path,
+                                   '-o', self.path]
 
-        # TODO
-        # for win:  ['py', '-2']
-        # for linux: ['python2']
-        # l= ['py', '-2']
         personalization_output = self.host.run_python2(*personalization_command)
         personalization_file_name = personalization_output[-1].replace('\\', '/').split('/')[-1]
-        return self.host.SEP.join([self.path, personalization_file_name.replace('.', '_') + '.zip'])
+        return self.host.SEP.join([self.path, personalization_file_name])
 
     @staticmethod
     def _find_artifact(latest_build_path, package_prefix):
