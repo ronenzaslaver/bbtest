@@ -59,11 +59,11 @@ class BaseHost(object):
 
     @property
     def bit(self):
-        return platform.machine()[-2:]
+        raise NotImplementedError('Missing method implementation')
 
     @property
     def name(self):
-        return socket.gethostname()
+        raise NotImplementedError('Missing method implementation')
 
     @property
     def package_type(self):
@@ -100,7 +100,19 @@ class LocalHost(BaseHost):
 
     @property
     def package_type(self):
-        raise NotImplementedError('Non Windows OS')
+        if 'win' in self.os:
+            return 'msi'
+        elif 'ubuntu' in self.os:
+            return 'deb'
+        raise NotImplementedError('Missing method implementation')
+
+    @property
+    def bit(self):
+        return platform.machine()[-2:]
+
+    @property
+    def name(self):
+        return socket.gethostname()
 
     @staticmethod
     def run(*args, **kwargs_in):

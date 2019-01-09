@@ -32,7 +32,7 @@ class PersonalizationBox(CRServerBox):
     Can run on any machine that can:
     Access the download server
     Untar the personalizer script
-    Run python 2.7 with packages 'protobuf' and 'google'
+    Run python 2.7 with 'pip install protobuf' and 'pip install google'
     Copy files to a drive shared with EPs under test (e.g. \\cyberdev\\data\\ep_automation_shared)
     """
 
