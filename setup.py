@@ -5,9 +5,6 @@ from __future__ import print_function
 from setuptools import setup, find_packages
 import io
 
-from pipenv.project import Project
-from pipenv.utils import convert_deps_to_pip
-
 
 __version__ = '0.1'
 
@@ -22,14 +19,9 @@ def read(*filenames, **kwargs):
     return sep.join(buf)
 
 
-pfile = Project(chdir=False).parsed_pipfile
-install_requires = convert_deps_to_pip(pfile['packages'], r=False)
-tests_require = convert_deps_to_pip(pfile['dev-packages'], r=False)
-
-with open('requirements.txt', 'w+') as f:
-    f.writelines('\n'.join(install_requires))
-    f.write('\n')
-    f.writelines('\n'.join(tests_require))
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+install_requires = [r for r in required if r and r[0] != '#' and not r.startswith('git')]
 
 setup(
     name='bbtest',
@@ -46,7 +38,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     platforms='any',
-    tests_require=tests_require,
+    tests_require=['pytest'],
     classifiers=[
         'Programming Language :: Python',
         'Development Status :: 2 - Pre-Alpha',
