@@ -23,6 +23,7 @@ class Lab():
                 # TODO: allocate a host, use params['image']
                 host = host_class()
             self.hosts[host_name] = host
+            self.hosts[host_name].install()
             # let there be boxes!
             for box_class in params['boxes']:
                 new_box = box_class(host)
@@ -44,7 +45,7 @@ class Lab():
         for box in self.flatten_boxes():
             box.uninstall()
         for host in self.hosts.values():
-            host.destroy()
+            host.uninstall()
         self.boxes = {}
         self.hosts = {}
 

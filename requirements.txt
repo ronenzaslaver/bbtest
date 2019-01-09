@@ -1,0 +1,10 @@
+dohq-artifactory
+psutil
+rpyc
+pipenv
+pytest
+sphinx
+ipython
+pytest-pythonpath
+pyvmomi
+pipenv
