@@ -52,7 +52,8 @@ class BaseHost(object):
         pass
 
     def clean(self):
-        raise NotImplementedError('Missing method implementation')
+        """ Restore host to its original installed state """
+        pass
 
     @property
     def os(self):
