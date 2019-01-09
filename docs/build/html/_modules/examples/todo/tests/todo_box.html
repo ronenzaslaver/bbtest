@@ -51,14 +51,14 @@
 
 <div class="viewcode-block" id="ToDoBox.install"><a class="viewcode-back" href="../../../../examples/todo.html#examples.todo.tests.todo_box.ToDoBox.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; installing todo.txt</span>
-<span class="sd">        First creates a temp dir on the host and then coppies the assets</span>
+<span class="sd">        First creates a temp dir on the host and then copies the assets</span>
 <span class="sd">        in. On Linux, we need to make sure `todo.sh` is executable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
         <span class="n">src_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
                                <span class="s1">&#39;src&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">),</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">)</span>
-        <span class="c1"># need to run t once so it creates its config file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">todopy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src_dir</span><span class="p">,</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">),</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">)</span>
+        <span class="c1"># need to run once so it creates its config file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ToDoBox.run"><a class="viewcode-back" href="../../../../examples/todo.html#examples.todo.tests.todo_box.ToDoBox.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -66,7 +66,7 @@
 <span class="sd">        for more details.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;ToDoBox Starts: </span><span class="si">{args}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;todo.py&#39;</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;python </span><span class="si">{self.todopy}</span><span class="s1"> -d </span><span class="si">{self.path}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;ToDoBox returns: </span><span class="si">{result}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
@@ -93,7 +93,6 @@
 <div class="viewcode-block" id="ToDoBox.clean"><a class="viewcode-back" href="../../../../examples/todo.html#examples.todo.tests.todo_box.ToDoBox.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Clean&#39;s job is to wipe all data. In todo&#39;s case, it&#39;s just a file&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">rmfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;todo.txt&#39;</span><span class="p">))</span></div></div>
-
 </pre></div>
 
           </div>
