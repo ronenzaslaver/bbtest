@@ -32,7 +32,7 @@ class ToDoBox(HomeBox):
         for more details.
         """
         logger.info(f"ToDoBox Starts: {args}")
-        result = super().run('python', self.todopy, '-d', self.path, *args)
+        result = super().run(f'python {self.todopy} -d {self.path}' + ' '.join(args))
         logger.info(f"ToDoBox returns: {result}")
         return result
 

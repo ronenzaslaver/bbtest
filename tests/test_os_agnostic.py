@@ -20,5 +20,5 @@ class BaseToDoTest(BBTestCase):
         box = self.lab.boxes[MyToDoBox.NAME][0]
         box.add('Foo')
         todos = box.list()
-        self.assertEquals(len(todos), 1)
-        self.assertEquals(todos[0], 'Foo')
+        self.assertEqual(len(todos), 1)
+        self.assertEqual(todos[0], 'Foo')

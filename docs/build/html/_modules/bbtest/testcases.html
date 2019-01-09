@@ -55,6 +55,12 @@
             <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">flatten_boxes</span><span class="p">():</span>
                 <span class="n">box</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div>
 
+<div class="viewcode-block" id="BBTestCase.tearDown"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">tearDown</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;lab&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">flatten_boxes</span><span class="p">():</span>
+                <span class="n">box</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="BBTestCase.setUpClass"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.setUpClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setups a lab for black box testing. &quot;&quot;&quot;</span>
@@ -66,7 +72,7 @@
 <div class="viewcode-block" id="BBTestCase.tearDownClass"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.tearDownClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;lab&#39;</span><span class="p">):</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">tearDown</span><span class="p">()</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">()</span></div></div>
 </pre></div>
 

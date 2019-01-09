@@ -35,20 +35,52 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Hosts in the network.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">winreg</span> <span class="k">import</span> <span class="n">HKEY_LOCAL_MACHINE</span><span class="p">,</span> <span class="n">OpenKey</span><span class="p">,</span> <span class="n">EnumKey</span><span class="p">,</span> <span class="n">QueryValueEx</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="kn">from</span> <span class="nn">ftplib</span> <span class="k">import</span> <span class="n">FTP</span>
+<span class="kn">import</span> <span class="nn">rpyc</span>
+<span class="kn">import</span> <span class="nn">winrm</span>
 
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">from</span> <span class="nn">psutil</span> <span class="k">import</span> <span class="n">NoSuchProcess</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;bblog&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost">[docs]</a><span class="k">class</span> <span class="nc">BaseHost</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">_SEP</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+    <span class="sd">&quot;&quot;&quot;&quot;A base host class</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+<span class="sd">    :param SEP: The path separator character</span>
+<span class="sd">    :type SEP: str</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SEP</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROOT_PATH</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root_path</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">os</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implmentation&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implmentation&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">package_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Non Windows OS&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseHost.destroy"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Release the host&quot;&quot;&quot;</span>
@@ -56,97 +88,212 @@
 
 <div class="viewcode-block" id="BaseHost.uninstall"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.uninstall">[docs]</a>    <span class="k">def</span> <span class="nf">uninstall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; the opposite of install,  uninstall our tools from the host &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implmentation&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseHost.clean"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="BaseHost.join"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SEP</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="BaseHost.mkdtemp"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.mkdtemp">[docs]</a>    <span class="k">def</span> <span class="nf">mkdtemp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; same args as tempfile.mkdtemp &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="BaseHost.rm"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.rm">[docs]</a>    <span class="k">def</span> <span class="nf">rm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implmentation&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseHost.isfile"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.isfile">[docs]</a>    <span class="k">def</span> <span class="nf">isfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implmentation&#39;</span><span class="p">)</span></div>
 
-    <span class="c1"># TODO: remove the next methods as they are too specific</span>
 <div class="viewcode-block" id="BaseHost.rmtree"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.rmtree">[docs]</a>    <span class="k">def</span> <span class="nf">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">onerror</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implmentation&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseHost.rmfile"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.rmfile">[docs]</a>    <span class="k">def</span> <span class="nf">rmfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="k">pass</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implmentation&#39;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="BaseHost.join"><a class="viewcode-back" href="../../API.html#bbtest.hosts.BaseHost.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SEP</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="LocalHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost">[docs]</a><span class="k">class</span> <span class="nc">LocalHost</span><span class="p">(</span><span class="n">BaseHost</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Suppose to be an os-agnostic local host.</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+<span class="sd">    For now, supports only Win32 and Win64</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">os</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+        <span class="sd">&quot;&quot;&quot;Returns a lower case string identifying the OS&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-<div class="viewcode-block" id="LocalHost.run"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">args_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="p">[]</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">cmd</span><span class="p">]</span> <span class="o">+</span> <span class="n">args_list</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">output</span><span class="o">.</span><span class="n">stdout</span> <span class="k">else</span> <span class="p">[]</span></div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#TODO: use a regex to extract 23|64</span>
+        <span class="k">return</span> <span class="n">platform</span><span class="o">.</span><span class="n">architecture</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">package_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Non Windows OS&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LocalHost.run"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.run">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_in</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">kwargs</span> <span class="p">[</span><span class="s1">&#39;stdout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
+        <span class="n">kwargs</span> <span class="p">[</span><span class="s1">&#39;shell&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;running a subprocess </span><span class="si">{args}</span><span class="s1"> </span><span class="si">{kwargs}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;  returned: </span><span class="si">{output.stdout}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LocalHost.put"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.put">[docs]</a>    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">remote</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="n">remote</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LocalHost.mkdtemp"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.mkdtemp">[docs]</a>    <span class="k">def</span> <span class="nf">mkdtemp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="LocalHost.mkdtemp"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.mkdtemp">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">mkdtemp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; same args as tempfile.mkdtemp &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LocalHost.rm"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.rm">[docs]</a>    <span class="k">def</span> <span class="nf">rm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">options</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
-            <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
-            <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">)</span>
-        <span class="n">options</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;rm&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">options</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="LocalHost.rmtree"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.rmtree">[docs]</a>    <span class="k">def</span> <span class="nf">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">onerror</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="LocalHost.rmtree"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.rmtree">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rmtree</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">onerror</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="p">,</span> <span class="n">onerror</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LocalHost.rmfile"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.rmfile">[docs]</a>    <span class="k">def</span> <span class="nf">rmfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<div class="viewcode-block" id="LocalHost.rmfile"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.rmfile">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rmfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
             <span class="k">pass</span></div>
 
+<div class="viewcode-block" id="LocalHost.rmfiles"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.rmfiles">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">rmfiles</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;rmfiles with &#39;</span><span class="si">{path}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
+                <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+                    <span class="n">LocalHost</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">dir</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
 <div class="viewcode-block" id="LocalHost.isfile"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.isfile">[docs]</a>    <span class="k">def</span> <span class="nf">isfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LocalHost.run_python2"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.run_python2">[docs]</a>    <span class="k">def</span> <span class="nf">run_python2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;win&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">os</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">python_executable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;py&#39;</span><span class="p">,</span> <span class="s1">&#39;-2&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">python_executable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;python2&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">python_executable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LocalHost.is_process_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalHost.is_process_running">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_process_running</span><span class="p">(</span><span class="n">process_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">psutil</span><span class="o">.</span><span class="n">process_iter</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">name</span><span class="p">()</span> <span class="o">==</span> <span class="n">process_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
+
+<div class="viewcode-block" id="LocalWindowsHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalWindowsHost">[docs]</a><span class="k">class</span> <span class="nc">LocalWindowsHost</span><span class="p">(</span><span class="n">LocalHost</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;A collection of windows utilities and validators &quot;&quot;&quot;</span>
+    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;c:/temp&#39;</span>
+    <span class="n">package_type</span> <span class="o">=</span> <span class="s1">&#39;msi&#39;</span>
+
+<div class="viewcode-block" id="LocalWindowsHost.is_package_installed"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalWindowsHost.is_package_installed">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_package_installed</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="n">key_val</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall&#39;</span>
+        <span class="n">products</span> <span class="o">=</span> <span class="n">OpenKey</span><span class="p">(</span><span class="n">HKEY_LOCAL_MACHINE</span><span class="p">,</span> <span class="n">key_val</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">product_key_name</span> <span class="o">=</span> <span class="n">EnumKey</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">product_values</span> <span class="o">=</span> <span class="n">OpenKey</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">product_key_name</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">QueryValueEx</span><span class="p">(</span><span class="n">product_values</span><span class="p">,</span> <span class="s1">&#39;DisplayName&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                    <span class="c1"># product has no &#39;DisplayName&#39; attribute</span>
+                    <span class="k">pass</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">except</span> <span class="ne">WindowsError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LocalWindowsHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalWindowsHost.is_service_running">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="n">service_name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">psutil</span><span class="o">.</span><span class="n">win_service_get</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span><span class="o">.</span><span class="n">status</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;running&#39;</span>
+        <span class="k">except</span> <span class="n">NoSuchProcess</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="LocalWindowsHost.mkdtemp"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalWindowsHost.mkdtemp">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">mkdtemp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="WindowsHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost">[docs]</a><span class="k">class</span> <span class="nc">WindowsHost</span><span class="p">(</span><span class="n">BaseHost</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="s1">&#39;Window7 SP2&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Deploy a host and store its address and credentials&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+<div class="viewcode-block" id="RemoteHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.RemoteHost">[docs]</a><span class="k">class</span> <span class="nc">RemoteHost</span><span class="p">(</span><span class="n">BaseHost</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A remote host using RPyC</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ftp</span> <span class="o">=</span> <span class="n">FTP</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rpyc</span> <span class="o">=</span> <span class="n">rpyc</span><span class="o">.</span><span class="n">classic</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;localhost&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rpyc</span><span class="o">.</span><span class="n">modules</span>
 
-<div class="viewcode-block" id="WindowsHost.destroy"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.destroy">[docs]</a>    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Release the host&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RemoteHost.mkdtemp"><a class="viewcode-back" href="../../API.html#bbtest.hosts.RemoteHost.mkdtemp">[docs]</a>    <span class="k">def</span> <span class="nf">mkdtemp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; same args as tempfile.mkdtemp &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RemoteHost.isfile"><a class="viewcode-back" href="../../API.html#bbtest.hosts.RemoteHost.isfile">[docs]</a>    <span class="k">def</span> <span class="nf">isfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RemoteHost.run_python2"><a class="viewcode-back" href="../../API.html#bbtest.hosts.RemoteHost.run_python2">[docs]</a>    <span class="k">def</span> <span class="nf">run_python2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call run command with python2 as the process&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
+<div class="viewcode-block" id="RemoteHost.put"><a class="viewcode-back" href="../../API.html#bbtest.hosts.RemoteHost.put">[docs]</a>    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local</span><span class="p">,</span> <span class="n">remote</span><span class="p">):</span>
+        <span class="n">ftp_remote</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_path</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ftp</span><span class="o">.</span><span class="n">storbinary</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;STOR </span><span class="si">{ftp_remote}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="WindowsHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost">[docs]</a><span class="k">class</span> <span class="nc">WindowsHost</span><span class="p">(</span><span class="n">RemoteHost</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A remote windows host &quot;&quot;&quot;</span>
+    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;c:/temp&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;pass&quot;</span><span class="p">)):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">auth</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">winrm</span> <span class="o">=</span> <span class="n">winrm</span><span class="o">.</span><span class="n">Session</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">,</span> <span class="n">transport</span><span class="o">=</span><span class="s1">&#39;ntlm&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WindowsHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.is_service_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">psutil</span><span class="o">.</span><span class="n">win_service_get</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span><span class="o">.</span><span class="n">status</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;running&#39;</span>
+        <span class="k">except</span> <span class="n">NoSuchProcess</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="WindowsHost.is_package_installed"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.is_package_installed">[docs]</a>    <span class="k">def</span> <span class="nf">is_package_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalWindowsHost</span><span class="o">.</span><span class="n">is_package_installed</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">os</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;win32&#39;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="o">.</span><span class="n">os</span>
+
+<div class="viewcode-block" id="WindowsHost.rmtree"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.rmtree">[docs]</a>    <span class="k">def</span> <span class="nf">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WindowsHost.run"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WindowsHost.rmfile"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.rmfile">[docs]</a>    <span class="k">def</span> <span class="nf">rmfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="o">.</span><span class="n">rmfile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WindowsHost.rmfiles"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.rmfiles">[docs]</a>    <span class="k">def</span> <span class="nf">rmfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="o">.</span><span class="n">rmfiles</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WindowsHost.mkdtemp"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.mkdtemp">[docs]</a>    <span class="k">def</span> <span class="nf">mkdtemp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; same args as tempfile.mkdtemp &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;dir&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_path</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalWindowsHost</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="LinuxHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LinuxHost">[docs]</a><span class="k">class</span> <span class="nc">LinuxHost</span><span class="p">(</span><span class="n">RemoteHost</span><span class="p">):</span>
+    <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="LinuxHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LinuxHost">[docs]</a><span class="k">class</span> <span class="nc">LinuxHost</span><span class="p">(</span><span class="n">BaseHost</span><span class="p">):</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">os</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;linux&#39;</span></div>
-
-
-<div class="viewcode-block" id="OSXHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.OSXHost">[docs]</a><span class="k">class</span> <span class="nc">OSXHost</span><span class="p">(</span><span class="n">BaseHost</span><span class="p">):</span>
+<div class="viewcode-block" id="OSXHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.OSXHost">[docs]</a><span class="k">class</span> <span class="nc">OSXHost</span><span class="p">(</span><span class="n">RemoteHost</span><span class="p">):</span>
     <span class="k">pass</span></div>
 </pre></div>
 
