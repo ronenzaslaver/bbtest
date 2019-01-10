@@ -325,6 +325,7 @@ class WindowsHost(RemoteHost):
 
 
 class LinuxHost(RemoteHost):
+
     ROOT_PATH = '/tmp'
 
     def run(self, *args, **kwargs_in):
@@ -332,4 +333,8 @@ class LinuxHost(RemoteHost):
 
 
 class OSXHost(RemoteHost):
-    pass
+
+    ROOT_PATH = '/tmp'
+
+    def run(self, *args, **kwargs_in):
+        return super().run(' '.join(args), **kwargs_in)

@@ -1,12 +1,14 @@
 
-from bbtest import LocalHost, WindowsHost, LinuxHost
+from bbtest import LocalHost, WindowsHost, LinuxHost, OSXHost
 from tests.test_os_agnostic import BaseToDoTest
 
 os_2_class = {'local': LocalHost,
               'win': WindowsHost,
               'windows': WindowsHost,
               'win32': WindowsHost,
-              'linux': LinuxHost}
+              'linux': LinuxHost,
+              'mac': OSXHost,
+              'osx': OSXHost}
 
 
 def pytest_addoption(parser):
