@@ -8,14 +8,12 @@ pytest = "*"
 sphinx = "*"
 ipython = "*"
 pytest-pythonpath = "*"
-pyvmomi = "*"
-pipenv = "*"
+pytest-cov = "*"
 
 [packages]
 dohq-artifactory = "*"
 psutil = "*"
 rpyc = "*"
-pipenv = "*"
 
 [requires]
 python_version = "3.7"

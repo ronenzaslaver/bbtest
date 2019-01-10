@@ -18,14 +18,12 @@ class BBTestCase(unittest.TestCase):
     def setUp(self):
         super().setUp()
         if hasattr(self, 'lab'):
-            for box in self.lab.flatten_boxes():
-                box.clean()
+            self.lab.clean()
 
     def tearDown(self):
-        super().tearDown()
         if hasattr(self, 'lab'):
-            for box in self.lab.flatten_boxes():
-                box.clean()
+            self.lab.clean()
+        super().tearDown()
 
     @classmethod
     def setUpClass(cls):
