@@ -71,22 +71,3 @@ class HomeBox(BlackBox):
         if self.host.os.startswith('linux'):
             self.run(f'chmod 777 {basename}')
         self.run(f'./{basename} ' + ' '.join(params))
-
-
-class SpyServerBox(BlackBox):
-    """A box that exposes a `url` and a `log` so that any messages POSTed to
-    url is appended to the log.
-
-    .. important:: It still doesn't work and the log never changes
-    """
-
-    NAME = 'serverspy'
-
-    log = ['Hello Sara!']
-    """log is an array of log messages where Each POSTed message is appended"""
-
-    def install(self):
-        self.url = "http://example.com"
-
-    def clean(self):
-        pass
