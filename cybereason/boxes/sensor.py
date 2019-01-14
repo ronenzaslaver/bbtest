@@ -1,5 +1,4 @@
 import re
-from winreg import QueryValueEx, OpenKey, HKEY_LOCAL_MACHINE
 
 from cybereason.services.ecosystem import logger
 from . import CRBox
@@ -19,11 +18,10 @@ class SensorBox(CRBox):
         install_command = ['/install', '/quiet', '/norestart']
         self.host.run(installer_path, *install_command)
 
-    @staticmethod
-    def open_key(key_name):
-        cybereason_key = OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Cybereason\ActiveProbe')
+    def open_key(self, key_name):
+        cybereason_key = r'SOFTWARE\Cybereason\ActiveProbe'
         # TODO find a better more abstract way for querying the registry
-        return QueryValueEx(cybereason_key, key_name)[0]
+        return self.host.open_key(cybereason_key, key_name)
 
     def calc_pylumid(self):
         separator = '_'
