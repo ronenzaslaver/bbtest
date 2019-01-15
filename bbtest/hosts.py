@@ -21,6 +21,9 @@ import glob
 import psutil
 from psutil import NoSuchProcess
 
+import bbtest.target
+
+
 logger = logging.getLogger('bblog')
 
 
@@ -89,10 +92,7 @@ class BaseHost(object):
 
 
 class LocalHost(BaseHost):
-    """Suppose to be an os-agnostic local host.
-
-    For now, supports only Win32 and Win64
-    """
+    """Suppose to be an os-agnostic local host."""
     ip = '127.0.0.1'
 
     @property
@@ -116,18 +116,19 @@ class LocalHost(BaseHost):
     def name(self):
         return socket.gethostname()
 
-    @staticmethod
-    def run(*args, **kwargs_in):
-        kwargs = kwargs_in.copy()
-        kwargs['stdout'] = subprocess.PIPE
-        kwargs['shell'] = True
-        logger.debug(f'running a subprocess {args} {kwargs}')
-        output = subprocess.run(list(args), **kwargs)
-        logger.debug(f'  returned: {output.stdout}')
-        return output.stdout.decode('utf-8').strip().split('\n')
+    def run(self, *args, **kwargs):
+        logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
+        output = bbtest.target.run(*args, **kwargs)
+        logger.debug(f'{self.__class__.__name__} run raw stdout: {output}')
+        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines() # .strip().split('\n')
+        logger.debug(f'{self.__class__.__name__} run parsed stdout: {parsed_output}')
+        return parsed_output
 
     def put(self, local, remote):
         return shutil.copyfile(local, remote)
+
+    def get(self, remote, local):
+        return shutil.copyfile(remote, local)
 
     @staticmethod
     def mkdtemp(**kwargs):
@@ -276,15 +277,25 @@ class RemoteHost(BaseHost):
                 raise Exception(f'Failed to find bbtest package - {e}')
         bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
         args = ['python', '-m', 'pip', 'install', '-U', bbtest_remote]
-        stdout = self.modules.subprocess.run(' '.join(args), shell=True, stdout=subprocess.PIPE)
+        self.modules.subprocess.run(' '.join(args), shell=True, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
         ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')[1:]
         self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
+    def get(self, remote, local):
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')[1:]
+        self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
+        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
+
     def run(self, *args, **kwargs):
-        return self.modules.bbtest.LocalHost.run(*args, **kwargs)
+        logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
+        output = self.modules.bbtest.target.run(*args, **kwargs)
+        logger.debug(f'{self.__class__.__name__} run raw stdout: {output}')
+        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines() # .strip().split('\n')
+        logger.debug(f'{self.__class__.__name__} run parsed stdout: {parsed_output}')
+        return parsed_output
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
@@ -315,10 +326,8 @@ class WindowsHost(RemoteHost):
     def is_version_installed(self, name, version):
         return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
 
-
     def rmfiles(self, name):
         return self.modules.bbtest.LocalHost.rmfiles(name)
-
 
     def isfile(self, path):
         return self.modules.bbtest.LocalWindowsHost.isfile(path)
@@ -332,9 +341,5 @@ class LinuxHost(RemoteHost):
         return super().run(' '.join(args), **kwargs_in)
 
 
-class OSXHost(RemoteHost):
-
-    ROOT_PATH = '/tmp'
-
-    def run(self, *args, **kwargs_in):
-        return super().run(' '.join(args), **kwargs_in)
+class OSXHost(LinuxHost):
+    pass
