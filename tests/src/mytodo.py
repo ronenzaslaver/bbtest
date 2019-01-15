@@ -42,9 +42,13 @@ def main(args=None):
     add_convert.add_argument('todo', nargs=1, metavar='todo',
                              help='Delete todo from the list')
 
-    # load sub-parser
+    # list sub-parser
     load_analyze = subparsers.add_parser('list', formatter_class=ArgumentDefaultsHelpFormatter)
     load_analyze.set_defaults(func=list_todos)
+
+    # nothing sub-parser
+    load_analyze = subparsers.add_parser('nothing', formatter_class=ArgumentDefaultsHelpFormatter)
+    load_analyze.set_defaults(func=do_nothing)
 
     # Process arguments
     parsed_args = parser.parse_args(args)
@@ -54,7 +58,8 @@ def main(args=None):
 
 def add_todo(parsed_args):
 
-    print(f'todo_file = {todo_file}')
+    if not parsed_args.todo[0]:
+        sys.exit('empty TODO is not supported')
 
     with open(todo_file, 'a+') as f:
         f.write(f'{parsed_args.todo[0]}\n')
@@ -63,10 +68,14 @@ def add_todo(parsed_args):
 def del_todo(parsed_args):
 
     with open(todo_file, 'r+') as f:
-        todos = f.readlines()
-    todos.remove(parsed_args.todo)
+        todos = [l.strip() for l in f.readlines()]
+    if parsed_args.todo[0] in todos:
+        todos.remove(parsed_args.todo[0])
+    if not todos:
+        os.remove(todo_file)
+        return
     with open(todo_file, 'w+') as f:
-        f.writelines(todos)
+        f.writelines('\n'.join(todos))
 
 
 def list_todos(parsed_args):
@@ -74,8 +83,11 @@ def list_todos(parsed_args):
     if not os.path.isfile(todo_file):
         return []
     with open(todo_file, 'r+') as f:
-        todos = f.readlines()
-    print('\n'.join([t.strip() for t in todos]))
+        todos = [t.strip() for t in f.readlines()]
+    print('\n'.join(todos))
+
+def do_nothing(parsed_args):
+    return
 
 
 if __name__ == "__main__":

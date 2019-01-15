@@ -38,7 +38,10 @@ class MyToDoBox(HomeBox):
     def list(self):
         return self.run('list')
 
-    def remove(self):
+    def do_nothing(self):
+        return self.run('nothing')
+
+    def uninstall(self):
         return self.host.rmtree(self.path)
 
     def clean(self):
