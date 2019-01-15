@@ -1,6 +1,5 @@
 """
 """
-
 from bbtest import BBTestCase
 from bbtest import LocalWindowsHost
 from cybereason.boxes.sensor import SensorBox
@@ -55,10 +54,12 @@ class InstallTest(BBTestCase):
         assert personalization.host.isfile(installer_package_path)
 
         # CYBR-15886 - Add functionality to Endpoint Host to download package from the Personalization server
-        sensor.download(personalization)
+        personalization.host.get(installer_package_path, installer_package_path.replace('\\', '/').split('/')[-1])
+        installer_path_in_endpoint = endpoint.put(installer_package_path,
+                                                  installer_package_path.replace('\\', '/').split('/')[-1])
 
         # CYBR-15889 - Add functionality to Endpoint BB to install sensor from local package
-        sensor.install_wo_download(installer_package_path)
+        sensor.install_wo_download(installer_path_in_endpoint)
 
         # CYBR-15909 - Add functionality to Sensor BB to get Sensor Packages info
         expected_version = sensor.extract_version_from_file(installer_package_path)

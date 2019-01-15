@@ -1,5 +1,6 @@
 
 from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost
+from bbtest.exceptions import ImproperlyConfigured
 
 
 class EmptyBox(BlackBox):
@@ -13,6 +14,26 @@ class YetAnotherEmptyBox(BlackBox):
 class TestNoLab(BBTestCase):
 
     def test_no_lab(self):
+        pass
+
+
+class TestNoClass(BBTestCase):
+
+    LAB = {
+        'host1': {
+            'boxes': []
+         },
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            super().setUpClass()
+        except ImproperlyConfigured as e:
+            return
+        raise Exception
+
+    def test_no_class(self):
         pass
 
 
