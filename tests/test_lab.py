@@ -1,4 +1,6 @@
 
+import pytest
+
 from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost
 from bbtest.exceptions import ImproperlyConfigured
 
@@ -27,11 +29,8 @@ class TestNoClass(BBTestCase):
 
     @classmethod
     def setUpClass(cls):
-        try:
+        with pytest.raises(ImproperlyConfigured) as _:
             super().setUpClass()
-        except ImproperlyConfigured as e:
-            return
-        raise Exception
 
     def test_no_class(self):
         pass
