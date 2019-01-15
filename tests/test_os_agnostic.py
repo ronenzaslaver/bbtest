@@ -1,4 +1,6 @@
 
+import subprocess
+
 from bbtest import BBTestCase
 from .mytodo_box import MyToDoBox
 
@@ -24,8 +26,4 @@ class BaseToDoTest(BBTestCase):
         box.delete('Foo')
         todos = box.list()
         self.assertEqual(len(todos), 0)
-        # test empty string return
-        # box.add('')
-        # todos = box.list()
-        # self.assertEqual(len(todos), 1)
-        # self.assertEqual(todos[0], '')
+        self.assertRaises(subprocess.SubprocessError, box.add, '')

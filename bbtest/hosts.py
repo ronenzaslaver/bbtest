@@ -21,7 +21,7 @@ import glob
 import psutil
 from psutil import NoSuchProcess
 
-import bbtest.target
+from bbtest import target
 
 
 logger = logging.getLogger('bblog')
@@ -118,9 +118,9 @@ class LocalHost(BaseHost):
 
     def run(self, *args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
-        output = bbtest.target.run(*args, **kwargs)
+        output = target.run(*args, **kwargs)
         logger.debug(f'{self.__class__.__name__} run raw stdout: {output}')
-        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines() # .strip().split('\n')
+        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines()
         logger.debug(f'{self.__class__.__name__} run parsed stdout: {parsed_output}')
         return parsed_output
 
@@ -312,7 +312,7 @@ class RemoteHost(BaseHost):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         output = self.modules.bbtest.target.run(*args, **kwargs)
         logger.debug(f'{self.__class__.__name__} run raw stdout: {output}')
-        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines() # .strip().split('\n')
+        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines()
         logger.debug(f'{self.__class__.__name__} run parsed stdout: {parsed_output}')
         return parsed_output
 

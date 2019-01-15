@@ -14,7 +14,7 @@ os_2_class = {'local': LocalHost,
 
 
 def pytest_addoption(parser):
-    parser.addoption('--os', action='store', default='linux',
+    parser.addoption('--os', action='store', default='local',
                      help='OS of target machine - local, windows, linux, mac or config')
     parser.addoption('--ip', action='store', default='172.16.30.164', help='IP address of target machine')
     parser.addoption('--user', action='store', default='root', help='Username for target machine')
