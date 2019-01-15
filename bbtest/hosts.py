@@ -124,10 +124,12 @@ class LocalHost(BaseHost):
         logger.debug(f'{self.__class__.__name__} run parsed stdout: {parsed_output}')
         return parsed_output
 
-    def put(self, local, remote):
+    @staticmethod
+    def put(local, remote):
         return shutil.copyfile(local, remote)
 
-    def get(self, remote, local):
+    @staticmethod
+    def get(remote, local):
         return shutil.copyfile(remote, local)
 
     @staticmethod
@@ -167,6 +169,11 @@ class LocalHost(BaseHost):
             if process.name() == process_name:
                 return True
         return False
+
+    @staticmethod
+    def open_key(parent_key, key):
+        cybereason_key = OpenKey(HKEY_LOCAL_MACHINE, parent_key)
+        return QueryValueEx(cybereason_key, key)[0]
 
 
 class LocalWindowsHost(LocalHost):
@@ -233,7 +240,19 @@ class RemoteHost(BaseHost):
 
     @property
     def os(self):
-        return self.modules.bbtest.LocalHost.os
+        return self.modules.bbtest.LocalHost().os
+
+    @property
+    def bit(self):
+        return self.modules.bbtest.LocalHost().bit
+
+    @property
+    def package_type(self):
+        return self.modules.bbtest.LocalHost().package_type
+
+    @property
+    def name(self):
+        return self.modules.bbtest.LocalHost().name
 
     def __init__(self, ip=None, auth=None):
         """ Initialise remote host - open FTP and rpyc connections.
@@ -280,12 +299,12 @@ class RemoteHost(BaseHost):
         self.modules.subprocess.run(' '.join(args), shell=True, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')[1:]
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').split('/', 1)[-1]
         self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def get(self, remote, local):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')[1:]
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').split('/', 1)[-1]
         self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
@@ -309,6 +328,9 @@ class RemoteHost(BaseHost):
     def rmfile(self, path):
         return self.modules.bbtest.LocalHost.rmfile(path)
 
+    def is_process_running(self, process):
+        return self.modules.bbtest.LocalHost.is_process_running(process)
+
 
 class WindowsHost(RemoteHost):
     """ A remote windows host """
@@ -316,12 +338,6 @@ class WindowsHost(RemoteHost):
 
     def __init__(self, ip="localhost", auth=("user", "pass")):
         super().__init__(ip, auth)
-
-    def is_service_running(self, service_name):
-        try:
-            return self.modules.psutil.win_service_get(service_name).status() == 'running'
-        except NoSuchProcess:
-            return False
 
     def is_version_installed(self, name, version):
         return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
@@ -332,13 +348,28 @@ class WindowsHost(RemoteHost):
     def isfile(self, path):
         return self.modules.bbtest.LocalWindowsHost.isfile(path)
 
+    def open_key(self, parent_key, key):
+        return self.modules.bbtest.LocalHost.open_key(parent_key, key)
+
+    def get_active_macs(self):
+        return self.modules.bbtest.LocalWindowsHost().get_active_macs()
+
+    def is_service_running(self, service):
+        return self.modules.bbtest.LocalWindowsHost.is_service_running(service)
+
 
 class LinuxHost(RemoteHost):
 
     ROOT_PATH = '/tmp'
 
-    def run(self, *args, **kwargs_in):
-        return super().run(' '.join(args), **kwargs_in)
+    def run(self, *args, **kwargs):
+        return super().run(' '.join(args), **kwargs)
+
+    def is_service_running(self, service):
+        raise NotImplementedError('Missing method implementation')
+
+    def is_version_installed(self, name, version):
+        raise NotImplementedError('Missing method implementation')
 
 
 class OSXHost(LinuxHost):
