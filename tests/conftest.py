@@ -2,7 +2,7 @@
 import pytest
 
 from bbtest import LocalHost, WindowsHost, LinuxHost, OSXHost
-from tests.test_os_agnostic import TestOsAgnostic
+
 
 os_2_class = {'local': LocalHost,
               'win': WindowsHost,
@@ -14,26 +14,27 @@ os_2_class = {'local': LocalHost,
 
 
 def pytest_addoption(parser):
-    parser.addoption('--os', action='store', default='',
-                     help='OS of target machine - local, windows, linux, mac or config')
-    parser.addoption('--ip', action='store', default='172.16.30.164', help='IP address of target machine')
-    parser.addoption('--user', action='store', default='root', help='Username for target machine')
-    parser.addoption('--pw', action='store', default='Password1', help='Password for target machine')
-
-
-def pytest_configure(config):
-    print('in pytest_configure')
-    TestOsAgnostic.address_book['host1']['ip'] = config.getoption('--ip')
-    TestOsAgnostic.address_book['host1']['auth'] = (config.getoption('--user'), config.getoption('--pw'))
+    parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
+    parser.addoption('--config', action='store', default='config', help='path to configuration file')
+    parser.addoption('--ip', action='store', default='', help='IP address of target machine')
+    parser.addoption('--user', action='store', default='', help='Username for target machine')
+    parser.addoption('--pw', action='store', default='', help='Password for target machine')
 
 
 @pytest.fixture(scope='class')
-def os(request):
-    print('in fixture')
-    request.cls.LAB['host1']['class'] = os_2_class[request.param]
+def host(request):
+    request.cls.LAB['host1']['class'] = os_2_class[request.param[0]]
+    request.cls.address_book['host1']['ip'] = request.param[1]
+    request.cls.address_book['host1']['auth'] = (request.param[2][0], request.param[2][1])
+    request.cls.setup_lab()
+    yield
+    request.cls.teardown_lab()
 
 
 def pytest_generate_tests(metafunc):
-    print('in pytest_generate_tests')
-    oss = [metafunc.config.getoption('--os')] if metafunc.config.getoption('--os') else ['local', 'win']
-    metafunc.parametrize('os', oss, indirect=True)
+    if metafunc.config.getoption('--config'):
+        hosts = [['local', '', ('', '')], ['win', 'localhost', ('', '')]]
+    else:
+        hosts = [metafunc.config.getoption('--os'), metafunc.config.getoption('--ip'),
+                (metafunc.config.getoption('--user'), metafunc.config.getoption('--pw'))]
+    metafunc.parametrize('host', hosts, indirect=True)
