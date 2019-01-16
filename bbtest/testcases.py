@@ -1,5 +1,4 @@
 import logging
-import unittest
 
 from bbtest import Lab
 
@@ -24,13 +23,13 @@ class BBTestCase(object):
             self.lab.clean()
 
     @classmethod
-    def setup_class(cls):
+    def setup_lab(cls):
         """Setups a lab for black box testing. """
         logger.setLevel(logging.DEBUG)
         if hasattr(cls, 'LAB'):
             cls.lab = Lab(cls.LAB, address_book=cls.address_book)
 
     @classmethod
-    def teardown_class(cls):
+    def teardown_lab(cls):
         if hasattr(cls, 'lab'):
             cls.lab.destroy()
