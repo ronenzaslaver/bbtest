@@ -6,7 +6,7 @@ from bbtest import Lab
 logger = logging.getLogger('bblog')
 
 
-class BBTestCase(unittest.TestCase):
+class BBTestCase(object):
     """A black box test case based on :class:`unittest.TestCase`
 
     We've added a class property `LAB` that holds a dictionary defining the lab enviornment.
@@ -15,26 +15,22 @@ class BBTestCase(unittest.TestCase):
 
     address_book = {}
 
-    def setUp(self):
-        super().setUp()
+    def setup(self):
         if hasattr(self, 'lab'):
             self.lab.clean()
 
-    def tearDown(self):
+    def teardown(self):
         if hasattr(self, 'lab'):
             self.lab.clean()
-        super().tearDown()
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Setups a lab for black box testing. """
-        super().setUpClass()
         logger.setLevel(logging.DEBUG)
         if hasattr(cls, 'LAB'):
             cls.lab = Lab(cls.LAB, address_book=cls.address_book)
 
     @classmethod
-    def tearDownClass(cls):
+    def teardown_class(cls):
         if hasattr(cls, 'lab'):
             cls.lab.destroy()
-        super().tearDownClass()
