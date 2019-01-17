@@ -83,9 +83,19 @@ class BaseHost(object):
     def rmfile(self, path):
         raise NotImplementedError('Missing method implementation')
 
-    def run_python2(self, *args, **kwargs):
-        """Call run command with python2 as the process"""
-        raise NotImplementedError('Missing method implementation')
+    def run_python2(self, args_in, **kwargs):
+        return self._run_python(2, args_in, **kwargs)
+
+    def run_python3(self, args_in, **kwargs):
+        return self._run_python(3, args_in, **kwargs)
+
+    def _run_python(self, version, args_in, **kwargs):
+        args = ['py', '-' + str(version)] if self.is_winodws_host() else ['python' + str(version)]
+        args.extend(args_in)
+        return self.run(args, **kwargs)
+
+    def is_winodws_host(self):
+        return 'win' in self.os
 
     def join(self, *args):
         return self.SEP.join(args)
@@ -116,9 +126,9 @@ class LocalHost(BaseHost):
     def name(self):
         return socket.gethostname()
 
-    def run(self, *args, **kwargs):
+    def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
-        output = target.run(*args, **kwargs)
+        output = target.run(args, **kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -204,10 +214,16 @@ class LocalWindowsHost(LocalHost):
         except WindowsError:
             return False
 
-    def run_python2(self, *args_in, **kwargs):
-        args = ['py', '-2']
+    def run_python2(self, args_in, **kwargs):
+        return self._run_python(2, args_in, **kwargs)
+
+    def run_python3(self, args_in, **kwargs):
+        return self._run_python(3, args_in, **kwargs)
+
+    def _run_python(self, version, args_in, **kwargs):
+        args = ['py', '-' + str(version)]
         args.extend(args_in)
-        return self.run(*args, **kwargs)
+        return self.run(args, **kwargs)
 
     @staticmethod
     def is_service_running(service_name):
@@ -225,7 +241,7 @@ class LocalWindowsHost(LocalHost):
                     'Where-Object -Property NetConnectionStatus -eq -Value "2" | '
                     'Sort-Object -Property DeviceId | '
                     'Select-Object -ExpandProperty MACAddress')
-        return self.run(*args)
+        return self.run(args)
 
 
 class LocalLinuxHost(LocalHost):
@@ -235,7 +251,17 @@ class LocalLinuxHost(LocalHost):
     def run_python2(self, *args_in, **kwargs):
         args = ['python2']
         args.extend(args_in)
-        return self.run(*args, **kwargs)
+        return self.run(args, **kwargs)
+
+    def run_python3(self, *args_in, **kwargs):
+        args = ['python2']
+        args.extend(args_in)
+        return self.run(args, **kwargs)
+
+    def _run_python3(self, version, *args_in, **kwargs):
+        args = ['python' + version]
+        args.extend(args_in)
+        return self.run(args, **kwargs)
 
 
 class RemoteHost(BaseHost):
@@ -299,8 +325,9 @@ class RemoteHost(BaseHost):
             except Exception as e:
                 raise Exception(f'Failed to find bbtest package - {e}')
         bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
-        args = ['python', '-m', 'pip', 'install', '-U', bbtest_remote]
-        self.modules.subprocess.run(' '.join(args), shell=True, stdout=subprocess.PIPE)
+        args = ['py', '-3'] if 'win' in self.modules.platform.platform().lower() else ['python3']
+        args.extend(['-m', 'pip', 'install', '-U', bbtest_remote])
+        self.modules.subprocess.run(args, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
         ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').split('/', 1)[-1]
@@ -312,9 +339,9 @@ class RemoteHost(BaseHost):
         self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
-    def run(self, *args, **kwargs):
+    def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
-        output = self.modules.bbtest.target.run(*args, **kwargs)
+        output = self.modules.bbtest.target.run(args, **kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -369,9 +396,6 @@ class WindowsHost(RemoteHost):
 class LinuxHost(RemoteHost):
 
     ROOT_PATH = '/tmp'
-
-    def run(self, *args, **kwargs):
-        return super().run(' '.join(args), **kwargs)
 
     def is_service_running(self, service):
         raise NotImplementedError('Missing method implementation')
