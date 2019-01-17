@@ -55,8 +55,8 @@ class HomeBox(BlackBox):
         if self.host and self.path:
             self.host.rmfiles(self.path)
 
-    def run(self, *args, **kwargs):
-        return self.host.run(*args, cwd=self.path, **kwargs)
+    def run(self, args, **kwargs):
+        return self.host.run(args, cwd=self.path, **kwargs)
 
     def put(self, src, dest, *args, **kwargs):
         """Put a file in the host's home directory """
@@ -69,8 +69,10 @@ class HomeBox(BlackBox):
         self.put(src_path, basename)
 
         if self.host.os.startswith('linux'):
-            self.run(f'chmod 777 {basename}')
-        self.run(f'./{basename} ' + ' '.join(params))
+            self.run(['chmod', '777', basename])
+        args = ['./{basename}']
+        args.extend(params)
+        self.run(args)
 
 
 class SpyServerBox(BlackBox):

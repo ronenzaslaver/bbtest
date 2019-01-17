@@ -15,8 +15,7 @@ class SensorBox(CRBox):
 
     def install_wo_download(self, installer_path):
         logger.info('install sensor on endpoint')
-        install_command = ['/install', '/quiet', '/norestart']
-        self.host.run(installer_path, *install_command)
+        self.host.run([f'{installer_path}/install', '/quiet', '/norestart'])
 
     def open_key(self, key_name):
         cybereason_key = r'SOFTWARE\Cybereason\ActiveProbe'
