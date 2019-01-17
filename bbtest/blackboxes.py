@@ -70,7 +70,7 @@ class HomeBox(BlackBox):
 
         if self.host.os.startswith('linux'):
             self.run(['chmod', '777', basename])
-        args = ['./{basename}']
+        args = [f'./{basename}']
         args.extend(params)
         self.run(args)
 
