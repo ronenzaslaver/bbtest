@@ -119,8 +119,12 @@ class LocalHost(BaseHost):
     def run(self, *args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         output = target.run(*args, **kwargs)
-        logger.debug(f'{self.__class__.__name__} run raw stdout: {output}')
-        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines()
+        if output.returncode > 0:
+            raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
+                                             f'stdout = {output.stdout}\n'
+                                             f'stderr = {output.stderr}')
+        logger.debug(f'{self.__class__.__name__} run raw stdout: {output.stdout}')
+        parsed_output = [] if output.stdout == b'' else output.stdout.decode('utf-8').splitlines()
         logger.debug(f'{self.__class__.__name__} run parsed stdout: {parsed_output}')
         return parsed_output
 
@@ -311,8 +315,12 @@ class RemoteHost(BaseHost):
     def run(self, *args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         output = self.modules.bbtest.target.run(*args, **kwargs)
-        logger.debug(f'{self.__class__.__name__} run raw stdout: {output}')
-        parsed_output = [] if output == b'' else output.decode('utf-8').splitlines()
+        if output.returncode > 0:
+            raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
+                                             f'stdout = {output.stdout}\n'
+                                             f'stderr = {output.stderr}')
+        logger.debug(f'{self.__class__.__name__} run raw stdout: {output.stdout}')
+        parsed_output = [] if output.stdout == b'' else output.stdout.decode('utf-8').splitlines()
         logger.debug(f'{self.__class__.__name__} run parsed stdout: {parsed_output}')
         return parsed_output
 
