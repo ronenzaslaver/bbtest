@@ -1,15 +1,16 @@
 
 import pytest
 
-from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost
+from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost, Lab
 from bbtest.exceptions import ImproperlyConfigured
 
 
-@pytest.fixture(scope='class')
-def lab(request):
-    request.cls.setup_lab()
-    yield request.cls.lab
-    request.cls.teardown_lab()
+@pytest.fixture(scope='class', autouse=True)
+def manage_lab(request):
+    topo = request.cls.topo if hasattr(request.cls, 'topo') else {}
+    request.cls.lab = Lab(topo)
+    yield
+    request.cls.lab.destroy()
 
 
 class EmptyBox(BlackBox):
@@ -22,70 +23,70 @@ class YetAnotherEmptyBox(BlackBox):
 
 class TestNoLab(BBTestCase):
 
-    def test_no_lab(self, lab):
+    def test_no_lab(self):
         pass
 
 
 class TestNoClass(BBTestCase):
 
-    LAB = {
+    topo = {
         'host1': {
             'boxes': []
          },
     }
 
-    @classmethod
-    def setup_lab(cls):
+    @pytest.fixture(scope='class', autouse=True)
+    def manage_lab(request):
         with pytest.raises(ImproperlyConfigured) as _:
-            super().setup_lab()
+            Lab(request.topo)
 
-    def test_no_class(self, lab):
+    def test_no_class(self):
         pass
 
 
 class TestBaseHost(BBTestCase):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': BaseHost,
             'boxes': []
          },
     }
 
-    def test_base_host(self, lab):
+    def test_base_host(self):
         pass
 
 
 class TestNoBox(BBTestCase):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': []
          },
     }
 
-    def test_no_box(self, lab):
+    def test_no_box(self):
         pass
 
 
 class TestSingleBox(BBTestCase):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': [EmptyBox]
          },
     }
 
-    def test_single_box(self, lab):
-        assert len(lab.boxes[EmptyBox.NAME]) == 1
-        assert lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'
+    def test_single_box(self):
+        assert len(self.lab.boxes[EmptyBox.NAME]) == 1
+        assert self.lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'
 
 
 class MultiBox(BBTestCase):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': [EmptyBox, EmptyBox]
@@ -96,6 +97,6 @@ class MultiBox(BBTestCase):
          },
     }
 
-    def test_multi_boxes(self, lab):
-        assert len(lab.boxes[EmptyBox.NAME]) == 2
-        assert len(lab.boxes[YetAnotherEmptyBox.NAME]) == 2
+    def test_multi_boxes(self):
+        assert len(self.lab.boxes[EmptyBox.NAME]) == 2
+        assert len(self.lab.boxes[YetAnotherEmptyBox.NAME]) == 2
