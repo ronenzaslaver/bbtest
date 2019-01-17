@@ -22,12 +22,12 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope='class')
-def host(request):
+def lab(request):
     request.cls.LAB['host1']['class'] = os_2_class[request.param[0]]
     request.cls.address_book['host1']['ip'] = request.param[1]
     request.cls.address_book['host1']['auth'] = (request.param[2][0], request.param[2][1])
     request.cls.setup_lab()
-    yield
+    yield request.cls.lab
     request.cls.teardown_lab()
 
 
@@ -37,4 +37,4 @@ def pytest_generate_tests(metafunc):
     else:
         hosts = [metafunc.config.getoption('--os'), metafunc.config.getoption('--ip'),
                 (metafunc.config.getoption('--user'), metafunc.config.getoption('--pw'))]
-    metafunc.parametrize('host', hosts, indirect=True)
+    metafunc.parametrize('lab', hosts, indirect=True)

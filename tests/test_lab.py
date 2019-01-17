@@ -5,6 +5,13 @@ from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost
 from bbtest.exceptions import ImproperlyConfigured
 
 
+@pytest.fixture(scope='class')
+def lab(request):
+    request.cls.setup_lab()
+    yield request.cls.lab
+    request.cls.teardown_lab()
+
+
 class EmptyBox(BlackBox):
     NAME = 'empty'
 
@@ -15,7 +22,7 @@ class YetAnotherEmptyBox(BlackBox):
 
 class TestNoLab(BBTestCase):
 
-    def test_no_lab(self):
+    def test_no_lab(self, lab):
         pass
 
 
@@ -28,11 +35,11 @@ class TestNoClass(BBTestCase):
     }
 
     @classmethod
-    def setUpClass(cls):
+    def setup_lab(cls):
         with pytest.raises(ImproperlyConfigured) as _:
-            super().setUpClass()
+            super().setup_lab()
 
-    def test_no_class(self):
+    def test_no_class(self, lab):
         pass
 
 
@@ -45,7 +52,7 @@ class TestBaseHost(BBTestCase):
          },
     }
 
-    def test_base_host(self):
+    def test_base_host(self, lab):
         pass
 
 
@@ -58,7 +65,7 @@ class TestNoBox(BBTestCase):
          },
     }
 
-    def test_no_box(self):
+    def test_no_box(self, lab):
         pass
 
 
@@ -71,9 +78,9 @@ class TestSingleBox(BBTestCase):
          },
     }
 
-    def test_single_box(self):
-        assert len(self.lab.boxes[EmptyBox.NAME]) == 1
-        assert self.lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'
+    def test_single_box(self, lab):
+        assert len(lab.boxes[EmptyBox.NAME]) == 1
+        assert lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'
 
 
 class MultiBox(BBTestCase):
@@ -89,6 +96,6 @@ class MultiBox(BBTestCase):
          },
     }
 
-    def test_multi_boxes(self):
-        assert len(self.lab.boxes[EmptyBox.NAME]) == 2
-        assert len(self.lab.boxes[YetAnotherEmptyBox.NAME]) == 2
+    def test_multi_boxes(self, lab):
+        assert len(lab.boxes[EmptyBox.NAME]) == 2
+        assert len(lab.boxes[YetAnotherEmptyBox.NAME]) == 2
