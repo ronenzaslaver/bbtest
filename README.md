@@ -32,15 +32,15 @@ To run tests on local machine simply run
 $ pytest tests
 ```
 To run tests on remote machine you need to run FTP server and RPyC server on remote machine.
+
 - Download and install python 3.7 and RPyC:
 ```bash
-$ pip3 install pipenv
-$ pipenv shell --python 3.7
-$ pipenv install rpyc
+$ pip3 install rpyc
 $ rpyc_classic.py --host 0.0.0.0
 ```
 - Start FTP server on the remote machine with root directory set to "temp" directory (c:\temp, /tmp).
 - Now you can run tests on the remote host:
+
 ```bash
 $ python setup.py sdist
 $ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
