@@ -186,8 +186,8 @@ class LocalHost(BaseHost):
 
     @staticmethod
     def open_key(parent_key, key):
-        cybereason_key = OpenKey(HKEY_LOCAL_MACHINE, parent_key)
-        return QueryValueEx(cybereason_key, key)[0]
+        parent = OpenKey(HKEY_LOCAL_MACHINE, parent_key)
+        return QueryValueEx(parent, key)[0]
 
 
 class LocalWindowsHost(LocalHost):
