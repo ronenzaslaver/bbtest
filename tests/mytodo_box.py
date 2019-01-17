@@ -23,10 +23,10 @@ class MyToDoBox(HomeBox):
     def run(self, args_in, **kwargs):
 
         mytodo_py = self.host.join(self.path, 'mytodo.py')
-        args = ['python', mytodo_py ] + list(args_in)
-        logger.info(f"PyToDoBox command: host.run({args} {kwargs})")
-        result = self.host.run(args, **kwargs)
-        logger.info(f"PyToDoBox returns: {result}")
+        args = [mytodo_py ] + list(args_in)
+        logger.info(f'{self.__class__.__name__} command: host.run({args} {kwargs})')
+        result = self.host.run_python3(args, **kwargs)
+        logger.info(f"{self.__class__.__name__} returns: {result}")
         return result
 
     def add(self, todo):
