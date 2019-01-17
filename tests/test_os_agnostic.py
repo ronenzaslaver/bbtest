@@ -18,9 +18,9 @@ class TestOsAgnostic(BBTestCase):
 
     address_book = {'host1': {'ip': None, 'auth': None}}
 
-    def test_operations(self, host):
+    def test_operations(self, lab):
         # Test no output.
-        box = self.lab.boxes[MyToDoBox.NAME][0]
+        box = lab.boxes[MyToDoBox.NAME][0]
         assert box.do_nothing() == []
         # Test output capture.
         box.add('Foo')
