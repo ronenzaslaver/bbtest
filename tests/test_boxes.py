@@ -2,14 +2,14 @@
 import os
 import pytest
 
-from bbtest import BBTestCase, LocalHost, HomeBox, BaseHost
+from bbtest import BBTestCase, LocalHost, HomeBox, BaseHost, Lab
 
 
-@pytest.fixture(scope='class')
-def lab(request):
-    request.cls.setup_lab()
-    yield request.cls.lab
-    request.cls.teardown_lab()
+@pytest.fixture(scope='class', autouse=True)
+def manage_lab(request):
+    request.cls.lab = Lab(request.cls.topo)
+    yield
+    request.cls.lab.destroy()
 
 
 class TestHomeBox(BBTestCase):
@@ -18,27 +18,16 @@ class TestHomeBox(BBTestCase):
     This test can run only on LocalHost.
     """
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': [HomeBox, HomeBox],
          },
     }
 
-    def teardown(self):
-        assert os.path.exists(TestHomeBox.empty_file_1)
-        super().teardown()
-        assert not os.path.exists(TestHomeBox.empty_file_1)
-
-    @classmethod
-    def teardown_lab(cls):
-        assert os.path.isdir(TestHomeBox.empty_box_1.path)
-        super().teardown_lab()
-        assert not os.path.isdir(TestHomeBox.empty_box_1.path)
-
-    def test_home_box(self, lab):
-        empty_box_0 = lab.boxes[HomeBox.NAME][0]
-        TestHomeBox.empty_box_1 = lab.boxes[HomeBox.NAME][1]
+    def test_home_box(self):
+        empty_box_0 = self.lab.boxes[HomeBox.NAME][0]
+        TestHomeBox.empty_box_1 = self.lab.boxes[HomeBox.NAME][1]
         assert os.path.isdir(empty_box_0.path)
         assert os.path.isdir(TestHomeBox.empty_box_1.path)
         assert empty_box_0.path != TestHomeBox.empty_box_1

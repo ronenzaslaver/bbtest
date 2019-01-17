@@ -4,16 +4,16 @@ from .exceptions import ImproperlyConfigured
 
 class Lab():
 
-    def __init__(self, lab, address_book={}):
+    def __init__(self, topology={}, address_book={}):
         """
-        :param lab: a dictionary where each hostname has
-                    a dictionary with `image` & `boxes`
+        :param topology: a dictionary representing the topology of the test setup.
+                         each hostname in the dictionary is a dictionary with `class` & `boxes`
         :param address_book: a dictionary where each hostname has
                              a dictionary with ip, username & password
         """
         self.boxes = {}
         self.hosts = {}
-        for host_name, params in lab.items():
+        for host_name, params in topology.items():
             if 'class' not in params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
             host_class = params['class']
