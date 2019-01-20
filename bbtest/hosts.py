@@ -214,17 +214,6 @@ class LocalWindowsHost(LocalHost):
         except WindowsError:
             return False
 
-    def run_python2(self, args_in, **kwargs):
-        return self._run_python(2, args_in, **kwargs)
-
-    def run_python3(self, args_in, **kwargs):
-        return self._run_python(3, args_in, **kwargs)
-
-    def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)]
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
     @staticmethod
     def is_service_running(service_name):
         try:
@@ -247,21 +236,6 @@ class LocalWindowsHost(LocalHost):
 class LocalLinuxHost(LocalHost):
 
     ROOT_PATH = '/tmp'
-
-    def run_python2(self, *args_in, **kwargs):
-        args = ['python2']
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
-    def run_python3(self, *args_in, **kwargs):
-        args = ['python2']
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
-    def _run_python3(self, version, *args_in, **kwargs):
-        args = ['python' + version]
-        args.extend(args_in)
-        return self.run(args, **kwargs)
 
 
 class RemoteHost(BaseHost):

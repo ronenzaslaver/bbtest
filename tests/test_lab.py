@@ -5,14 +5,6 @@ from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost, Lab
 from bbtest.exceptions import ImproperlyConfigured
 
 
-@pytest.fixture(scope='class', autouse=True)
-def manage_lab(request):
-    topo = request.cls.topo if hasattr(request.cls, 'topo') else {}
-    request.cls.lab = Lab(topo)
-    yield
-    request.cls.lab.destroy()
-
-
 class EmptyBox(BlackBox):
     NAME = 'empty'
 
@@ -36,7 +28,7 @@ class TestNoClass(BBTestCase):
     }
 
     @pytest.fixture(scope='class', autouse=True)
-    def manage_lab(request):
+    def create_destroy_lab(request):
         with pytest.raises(ImproperlyConfigured) as _:
             Lab(request.topo)
 
