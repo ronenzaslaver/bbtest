@@ -1,4 +1,11 @@
 
+"""
+Base classes for black box tests - one for pytest and one for unittest derived tests.
+
+The base classes should be identical so unittest users and pytest users will get the exact same services from the
+infrastructure.
+"""
+
 import logging
 import unittest
 
@@ -9,9 +16,12 @@ logger = logging.getLogger('bblog')
 
 
 class BBPytest(object):
-    """A black box test case based on :class:`unittest.TestCase`
+    """ Base class for black box tests for pytest tests.
 
-    We've added a class property `topo` that holds a dictionary defining the lab enviornment.
+    The setup/teardown methods within this class should be called from fixtures.
+    A default conftest file with default fixtures can be found under the tests sample folder.
+
+    We've added a class property `topo` that holds a dictionary defining the lab environment.
     Each test case can define a `topo` property used to setup a lab and store it in `self.lab`.
     """
 
@@ -44,6 +54,8 @@ class BBPytest(object):
 
 class BBTestCase(unittest.TestCase):
     """A black box test case based on :class:`unittest.TestCase`
+
+    unitest calls the setup/teardown classes within this base class automatically.
 
     We've added a class property `topo` that holds a dictionary defining the lab enviornment.
     Each test case can define a `topo` property used to setup a lab and store it in `self.lab`.

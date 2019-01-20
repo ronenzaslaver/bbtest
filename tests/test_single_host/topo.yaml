@@ -1,0 +1,24 @@
+
+-
+  class: local
+  ip: ''
+  user: ''
+  pw: ''
+
+-
+  class: win
+  ip: localhost
+  user: ''
+  pw: ''
+
+-
+  class: win
+  ip: 172.16.30.49
+  user: Administrator
+  pw: Password1
+
+-
+  class: linux
+  ip: 172.16.30.164
+  user: root
+  pw: Password1
