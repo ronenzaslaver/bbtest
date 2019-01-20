@@ -1,13 +1,15 @@
 
 import os
 
-from bbtest import BBTestCase, LocalHost, HomeBox
+from bbtest import BBPytest, LocalHost, HomeBox
 
 
-class TestHomeBox(BBTestCase):
+class TestHomeBox(BBPytest):
     """ Test basic methods - install, clean, remove.
 
     This test can run only on LocalHost.
+
+    :todo: add tests for default fixtures.
     """
 
     topo = {

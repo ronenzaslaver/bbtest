@@ -9,10 +9,10 @@ import pytest
 import subprocess
 
 from tests.mytodo_box import MyToDoBox
-from bbtest import BBTestCase
+from bbtest import BBPytest
 
 
-class TestHosts(BBTestCase):
+class TestHosts(BBPytest):
 
     def test_builtin_command(self, topo):
         host = self.lab.hosts['host1']

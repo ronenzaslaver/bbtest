@@ -1,7 +1,7 @@
 
 import pytest
 
-from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost, Lab
+from bbtest import BBPytest, LocalHost, BlackBox, BaseHost, Lab
 from bbtest.exceptions import ImproperlyConfigured
 
 
@@ -13,13 +13,13 @@ class YetAnotherEmptyBox(BlackBox):
     NAME = 'yetanotherempty'
 
 
-class TestNoLab(BBTestCase):
+class TestNoLab(BBPytest):
 
     def test_no_lab(self):
         pass
 
 
-class TestNoClass(BBTestCase):
+class TestNoClass(BBPytest):
 
     topo = {
         'host1': {
@@ -36,7 +36,7 @@ class TestNoClass(BBTestCase):
         pass
 
 
-class TestBaseHost(BBTestCase):
+class TestBaseHost(BBPytest):
 
     topo = {
         'host1': {
@@ -49,7 +49,7 @@ class TestBaseHost(BBTestCase):
         pass
 
 
-class TestNoBox(BBTestCase):
+class TestNoBox(BBPytest):
 
     topo = {
         'host1': {
@@ -62,7 +62,7 @@ class TestNoBox(BBTestCase):
         pass
 
 
-class TestSingleBox(BBTestCase):
+class TestSingleBox(BBPytest):
 
     topo = {
         'host1': {
@@ -76,7 +76,7 @@ class TestSingleBox(BBTestCase):
         assert self.lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'
 
 
-class MultiBox(BBTestCase):
+class MultiBox(BBPytest):
 
     topo = {
         'host1': {
