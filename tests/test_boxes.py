@@ -1,15 +1,7 @@
 
 import os
-import pytest
 
-from bbtest import BBTestCase, LocalHost, HomeBox, BaseHost, Lab
-
-
-@pytest.fixture(scope='class', autouse=True)
-def manage_lab(request):
-    request.cls.lab = Lab(request.cls.topo)
-    yield
-    request.cls.lab.destroy()
+from bbtest import BBTestCase, LocalHost, HomeBox
 
 
 class TestHomeBox(BBTestCase):

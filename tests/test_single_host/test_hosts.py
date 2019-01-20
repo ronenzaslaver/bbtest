@@ -1,22 +1,27 @@
 
-import pytest
+"""
+Test different command types (built in, python script etc...) on different hosts.
 
+The destination host is set by
+"""
+
+import pytest
 import subprocess
 
+from tests.mytodo_box import MyToDoBox
 from bbtest import BBTestCase
-from .mytodo_box import MyToDoBox
 
 
-class TestOsAgnostic(BBTestCase):
+class TestHosts(BBTestCase):
 
-    def test_builtin_command(self):
+    def test_builtin_command(self, topo):
         host = self.lab.hosts['host1']
         kwargs = {}
         if host.is_winodws_host():
             kwargs['shell'] = True
         assert host.run(['echo', 'Hello'], **kwargs) == ['Hello']
 
-    def test_python_script(self):
+    def test_python_script(self, topo):
         # Test no output.
         box = self.lab.boxes[MyToDoBox.NAME][0]
         assert box.do_nothing() == []
