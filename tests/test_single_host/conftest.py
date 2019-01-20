@@ -4,6 +4,7 @@ Note that the default create_destroy will be called anyway but as it works on em
 """
 
 import pytest
+import yaml
 
 from bbtest import LocalHost, WindowsHost, LinuxHost, OSXHost
 from tests.mytodo_box import MyToDoBox
@@ -25,7 +26,7 @@ os_2_class = {'local': LocalHost,
 
 
 def pytest_addoption(parser):
-    parser.addoption('--bbtopo', action='store', default='config', help='path to bbtest lab topology file')
+    parser.addoption('--topo', action='store', default='c:/Users/yoram.shamir/PycharmProjects/bbtest/tests/test_single_host/topo.yaml', help='path to bbtest lab topology file')
     parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
     parser.addoption('--ip', action='store', default='', help='IP address of target machine')
     parser.addoption('--user', action='store', default='', help='Username for target machine')
@@ -37,13 +38,15 @@ def topo(request):
     request.cls.topo = {'host1': {'class': os_2_class[request.param[0]],
                         'boxes': [MyToDoBox]}}
     request.cls.address_book = {'host1': {'ip': request.param[1],
-                                'auth': (request.param[2][0], request.param[2][1])}}
+                                'auth': (request.param[2], request.param[3])}}
 
 
 def pytest_generate_tests(metafunc):
-    if metafunc.config.getoption('--bbtopo'):
-        topos = [['local', '', ('', '')], ['win', 'localhost', ('', '')]]
+    if metafunc.config.getoption('--topo'):
+        with open(metafunc.config.getoption('--topo')) as f:
+            topos_in = yaml.safe_load(f)
+        topos = [list(t.values()) for t in topos_in]
     else:
-        topos = [metafunc.config.getoption('--os'), metafunc.config.getoption('--ip'),
-                (metafunc.config.getoption('--user'), metafunc.config.getoption('--pw'))]
+        topos = [[metafunc.config.getoption('--os'), metafunc.config.getoption('--ip'),
+                  metafunc.config.getoption('--user'), metafunc.config.getoption('--pw')]]
     metafunc.parametrize('topo', topos, indirect=True)
