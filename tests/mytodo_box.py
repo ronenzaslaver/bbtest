@@ -20,26 +20,26 @@ class MyToDoBox(HomeBox):
         if self.host.os == 'linux':
             self.host.run('chmod', '777', self.host.join(self.path, 'mytodo.py'))
 
-    def run(self, *args_in, **kwargs):
+    def run(self, args_in, **kwargs):
 
         mytodo_py = self.host.join(self.path, 'mytodo.py')
-        args = ['python', mytodo_py ] + list(args_in)
-        logger.info(f"PyToDoBox command: host.run({args} {kwargs})")
-        result = self.host.run(*args, **kwargs)
-        logger.info(f"PyToDoBox returns: {result}")
+        args = [mytodo_py ] + list(args_in)
+        logger.info(f'{self.__class__.__name__} command: host.run({args} {kwargs})')
+        result = self.host.run_python3(args, **kwargs)
+        logger.info(f"{self.__class__.__name__} returns: {result}")
         return result
 
     def add(self, todo):
-        return self.run('add', todo)
+        return self.run(['add', todo])
 
     def delete(self, todo):
-        return self.run('del', todo)
+        return self.run(['del', todo])
 
     def list(self):
-        return self.run('list')
+        return self.run(['list'])
 
     def do_nothing(self):
-        return self.run('nothing')
+        return self.run(['nothing'])
 
     def uninstall(self):
         return self.host.rmtree(self.path)
