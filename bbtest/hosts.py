@@ -38,10 +38,7 @@ class BaseHost(object):
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        try:
-            self.ROOT_PATH = self.ROOT_PATH
-        except AttributeError:
-            self.ROOT_PATH = tempfile.gettempdir()
+        self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
     def install(self):
         """ install host for bbtest
@@ -330,15 +327,14 @@ class RemoteHost(BaseHost):
         self.modules.subprocess.run(args, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
-        ftp_remote = remote.replace(self.ROOT_PATH, '').replace('\\', '/').split('/', 1)[-1]
+        ftp_remote = remote.replace(self.root_path, '').replace('\\', '/').split('/', 1)[-1]
         self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
-        return os.path.join(self.ROOT_PATH, ftp_remote).replace('\\', '/')
+        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def get(self, remote, local):
-        ftp_remote = remote.replace('\\', '/').replace(self.ROOT_PATH, '')
-        # ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').split('/', 1)[-1]
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '')
         self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
-        return os.path.join(self.ROOT_PATH, ftp_remote).replace('\\', '/')
+        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
@@ -355,7 +351,7 @@ class RemoteHost(BaseHost):
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
         if 'dir' not in kwargs:
-            kwargs['dir'] = self.ROOT_PATH
+            kwargs['dir'] = self.root_path
         return self.modules.bbtest.LocalHost.mkdtemp(**kwargs)
 
     def rmtree(self, *args, **kwargs):
