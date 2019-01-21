@@ -9,6 +9,7 @@ sphinx = "*"
 ipython = "*"
 pytest-pythonpath = "*"
 pytest-cov = "*"
+pbr = "*"
 
 [packages]
 dohq-artifactory = "*"
