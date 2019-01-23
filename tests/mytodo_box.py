@@ -17,8 +17,8 @@ class MyToDoBox(HomeBox):
         self.host.put(os.path.join(src_dir, 'mytodo.py'),
                       remote=self.host.join(self.path, 'mytodo.py'))
 
-        if self.host.os == 'linux':
-            self.host.run('chmod', '777', self.host.join(self.path, 'mytodo.py'))
+        if self.host.is_linux():
+            self.host.run(['chmod', '777', self.host.join(self.path, 'mytodo.py')])
 
     def run(self, args_in, **kwargs):
 

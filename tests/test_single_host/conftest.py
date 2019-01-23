@@ -7,7 +7,6 @@ import pytest
 import yaml
 
 from bbtest import LocalHost, WindowsHost, LinuxHost, OSXHost
-from tests.mytodo_box import MyToDoBox
 
 
 @pytest.fixture(scope='class', autouse=True)
@@ -26,17 +25,17 @@ os_2_class = {'local': LocalHost,
 
 
 def pytest_addoption(parser):
-    parser.addoption('--topo', action='store', default='c:/Users/yoram.shamir/PycharmProjects/bbtest/tests/test_single_host/topo.yaml', help='path to bbtest lab topology file')
-    parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
-    parser.addoption('--ip', action='store', default='', help='IP address of target machine')
-    parser.addoption('--user', action='store', default='', help='Username for target machine')
-    parser.addoption('--pw', action='store', default='', help='Password for target machine')
+    parser.addoption('--topo', action='store', default='', help='path to bbtest lab topology file')
+    parser.addoption('--os', action='store', default='linux', help='OS of target machine - local, windows, linux oe mac')
+    parser.addoption('--ip', action='store', default='172.16.30.22', help='IP address of target machine')
+    parser.addoption('--user', action='store', default='root', help='Username for target machine')
+    parser.addoption('--pw', action='store', default='Password1', help='Password for target machine')
 
 
 @pytest.fixture(scope='class')
 def topo(request):
     request.cls.topo = {'host1': {'class': os_2_class[request.param[0]],
-                        'boxes': [MyToDoBox]}}
+                        'boxes': []}}
     request.cls.address_book = {'host1': {'ip': request.param[1],
                                 'auth': (request.param[2], request.param[3])}}
 

@@ -16,6 +16,8 @@ class Lab():
         for host_name, params in topology.items():
             if 'class' not in params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
+            if 'boxes' not in params:
+                raise ImproperlyConfigured(f"Host '{host_name}' must have a `boxes` key")
             host_class = params['class']
             try:
                 host = host_class(**address_book[host_name])
@@ -26,13 +28,17 @@ class Lab():
             self.hosts[host_name].install()
             # let there be boxes!
             for box_class in params['boxes']:
-                new_box = box_class(host)
-                new_box.install()
-                box_name = new_box.NAME
-                if box_name in self.boxes:
-                    self.boxes[box_name].append(new_box)
-                else:
-                    self.boxes[box_name] = [new_box]
+                self.add_box(box_class, host)
+
+    def add_box(self, box_class, host):
+        new_box = box_class(host)
+        new_box.install()
+        box_name = new_box.NAME
+        if box_name in self.boxes:
+            self.boxes[box_name].append(new_box)
+        else:
+            self.boxes[box_name] = [new_box]
+        return new_box
 
     def flatten_boxes(self):
         """ an iterator returning  one box after the other """
