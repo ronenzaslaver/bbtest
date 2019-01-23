@@ -6,4 +6,4 @@ __pycache__
 bbtest.egg-info/*
 dist/*
 
-tests/test_single_host/temp_file
+tests/temp

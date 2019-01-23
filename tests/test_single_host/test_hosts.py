@@ -9,8 +9,9 @@ import pytest
 import subprocess
 import os
 
-from tests.mytodo_box import MyToDoBox
 from bbtest import BBPytest
+from tests.test_utils import get_temp_dir
+from tests.mytodo_box import MyToDoBox
 
 
 class TestHosts(BBPytest):
@@ -21,7 +22,7 @@ class TestHosts(BBPytest):
     def test_builtin_command(self):
         kwargs = {}
         # todo move to hosts...
-        if self.host.is_winodws():
+        if self.host.is_winodws:
             kwargs['shell'] = True
         assert self.host.run(['echo', 'Hello'], **kwargs) == ['Hello']
 
@@ -41,12 +42,15 @@ class TestHosts(BBPytest):
         with pytest.raises(subprocess.SubprocessError) as _:
             box.add('')
 
-    def _test_put_get_files(self):
+    def test_put_get_files(self):
         """ Work in progress """
         host = self.lab.hosts['host1']
-        temp_file = os.path.join(os.path.dirname(__file__), 'temp_file')
-        with open(temp_file, 'wb') as f:
+        local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
+        with open(local_temp_file, 'wb') as f:
             f.write(os.urandom(1024))
-        host.put(temp_file, temp_file)
+        host.put(local_temp_file, 'temp_file')
         print(host.root_path)
-        os.remove(temp_file)
+        os.remove(local_temp_file)
+        host.get('temp_file', local_temp_file)
+        os.path.isfile(local_temp_file)
+        os.remove(local_temp_file)

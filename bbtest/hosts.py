@@ -74,6 +74,14 @@ class BaseHost(object):
     def package_type(self):
         raise NotImplementedError('Non Windows OS')
 
+    @property
+    def is_winodws(self):
+        return 'win' in self.os
+
+    @property
+    def is_linux(self):
+        return 'linux' in self.os
+
     def isfile(self, path):
         raise NotImplementedError('Missing method implementation')
 
@@ -90,15 +98,9 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_winodws() else ['python' + str(version)]
+        args = ['py', '-' + str(version)] if self.is_winodws else ['python' + str(version)]
         args.extend(args_in)
         return self.run(args, **kwargs)
-
-    def is_winodws(self):
-        return 'win' in self.os
-
-    def is_linux(self):
-        return 'linux' in self.os
 
     def join(self, *args):
         return self.SEP.join(args)
@@ -312,7 +314,7 @@ class RemoteHost(BaseHost):
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def get(self, remote, local):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').split('/', 1)[-1]
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
         self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 

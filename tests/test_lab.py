@@ -27,7 +27,7 @@ class TestImproperlyConfigured(BBPytest):
     }
 
     @pytest.fixture(scope='class', autouse=True)
-    def create_destroy_lab(request):
+    def lab_factory(request):
         with pytest.raises(ImproperlyConfigured) as _:
             Lab(request.topo)
         request.topo['host1']['class'] = BaseHost
