@@ -19,11 +19,10 @@ class TestNoLab(BBPytest):
         pass
 
 
-class TestNoClass(BBPytest):
+class TestImproperlyConfigured(BBPytest):
 
     topo = {
         'host1': {
-            'boxes': []
          },
     }
 
@@ -31,6 +30,11 @@ class TestNoClass(BBPytest):
     def create_destroy_lab(request):
         with pytest.raises(ImproperlyConfigured) as _:
             Lab(request.topo)
+        request.topo['host1']['class'] = BaseHost
+        with pytest.raises(ImproperlyConfigured) as _:
+            Lab(request.topo)
+        request.topo['host1']['boxes'] = []
+        Lab(request.topo)
 
     def test_no_class(self):
         pass
