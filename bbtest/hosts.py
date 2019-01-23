@@ -22,7 +22,7 @@ import glob
 import psutil
 from psutil import NoSuchProcess
 
-from bbtest import target, path
+from bbtest import target
 
 logger = logging.getLogger('bblog')
 
@@ -74,6 +74,14 @@ class BaseHost(object):
     def package_type(self):
         raise NotImplementedError('Non Windows OS')
 
+    @property
+    def is_winodws(self):
+        return 'win' in self.os
+
+    @property
+    def is_linux(self):
+        return 'linux' in self.os
+
     def isfile(self, path):
         raise NotImplementedError('Missing method implementation')
 
@@ -90,15 +98,9 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_winodws() else ['python' + str(version)]
+        args = ['py', '-' + str(version)] if self.is_winodws else ['python' + str(version)]
         args.extend(args_in)
         return self.run(args, **kwargs)
-
-    def is_winodws(self):
-        return 'win' in self.os
-
-    def is_linux(self):
-        return 'linux' in self.os
 
     def join(self, *args):
         return self.SEP.join(args)
@@ -236,17 +238,6 @@ class LocalWindowsHost(LocalHost):
         except WindowsError:
             return False
 
-    def run_python2(self, args_in, **kwargs):
-        return self._run_python(2, args_in, **kwargs)
-
-    def run_python3(self, args_in, **kwargs):
-        return self._run_python(3, args_in, **kwargs)
-
-    def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)]
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
     @staticmethod
     def is_service_running(service_name):
         try:
@@ -269,29 +260,6 @@ class LocalWindowsHost(LocalHost):
 class LocalLinuxHost(LocalHost):
 
     ROOT_PATH = '/tmp'
-
-    def run_python2(self, *args_in, **kwargs):
-        args = ['python2']
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
-    def run_python3(self, *args_in, **kwargs):
-        args = ['python3']
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
-    def _run_python3(self, version, *args_in, **kwargs):
-        args = ['python' + version]
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
-
-class LocalFedoraHost(LocalLinuxHost):
-    pass
-
-
-class LocalDebianHost(LocalLinuxHost):
-    pass
 
 
 class RemoteHost(BaseHost):
@@ -365,9 +333,9 @@ class RemoteHost(BaseHost):
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def get(self, remote, local):
-        local_path = os.path.join(local, path.basename(remote))
-        self.ftp.retrbinary(f'RETR {remote}', open(local_path, 'wb').write)
-        return local_path
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
+        self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
+        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
@@ -437,15 +405,5 @@ class LinuxHost(RemoteHost):
         raise NotImplementedError('Missing method implementation')
 
 
-class FedoraHost(LinuxHost):
-    pass
-
-
-class DebianHost(LinuxHost):
-
-    def is_version_installed(self, version):
-        return self.modules.bbtest.LocalDebianHost().is_version_installed(version)
-
-
-class OsxHost(LinuxHost):
+class OSXHost(LinuxHost):
     pass
