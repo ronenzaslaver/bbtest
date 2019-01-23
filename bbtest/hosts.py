@@ -405,16 +405,5 @@ class LinuxHost(RemoteHost):
         raise NotImplementedError('Missing method implementation')
 
 
-
-class FedoraHost(LinuxHost):
-    pass
-
-
-class DebianHost(LinuxHost):
-
-    def is_version_installed(self, version):
-        return self.modules.bbtest.LocalDebianHost().is_version_installed(version)
-
-
-class OsxHost(LinuxHost):
+class OSXHost(LinuxHost):
     pass

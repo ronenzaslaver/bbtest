@@ -7,18 +7,12 @@
 
 -
   class: win
-  ip: localhost
+  ip: 172.16.30.159
   user: ''
   pw: ''
 
 -
-  class: win
-  ip: 172.16.30.49
-  user: Administrator
-  pw: Password1
-
--
   class: linux
-  ip: 172.16.30.22
+  ip: 172.16.30.151
   user: root
   pw: Password1
