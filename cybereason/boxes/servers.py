@@ -3,7 +3,7 @@ import tarfile
 
 from artifactory import ArtifactoryPath
 
-from bbtest import BaseHost, WindowsHost, LinuxHost, OSXHost, LocalHost
+from bbtest import BaseHost, WindowsHost, LinuxHost, OsxHost, LocalHost
 from cybereason.services.ecosystem import logger
 
 from . import CRBox
@@ -12,7 +12,11 @@ ARTIFACTORY_SENSOR_REPO_URL = 'http://artifactory01:8081/artifactory/sensor/cybe
 
 
 class CRServerBox(CRBox):
-    pass
+
+    def download_file(self, file_path):
+        dest_file_path = self.host.SEP.join([self.path, os.path.basename(file_path)])
+        self.host.download_file(file_path, dest_file_path)
+        return dest_file_path
 
 
 class PerspectiveBox(CRServerBox):
@@ -38,8 +42,8 @@ class PersonalizationBox(CRServerBox):
 
     def __init__(self, host, name=None):
         super().__init__(host, name=name)
-        if not issubclass(type(self.host), LocalHost):
-            raise NotImplementedError(f'Box {self.NAME} is not support on host type: {self.host}')
+        # if not issubclass(type(self.host), LocalHost):
+        #     raise NotImplementedError(f'Box {self.NAME} is not support on host type: {self.host}')
 
     def download(self, download_server, version, endpoint):
         """ Download installer package and personalizer from download server
@@ -84,15 +88,8 @@ class PersonalizationBox(CRServerBox):
         :return:
         """
 
-        # untar personalizer tool
         logger.info(f'Untar the personalizer tool')
-        if personalizer_tar.endswith('tar.gz'):
-            tar = tarfile.open(personalizer_tar, "r:gz")
-            tar.extractall(path=os.path.dirname(personalizer_tar))
-            tar.close()
-        else:
-            # todo add the actual file extension to exception
-            raise NotImplementedError('personalizer file extension is not supported')
+        self.host.untar_file(personalizer_tar)
 
         # personalize the installer package
         if type(registration_or_transparency) is RegistrationBox:
@@ -107,7 +104,7 @@ class PersonalizationBox(CRServerBox):
                                    port_flag, '8443', '-org', 'cybereason', '-f', installer_package_path,
                                    '-o', self.path]
 
-        personalization_output = self.host.run_python2(*personalization_command)
+        personalization_output = self.host.run_python2(personalization_command)
         personalization_file_name = personalization_output[-1].replace('\\', '/').split('/')[-1]
         return self.host.SEP.join([self.path, personalization_file_name])
 
@@ -127,15 +124,6 @@ class PersonalizationBox(CRServerBox):
         latest_build_path = max(branch_builds, key=self._extract_build_number)
         package_artifact_path = self._find_artifact(latest_build_path, file_prefix)
         return package_artifact_path
-
-    def download_file(self, file_path):
-        logger.info(f'Downloading file from: {file_path}')
-        dest_file_path = self.host.SEP.join([self.path, os.path.basename(file_path)])
-        with file_path.open() as fd:
-            with open(dest_file_path, "wb") as out:
-                out.write(fd.read())
-        logger.info(f'Downloaded file path on disk: {dest_file_path}')
-        return dest_file_path
 
 
 class ProxyBox(CRServerBox):

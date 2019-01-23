@@ -1,6 +1,6 @@
 """
 """
-from bbtest import BBTestCase
+from bbtest import BBTestCase, WindowsHost, LinuxHost, os, DebianHost
 from bbtest import LocalWindowsHost
 from cybereason.boxes.sensor import SensorBox
 from cybereason.boxes.servers import TransparencyBox, PersonalizationBox, ArtifactoryBox
@@ -10,8 +10,8 @@ class InstallTest(BBTestCase):
 
     LAB = {
         'endpoint': {
-            'class': LocalWindowsHost,
-            'boxes': [],
+            'class': DebianHost,
+            'boxes': [PersonalizationBox],
          },
         'transparency': {
             'class': LocalWindowsHost,
@@ -23,9 +23,11 @@ class InstallTest(BBTestCase):
         },
         'local': {
             'class': LocalWindowsHost,
-            'boxes': [PersonalizationBox],
+            'boxes': [],
         },
     }
+
+    address_book = {'endpoint': {'ip': '172.16.30.22', 'auth': ['root', 'Password1']}}
 
     def test_install(self):
         """
@@ -45,7 +47,7 @@ class InstallTest(BBTestCase):
         personalization = self.lab.boxes[PersonalizationBox.NAME][0]
         artifactory = self.lab.boxes[ArtifactoryBox.NAME][0]
 
-        tested_version = 'rc-18.1.50' # todo - get tested version from external source
+        tested_version = 'rc-18.1.50'  # todo - get tested version from external source
         package_downloaded, personalizer_downloaded = personalization.download(artifactory, tested_version, endpoint)
         assert personalization.host.isfile(package_downloaded)
         assert personalization.host.isfile(personalizer_downloaded)
@@ -54,25 +56,26 @@ class InstallTest(BBTestCase):
         assert personalization.host.isfile(installer_package_path)
 
         # CYBR-15886 - Add functionality to Endpoint Host to download package from the Personalization server
-        personalization.host.get(installer_package_path, installer_package_path.replace('\\', '/').split('/')[-1])
-        installer_path_in_endpoint = endpoint.put(installer_package_path,
-                                                  installer_package_path.replace('\\', '/').split('/')[-1])
+        installer_path_in_local = personalization.host.get(installer_package_path, os.getcwd())
+        installer_path_in_endpoint = endpoint.put(installer_path_in_local,
+                                                  installer_path_in_local.replace('\\', '/').split('/')[-1])
+        assert endpoint.isfile(installer_path_in_endpoint)
 
         # CYBR-15889 - Add functionality to Endpoint BB to install sensor from local package
         sensor.install_wo_download(installer_path_in_endpoint)
 
         # CYBR-15909 - Add functionality to Sensor BB to get Sensor Packages info
-        expected_version = sensor.extract_version_from_file(installer_package_path)
-        assert endpoint.is_version_installed('Cybereason Sensor', expected_version), \
-            f"Cybereason Sensor {expected_version} is not installed"
+        assert sensor.get_version() == sensor.get_installer_version(installer_package_path)
 
         # CYBR-15908 - Add functionality to Sensor BB to get Sensor Process Status
-        assert endpoint.is_process_running('ActiveConsole.exe'), "ActiveConsole.exe is not running"
-        assert endpoint.is_process_running('PylumLoader.exe'), "PylumLoader.exe is not running"
-        assert endpoint.is_process_running('minionhost.exe'), "minionhost.exe is not running"
+        assert sensor.is_cr_processes_running()
+
+        assert endpoint.is_process_running('ActiveConsole.exe')
+        assert endpoint.is_process_running('PylumLoader.exe')
+        assert endpoint.is_process_running('minionhost.exe')
 
         # CYBR-15907 - Add functionality to Sensor BB to get Sensor Service Status
-        assert endpoint.is_service_running('CybereasonActiveProbe'), "CybereasonActiveProbe Service is not running"
+        assert endpoint.is_service_running('CybereasonActiveProbe')
 
         # CYBR-15936 - Add functionality to Sensor BB to get PylumId
-        assert sensor.calc_pylumid() == sensor.open_key('Identifier'), "PylumId not exists or incorrect"
+        assert sensor.calc_pylumid() == sensor.open_key('Identifier')

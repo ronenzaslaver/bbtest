@@ -4,7 +4,7 @@ from .hosts import *
 from .testcases import BBTestCase
 
 __all__ = ['BBTestCase', 'Lab',
-           'BaseHost', 'WindowsHost', 'LinuxHost', 'OSXHost', 'LocalWindowsHost',
+           'BaseHost', 'WindowsHost', 'LinuxHost', 'OsxHost', 'LocalWindowsHost',
            'BlackBox', 'HomeBox']
 
 __version__ = '0.1'
