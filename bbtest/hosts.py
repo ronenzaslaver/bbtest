@@ -184,9 +184,9 @@ class LocalHost(BaseHost):
         return os.path.isfile(path)
 
     @staticmethod
-    def is_process_running(process):
-        for process in psutil.process_iter():
-            if process.name() == process:
+    def is_process_running(proc_name):
+        for proc in psutil.process_iter():
+            if proc.name() == proc_name:
                 return True
         return False
 
@@ -253,6 +253,13 @@ class LocalLinuxHost(LocalHost):
 
     ROOT_PATH = '/tmp'
 
+    @staticmethod
+    def is_service_running(service_name):
+        if os.system(f'service {service_name} status') == '0':
+            return True
+        else:
+            return False
+
 
 class RemoteHost(BaseHost):
     """A remote host using RPyC
@@ -298,7 +305,6 @@ class RemoteHost(BaseHost):
             raise ConnectionError(f'Failed to connect to RPyC server on host {ip} - {e}')
         self.modules = self._rpyc.modules
         self.target = self.modules.bbtest.target
-        print(self.target)
 
     def install(self, bbtest_version=None):
         """ Install bbtest package on remote host.
@@ -318,7 +324,7 @@ class RemoteHost(BaseHost):
                 raise Exception(f'Failed to find bbtest package - {e}')
         bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
         args = ['py', '-3'] if 'win' in self.modules.platform.platform().lower() else ['python3']
-        args.extend(['-m', 'pip', 'install', '-UI', bbtest_remote])
+        args.extend(['-m', 'pip', 'install', '-U', bbtest_remote])
         self.modules.subprocess.run(args, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
@@ -329,7 +335,7 @@ class RemoteHost(BaseHost):
     def get(self, remote, local):
         ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
         self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
-        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
+        return local
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
@@ -385,6 +391,14 @@ class LinuxHost(RemoteHost):
 
     def is_service_running(self, service):
         raise NotImplementedError('Missing method implementation')
+
+
+class FedoraHost(LinuxHost):
+    pass
+
+
+class DebianHost(LinuxHost):
+    pass
 
 
 class OSXHost(LinuxHost):

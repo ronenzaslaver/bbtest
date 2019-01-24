@@ -5,7 +5,7 @@ from .testcases import *
 
 __all__ = ['BBPytest', 'BBTestCase',
            'Lab',
-           'BaseHost', 'WindowsHost', 'LinuxHost', 'OSXHost', 'LocalWindowsHost','LocalHost',
-           'BlackBox', 'HomeBox']
+           'BaseHost', 'WindowsHost', 'LinuxHost', 'FedoraHost', 'DebianHost', 'OSXHost', 'LocalWindowsHost',
+           'LocalHost', 'BlackBox', 'HomeBox']
 
 __version__ = '0.1'
