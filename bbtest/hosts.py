@@ -187,9 +187,9 @@ class LocalHost(BaseHost):
         return os.path.isfile(path)
 
     @staticmethod
-    def is_process_running(process):
-        for process in psutil.process_iter():
-            if process.name() == process:
+    def is_process_running(proc_name):
+        for proc in psutil.process_iter():
+            if proc.name() == proc_name:
                 return True
         return False
 
@@ -219,7 +219,7 @@ class LocalWindowsHost(LocalHost):
     package_type = 'msi'
 
     @staticmethod
-    def is_version_installed(version):
+    def get_package_version(package_name):
         products = OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
         try:
             i = 0
@@ -227,14 +227,14 @@ class LocalWindowsHost(LocalHost):
                 product_key_name = EnumKey(products, i)
                 product_values = OpenKey(products, product_key_name)
                 try:
-                    if QueryValueEx(product_values, 'DisplayName')[0] == 'Cybereason Sensor':
-                        return QueryValueEx(product_values, 'DisplayVersion')[0] == version
+                    if QueryValueEx(product_values, 'DisplayName')[0] == package_name:
+                        return QueryValueEx(product_values, 'DisplayVersion')[0]
                 except FileNotFoundError:
                     # product has no 'DisplayName' attribute
                     pass
                 i = i+1
         except WindowsError:
-            return False
+            raise RuntimeError('Cybereason version not found')
 
     @staticmethod
     def is_service_running(service_name):
@@ -258,6 +258,13 @@ class LocalWindowsHost(LocalHost):
 class LocalLinuxHost(LocalHost):
 
     ROOT_PATH = '/tmp'
+
+    @staticmethod
+    def is_service_running(service_name):
+        if os.system(f'service {service_name} status') == '0':
+            return True
+        else:
+            return False
 
 
 class RemoteHost(BaseHost):
@@ -323,7 +330,7 @@ class RemoteHost(BaseHost):
                 raise Exception(f'Failed to find bbtest package - {e}')
         bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
         args = ['py', '-3'] if 'win' in self.modules.platform.platform().lower() else ['python3']
-        args.extend(['-m', 'pip', 'install', '-UI', bbtest_remote])
+        args.extend(['-m', 'pip', 'install', '-U', bbtest_remote])
         self.modules.subprocess.run(args, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
@@ -373,8 +380,8 @@ class WindowsHost(RemoteHost):
     def __init__(self, ip="localhost", auth=("user", "pass")):
         super().__init__(ip, auth)
 
-    def is_version_installed(self, name, version):
-        return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
+    def get_package_version(self, package_name):
+        return self.modules.bbtest.LocalWindowsHost().get_package_version(package_name)
 
     def open_key(self, parent_key, key):
         return self.modules.bbtest.LocalHost.open_key(parent_key, key)
@@ -392,6 +399,14 @@ class LinuxHost(RemoteHost):
 
     def is_service_running(self, service):
         raise NotImplementedError('Missing method implementation')
+
+
+class FedoraHost(LinuxHost):
+    pass
+
+
+class DebianHost(LinuxHost):
+    pass
 
 
 class OSXHost(LinuxHost):
