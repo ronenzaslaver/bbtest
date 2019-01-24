@@ -2,8 +2,7 @@
 __pycache__
 *.log
 *.pyc
-
-bbtest.egg-info/*
-dist/*
-
+bbtest.egg-info
+dist
+build
 tests/temp

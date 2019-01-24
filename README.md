@@ -8,18 +8,14 @@ To run the tests you can use your favorite python tests runner (ours is pytest).
 
 We've added a class property `LAB` that holds a dictionary defining the lab enviornment.
 
-Installation
+Contributing
 ------------
 
-Fork and clone this repo.
+First fork and clone this repo.  Then use `pipenv` to setup the python environment.
+Open a shell in the cloned repo folder and type:
 
-Testing
--------
-In order to run all tests, you need to have python environment with all packages installed.
-Open a shell in the cloned repo folder:
 ```bash
 $ pipenv shell
-$ pipenv install
 $ pipenv install --dev
 ```
 Then take a look at pytest custom options and run tests: 
@@ -31,7 +27,8 @@ To run tests on local machine simply run
 ```bash
 $ pytest tests
 ```
-To run tests on remote machine you need to run FTP server and RPyC server on remote machine.
+To run tests on remote machines you'll need a [devpi] server to mirror PyPi
+and an FTP server and RPyC server on remote machine.
 
 - Download and install python 3.7 and RPyC:
 ```bash
@@ -42,10 +39,17 @@ $ rpyc_classic.py --host 0.0.0.0
 - Now you can run tests on the remote host:
 
 ```bash
-$ python setup.py sdist
+$ devpi upload
 $ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
 ```
-The examples contain tutorials and how-tos demoing parts of bbtest. You are 
+
+The build above uses a `requirments.txt` file which need to be updated every
+time a new package is added. Just run `pipenv lock -r > requirments.txt` and 
+don't forget to commit the change.
+
+Examples
+--------
+The `examples` folder  contain tutorials and how-tos demoing parts of bbtest. You are 
 welcome to browse the
 [docs](https://daonb.github.io/bbtest/build/html/examples.html).  
 If you want to play with the framework,  run `ipython` and you'll get an env 
