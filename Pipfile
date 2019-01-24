@@ -16,6 +16,7 @@ devpi-client = "*"
 dohq-artifactory = "*"
 psutil = "*"
 rpyc = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.7"
