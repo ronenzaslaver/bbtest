@@ -1,33 +1,23 @@
 
 import os
-import filecmp
 
-from bbtest import BBTestCase, LocalHost, HomeBox, BaseHost
+from bbtest import BBPytest, LocalHost, HomeBox
 
 
-class TestHomeBox(BBTestCase):
+class TestHomeBox(BBPytest):
     """ Test basic methods - install, clean, remove.
 
     This test can run only on LocalHost.
+
+    :todo: add tests for default fixtures.
     """
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': [HomeBox, HomeBox],
          },
     }
-
-    def tearDown(self):
-        assert os.path.exists(TestHomeBox.empty_file_1)
-        super().tearDown()
-        assert not os.path.exists(TestHomeBox.empty_file_1)
-
-    @classmethod
-    def tearDownClass(cls):
-        assert os.path.isdir(TestHomeBox.empty_box_1.path)
-        super().tearDownClass()
-        assert not os.path.isdir(TestHomeBox.empty_box_1.path)
 
     def test_home_box(self):
         empty_box_0 = self.lab.boxes[HomeBox.NAME][0]

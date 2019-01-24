@@ -1,7 +1,7 @@
 
 import pytest
 
-from bbtest import BBTestCase, LocalHost, BlackBox, BaseHost
+from bbtest import BBPytest, LocalHost, BlackBox, BaseHost, Lab
 from bbtest.exceptions import ImproperlyConfigured
 
 
@@ -13,32 +13,36 @@ class YetAnotherEmptyBox(BlackBox):
     NAME = 'yetanotherempty'
 
 
-class TestNoLab(BBTestCase):
+class TestNoLab(BBPytest):
 
     def test_no_lab(self):
         pass
 
 
-class TestNoClass(BBTestCase):
+class TestImproperlyConfigured(BBPytest):
 
-    LAB = {
+    topo = {
         'host1': {
-            'boxes': []
          },
     }
 
-    @classmethod
-    def setUpClass(cls):
+    @pytest.fixture(scope='class', autouse=True)
+    def lab_factory(request):
         with pytest.raises(ImproperlyConfigured) as _:
-            super().setUpClass()
+            Lab(request.topo)
+        request.topo['host1']['class'] = BaseHost
+        with pytest.raises(ImproperlyConfigured) as _:
+            Lab(request.topo)
+        request.topo['host1']['boxes'] = []
+        Lab(request.topo)
 
     def test_no_class(self):
         pass
 
 
-class TestBaseHost(BBTestCase):
+class TestBaseHost(BBPytest):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': BaseHost,
             'boxes': []
@@ -49,9 +53,9 @@ class TestBaseHost(BBTestCase):
         pass
 
 
-class TestNoBox(BBTestCase):
+class TestNoBox(BBPytest):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': []
@@ -62,9 +66,9 @@ class TestNoBox(BBTestCase):
         pass
 
 
-class TestSingleBox(BBTestCase):
+class TestSingleBox(BBPytest):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': [EmptyBox]
@@ -76,9 +80,9 @@ class TestSingleBox(BBTestCase):
         assert self.lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'
 
 
-class MultiBox(BBTestCase):
+class MultiBox(BBPytest):
 
-    LAB = {
+    topo = {
         'host1': {
             'class': LocalHost,
             'boxes': [EmptyBox, EmptyBox]

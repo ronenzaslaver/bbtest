@@ -74,6 +74,14 @@ class BaseHost(object):
     def package_type(self):
         raise NotImplementedError('Non Windows OS')
 
+    @property
+    def is_winodws(self):
+        return 'win' in self.os
+
+    @property
+    def is_linux(self):
+        return 'linux' in self.os
+
     def isfile(self, path):
         raise NotImplementedError('Missing method implementation')
 
@@ -90,12 +98,9 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_winodws_host() else ['python' + str(version)]
+        args = ['py', '-' + str(version)] if self.is_winodws else ['python' + str(version)]
         args.extend(args_in)
         return self.run(args, **kwargs)
-
-    def is_winodws_host(self):
-        return 'win' in self.os
 
     def join(self, *args):
         return self.SEP.join(args)
@@ -214,17 +219,6 @@ class LocalWindowsHost(LocalHost):
         except WindowsError:
             return False
 
-    def run_python2(self, args_in, **kwargs):
-        return self._run_python(2, args_in, **kwargs)
-
-    def run_python3(self, args_in, **kwargs):
-        return self._run_python(3, args_in, **kwargs)
-
-    def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)]
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
     @staticmethod
     def is_service_running(service_name):
         try:
@@ -247,21 +241,6 @@ class LocalWindowsHost(LocalHost):
 class LocalLinuxHost(LocalHost):
 
     ROOT_PATH = '/tmp'
-
-    def run_python2(self, *args_in, **kwargs):
-        args = ['python2']
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
-    def run_python3(self, *args_in, **kwargs):
-        args = ['python2']
-        args.extend(args_in)
-        return self.run(args, **kwargs)
-
-    def _run_python3(self, version, *args_in, **kwargs):
-        args = ['python' + version]
-        args.extend(args_in)
-        return self.run(args, **kwargs)
 
 
 class RemoteHost(BaseHost):
@@ -318,7 +297,7 @@ class RemoteHost(BaseHost):
         dist_dir = os.path.join(root_dir, 'dist')
         if not bbtest_version:
             def _extract_version(f):
-                return float(f.split('-')[1].split('.tar.gz')[0])
+                return float(f.split('-')[-1].split('.tar.gz')[0])
             bbtest_packages = glob.glob(os.path.join(dist_dir, 'bbtest-*.tar.gz'))
             try:
                 bbtest_package = max(bbtest_packages, key=_extract_version)
@@ -330,12 +309,12 @@ class RemoteHost(BaseHost):
         self.modules.subprocess.run(args, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').split('/', 1)[-1]
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
         self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 
     def get(self, remote, local):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').split('/', 1)[-1]
+        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
         self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
         return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
 

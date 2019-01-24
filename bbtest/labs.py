@@ -4,18 +4,20 @@ from .exceptions import ImproperlyConfigured
 
 class Lab():
 
-    def __init__(self, lab, address_book={}):
+    def __init__(self, topology={}, address_book={}):
         """
-        :param lab: a dictionary where each hostname has
-                    a dictionary with `image` & `boxes`
+        :param topology: a dictionary representing the topology of the test setup.
+                         each hostname in the dictionary is a dictionary with `class` & `boxes`
         :param address_book: a dictionary where each hostname has
                              a dictionary with ip, username & password
         """
         self.boxes = {}
         self.hosts = {}
-        for host_name, params in lab.items():
+        for host_name, params in topology.items():
             if 'class' not in params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
+            if 'boxes' not in params:
+                raise ImproperlyConfigured(f"Host '{host_name}' must have a `boxes` key")
             host_class = params['class']
             try:
                 host = host_class(**address_book[host_name])
@@ -26,13 +28,17 @@ class Lab():
             self.hosts[host_name].install()
             # let there be boxes!
             for box_class in params['boxes']:
-                new_box = box_class(host)
-                new_box.install()
-                box_name = new_box.NAME
-                if box_name in self.boxes:
-                    self.boxes[box_name].append(new_box)
-                else:
-                    self.boxes[box_name] = [new_box]
+                self.add_box(box_class, host)
+
+    def add_box(self, box_class, host):
+        new_box = box_class(host)
+        new_box.install()
+        box_name = new_box.NAME
+        if box_name in self.boxes:
+            self.boxes[box_name].append(new_box)
+        else:
+            self.boxes[box_name] = [new_box]
+        return new_box
 
     def flatten_boxes(self):
         """ an iterator returning  one box after the other """
