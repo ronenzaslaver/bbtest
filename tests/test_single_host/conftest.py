@@ -1,6 +1,5 @@
 """
 conftest that accepts a single host as parameter (see bellow for details) to be used for all tests that require single host as input.
-Note that the default create_destroy will be called anyway but as it works on empty topo it will have no effect.
 """
 
 import pytest
@@ -10,9 +9,10 @@ from bbtest import LocalHost, WindowsHost, LinuxHost, OSXHost
 
 
 @pytest.fixture(scope='class', autouse=True)
-def create_destroy(request, topo):
+def lab_factory(request, topo):
     request.cls.create_lab()
     yield
+    request.cls.destroy_lab()
 
 
 os_2_class = {'local': LocalHost,
@@ -27,7 +27,7 @@ os_2_class = {'local': LocalHost,
 def pytest_addoption(parser):
     parser.addoption('--topo', action='store', default='', help='path to bbtest lab topology file')
     parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
-    parser.addoption('--ip', action='store', default='localhost', help='IP address of target machine')
+    parser.addoption('--ip', action='store', default='', help='IP address of target machine')
     parser.addoption('--user', action='store', default='', help='Username for target machine')
     parser.addoption('--pw', action='store', default='', help='Password for target machine')
 

@@ -1,8 +1,10 @@
 
 """
-Test different command types (built in, python script etc...) on different hosts.
+Test operations on remote hosts.
+- command types - built in, python script etc...
+- get/set/copy files
 
-The destination host is set by
+The destination host (==topo) is set by pytest.
 """
 
 import pytest

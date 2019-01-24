@@ -17,3 +17,12 @@ def run(args, **kwargs_in):
     output = subprocess.run(args, **kwargs)
     logger.debug(f'  returned: {output.stdout}')
     return output
+
+
+def download_file(src_path, dst_path):
+    logger.info(f'Downloading file from: {src_path}')
+    with src_path.open() as fd:
+        with open(dst_path, "wb") as out:
+            out.write(fd.read())
+    logger.info(f'Downloaded file path on disk: {dst_path}')
+    return dst_path
