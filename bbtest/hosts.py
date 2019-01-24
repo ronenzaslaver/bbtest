@@ -213,7 +213,7 @@ class LocalWindowsHost(LocalHost):
     package_type = 'msi'
 
     @staticmethod
-    def is_version_installed(version):
+    def get_package_version(package_name):
         products = OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
         try:
             i = 0
@@ -221,14 +221,14 @@ class LocalWindowsHost(LocalHost):
                 product_key_name = EnumKey(products, i)
                 product_values = OpenKey(products, product_key_name)
                 try:
-                    if QueryValueEx(product_values, 'DisplayName')[0] == 'Cybereason Sensor':
-                        return QueryValueEx(product_values, 'DisplayVersion')[0] == version
+                    if QueryValueEx(product_values, 'DisplayName')[0] == package_name:
+                        return QueryValueEx(product_values, 'DisplayVersion')[0]
                 except FileNotFoundError:
                     # product has no 'DisplayName' attribute
                     pass
                 i = i+1
         except WindowsError:
-            return False
+            raise RuntimeError('Cybereason version not found')
 
     @staticmethod
     def is_service_running(service_name):
@@ -372,8 +372,8 @@ class WindowsHost(RemoteHost):
     def __init__(self, ip="localhost", auth=("user", "pass")):
         super().__init__(ip, auth)
 
-    def is_version_installed(self, name, version):
-        return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
+    def get_package_version(self, package_name):
+        return self.modules.bbtest.LocalWindowsHost().get_package_version(package_name)
 
     def open_key(self, parent_key, key):
         return self.modules.bbtest.LocalHost.open_key(parent_key, key)
