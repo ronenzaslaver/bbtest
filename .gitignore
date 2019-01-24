@@ -5,3 +5,4 @@ __pycache__
 
 bbtest.egg-info/*
 dist/*
+build/*

@@ -27,7 +27,8 @@ To run tests on local machine simply run
 ```bash
 $ pytest tests
 ```
-To run tests on remote machine you need to run FTP server and RPyC server on remote machine.
+To run tests on remote machines you'll need a [devpi] server to mirror PyPi
+and an FTP server and RPyC server on remote machine.
 
 - Download and install python 3.7 and RPyC:
 ```bash
@@ -38,7 +39,7 @@ $ rpyc_classic.py --host 0.0.0.0
 - Now you can run tests on the remote host:
 
 ```bash
-$ python setup.py sdist
+$ devpi upload
 $ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
 ```
 
