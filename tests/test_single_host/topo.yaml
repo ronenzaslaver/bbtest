@@ -1,3 +1,8 @@
+# List of hosts to run tests on.
+# os: the OS of the host - local, win, linux or osx
+# ip: IP address of host
+# user: FTP user, leave empty for anonymous
+# pw: FTP password, leave empty for anonymous
 
 -
   class: local
@@ -8,11 +13,11 @@
 -
   class: win
   ip: 172.16.30.159
-  user: ''
-  pw: ''
+  user: 'administrator'
+  pw: 'Password1'
 
 -
   class: linux
-  ip: 172.16.30.151
+  ip: 172.16.30.21
   user: root
   pw: Password1
