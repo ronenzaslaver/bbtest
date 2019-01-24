@@ -38,10 +38,7 @@ class BaseHost(object):
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        try:
-            self.root_path = self.ROOT_PATH
-        except AttributeError:
-            self.root_path = tempfile.gettempdir()
+        self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
     def install(self):
         """ install host for bbtest
@@ -217,7 +214,7 @@ class LocalHost(BaseHost):
 class LocalWindowsHost(LocalHost):
 
     """A collection of windows utilities and validators """
-    ROOT_PATH = 'c:/temp'
+    ROOT_PATH = 'c:\\temp'
     package_type = 'msi'
 
     @staticmethod
@@ -289,7 +286,7 @@ class RemoteHost(BaseHost):
         :param auth:
         """
         super().__init__()
-        self.ip = ip
+        self.ip = str(ip)
         self.auth = auth
         try:
             self.ftp = FTP(ip)
@@ -301,7 +298,7 @@ class RemoteHost(BaseHost):
         except Exception as e:
             raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
         try:
-            self._rpyc = rpyc.classic.connect(ip)
+            self._rpyc = rpyc.classic.connect(self.ip)
         except Exception as e:
             raise ConnectionError(f'Failed to connect to RPyC server on host {ip} - {e}')
         self.modules = self._rpyc.modules
@@ -379,7 +376,7 @@ class RemoteHost(BaseHost):
 
 class WindowsHost(RemoteHost):
     """ A remote windows host """
-    ROOT_PATH = 'c:/temp'
+    ROOT_PATH = 'c:\\temp'
 
     def __init__(self, ip="localhost", auth=("user", "pass")):
         super().__init__(ip, auth)
