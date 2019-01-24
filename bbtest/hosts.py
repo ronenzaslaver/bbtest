@@ -114,6 +114,9 @@ class BaseHost(object):
     def join(self, *args):
         return self.SEP.join(args)
 
+    def download_file(self, src_path, dst_path):
+        return self.target.download_file(src_path, dst_path)
+
 
 class LocalHost(BaseHost):
     """Suppose to be an os-agnostic local host."""
@@ -144,13 +147,13 @@ class LocalHost(BaseHost):
     def name(self):
         return socket.gethostname()
 
-    @staticmethod
-    def put(local, remote):
-        return shutil.copyfile(local, remote)
+    def put(self, local, remote):
+        """ Put file on target host relative to root path. """
+        return shutil.copyfile(local, self._relative_remote(remote))
 
-    @staticmethod
-    def get(remote, local):
-        return shutil.copyfile(remote, local)
+    def get(self, remote, local):
+        """ Get file from target host relative to root path. """
+        return shutil.copyfile(self._relative_remote(remote), local)
 
     @staticmethod
     def mkdtemp(**kwargs):
@@ -204,6 +207,9 @@ class LocalHost(BaseHost):
         else:
             # todo add the actual file extension to exception
             raise NotImplementedError('File extension is not supported')
+
+    def _relative_remote(self, remote):
+        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, ''))
 
 
 class LocalWindowsHost(LocalHost):
@@ -298,7 +304,6 @@ class RemoteHost(BaseHost):
             raise ConnectionError(f'Failed to connect to RPyC server on host {ip} - {e}')
         self.modules = self._rpyc.modules
         self.target = self.modules.bbtest.target
-        print(self.target)
 
     def install(self, bbtest_version=None):
         """ Install bbtest package on remote host.
@@ -322,14 +327,16 @@ class RemoteHost(BaseHost):
         self.modules.subprocess.run(args, stdout=subprocess.PIPE)
 
     def put(self, local, remote):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
-        self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
-        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
+        """ Put file on target host relative to root path. """
+        relative_remote = self._relative_remote(remote)
+        self.ftp.storbinary(f'STOR {relative_remote}', open(local, 'rb'))
+        return os.path.join(self.root_path, relative_remote).replace('\\', '/')
 
     def get(self, remote, local):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
-        self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
-        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
+        """ Get file from target host relative to root path. """
+        relative_remote = self._relative_remote(remote)
+        self.ftp.retrbinary(f'RETR {relative_remote}', open(local, 'wb').write)
+        return local
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
@@ -349,14 +356,14 @@ class RemoteHost(BaseHost):
     def is_process_running(self, process):
         return self.modules.bbtest.LocalHost.is_process_running(process)
 
-    def download_file(self, src_path, dst_path):
-        return self.target.download_file(src_path, dst_path)
-
     def isfile(self, path):
         return self.modules.bbtest.LocalHost().isfile(path)
 
     def untar_file(self, path):
         return self.modules.bbtest.LocalHost().untar_file(path)
+
+    def _relative_remote(self, remote):
+        return remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
 
 
 class WindowsHost(RemoteHost):

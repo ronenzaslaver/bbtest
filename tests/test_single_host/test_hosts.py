@@ -15,6 +15,8 @@ from bbtest import BBPytest
 from tests.test_utils import get_temp_dir
 from tests.mytodo_box import MyToDoBox
 
+from artifactory import ArtifactoryPath
+
 
 class TestHosts(BBPytest):
 
@@ -50,9 +52,9 @@ class TestHosts(BBPytest):
         local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
         with open(local_temp_file, 'wb') as f:
             f.write(os.urandom(1024))
-        host.put(local_temp_file, 'temp_file')
-        print(host.root_path)
+        dest_temp_file = host.put(local_temp_file, 'temp_file')
         os.remove(local_temp_file)
+        assert host.isfile(dest_temp_file)
         host.get('temp_file', local_temp_file)
-        os.path.isfile(local_temp_file)
+        assert os.path.isfile(local_temp_file)
         os.remove(local_temp_file)

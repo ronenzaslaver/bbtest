@@ -19,10 +19,18 @@ def run(args, **kwargs_in):
     return output
 
 
-def download_file(src_path, dst_path):
-    logger.info(f'Downloading file from: {src_path}')
-    with src_path.open() as fd:
-        with open(dst_path, "wb") as out:
-            out.write(fd.read())
+def download_file(src_url, dst_path):
+    """ Download file from URL to target file.
+
+    :param src_url: source URL
+    :type src_url: pathlib.Path
+    :param dst_path: destination file path
+    :type dts_path: str
+    :return:
+    """
+    logger.info(f'Downloading file from: {src_url}')
+    with src_url.open() as in_file:
+        with open(dst_path, 'wb') as out_file:
+            out_file.write(in_file.read())
     logger.info(f'Downloaded file path on disk: {dst_path}')
     return dst_path
