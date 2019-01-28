@@ -12,12 +12,12 @@
 
 -
   class: win
-  ip: 172.16.30.159
+  ip: 172.16.30.49
   user: 'administrator'
   pw: 'Password1'
 
 -
   class: linux
-  ip: 172.16.30.21
+  ip: 172.16.28.33
   user: root
   pw: Password1

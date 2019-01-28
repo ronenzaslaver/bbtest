@@ -47,7 +47,6 @@ class TestHosts(BBPytest):
             box.add('')
 
     def test_put_get_files(self):
-        """ Work in progress """
         host = self.lab.hosts['host1']
         local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
         with open(local_temp_file, 'wb') as f:
@@ -58,3 +57,7 @@ class TestHosts(BBPytest):
         host.get('temp_file', local_temp_file)
         assert os.path.isfile(local_temp_file)
         os.remove(local_temp_file)
+
+    def test_download_file(self):
+        pass
+

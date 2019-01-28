@@ -26,7 +26,7 @@ def download_file(src_url, dst_path):
     :type src_url: pathlib.Path
     :param dst_path: destination file path
     :type dts_path: str
-    :return:
+    :return: destination path
     """
     logger.info(f'Downloading file from: {src_url}')
     with src_url.open() as in_file:
