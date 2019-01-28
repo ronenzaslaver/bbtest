@@ -69,11 +69,22 @@ class BaseHost(object):
 
     @property
     def package_type(self):
-        raise NotImplementedError('Non Windows OS')
+        # TODO - define by os type and not by class name
+        host_2_package_type = {
+            WindowsHost: 'msi',
+            LocalWindowsHost: 'msi',
+            FedoraHost: 'rpm',
+            LocalFedoraHost: 'rpm',
+            DebianHost: 'deb',
+            LocalDebianHost: 'deb',
+            OSXHost: 'pkg',
+            LocalOSXHost: 'pkg'
+        }
+        return host_2_package_type[self.__class__]
 
     @property
     def is_winodws(self):
-        return 'win' in self.os
+        return 'windows' in self.os
 
     @property
     def is_linux(self):
@@ -127,14 +138,6 @@ class LocalHost(BaseHost):
     def os(self):
         """Returns a lower case string identifying the OS"""
         return platform.platform().lower()
-
-    @property
-    def package_type(self):
-        if 'win' in self.os:
-            return 'msi'
-        elif 'ubuntu' in self.os:
-            return 'deb'
-        raise NotImplementedError('Missing method implementation')
 
     @property
     def bit(self):
@@ -210,7 +213,6 @@ class LocalWindowsHost(LocalHost):
 
     """A collection of windows utilities and validators """
     ROOT_PATH = 'c:/temp'
-    package_type = 'msi'
 
     @staticmethod
     def get_package_version(package_name):
@@ -255,7 +257,22 @@ class LocalLinuxHost(LocalHost):
 
     @staticmethod
     def is_service_running(service_name):
-        if os.system(f'service {service_name} status') == '0':
+        return True if os.system(f'service {service_name} status') == 0 else False
+
+
+class LocalFedoraHost(LocalLinuxHost):
+    pass
+
+
+class LocalDebianHost(LocalLinuxHost):
+    pass
+
+
+class LocalOSXHost(LocalHost):
+
+    def is_service_running(self, service_name):
+        command = f'sudo launchctl list | awk \'$3=="{service_name}" {{ print $2 }}\''
+        if self.run(command, shell=True)[0] == '0':
             return True
         else:
             return False
@@ -272,10 +289,6 @@ class RemoteHost(BaseHost):
     @property
     def bit(self):
         return self.modules.bbtest.LocalHost().bit
-
-    @property
-    def package_type(self):
-        return self.modules.bbtest.LocalHost().package_type
 
     @property
     def name(self):
@@ -390,7 +403,7 @@ class LinuxHost(RemoteHost):
     ROOT_PATH = '/tmp'
 
     def is_service_running(self, service):
-        raise NotImplementedError('Missing method implementation')
+        return self.modules.bbtest.LocalLinuxHost.is_service_running(service)
 
 
 class FedoraHost(LinuxHost):
@@ -401,5 +414,9 @@ class DebianHost(LinuxHost):
     pass
 
 
-class OSXHost(LinuxHost):
-    pass
+class OSXHost(RemoteHost):
+
+    ROOT_PATH = '/tmp'
+
+    def is_service_running(self, service):
+        return self.modules.bbtest.LocalOSXHost().is_service_running(service)
