@@ -361,10 +361,14 @@ class RemoteHost(BaseHost):
         self.ftp.retrbinary(f'RETR {relative_remote}', open(local, 'wb').write)
         return local
 
-    def run(self, args, **kwargs):
+    def run(self, args, **kwargs_in):
+        kwargs = kwargs_in.copy()
+        for key in self._rpyc._config:
+            kwargs.pop(key, None)
         self._rpyc._config['sync_request_timeout'] = kwargs.pop('timeout', SYNC_REQUEST_TIMEOUT)
-        return super().run(args, **kwargs)
+        output = super().run(args, **kwargs)
         self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
+        return output
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """

@@ -62,5 +62,5 @@ class TestHosts(BBPytest):
     def test_timeout(self):
         self.host.run(['sleep', '4'])
         with pytest.raises(Exception) as _:
-            self.host.run(['sleep', '4'], sync_request_timeout=2)
+            self.host.run(['sleep', '4'], timeout=2)
         self.host.run(['sleep', '4'])
