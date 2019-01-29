@@ -9,6 +9,7 @@ import subprocess
 import shutil
 import tarfile
 import tempfile
+import time
 
 try:
     from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
@@ -190,10 +191,12 @@ class LocalHost(BaseHost):
         return os.path.isfile(path)
 
     @staticmethod
-    def is_process_running(proc_name):
-        for proc in psutil.process_iter():
-            if proc.name() == proc_name:
-                return True
+    def is_process_running(proc_name, timeout=1):
+        for _ in range(0, timeout):
+            for proc in psutil.process_iter():
+                if proc.name() == proc_name:
+                    return True
+            time.sleep(1)
         return False
 
     @staticmethod
@@ -373,8 +376,8 @@ class RemoteHost(BaseHost):
     def rmfiles(self, name):
         return self.modules.bbtest.LocalHost.rmfiles(name)
 
-    def is_process_running(self, process):
-        return self.modules.bbtest.LocalHost.is_process_running(process)
+    def is_process_running(self, process, timeout=1):
+        return self.modules.bbtest.LocalHost.is_process_running(process, timeout)
 
     def isfile(self, path):
         return self.modules.bbtest.LocalHost().isfile(path)
