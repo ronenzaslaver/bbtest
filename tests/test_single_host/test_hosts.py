@@ -10,12 +10,11 @@ The destination host (==topo) is set by pytest.
 import pytest
 import subprocess
 import os
+import rpyc
 
 from bbtest import BBPytest
 from tests.test_utils import get_temp_dir
 from tests.mytodo_box import MyToDoBox
-
-from artifactory import ArtifactoryPath
 
 
 class TestHosts(BBPytest):
@@ -47,17 +46,21 @@ class TestHosts(BBPytest):
             box.add('')
 
     def test_put_get_files(self):
-        host = self.lab.hosts['host1']
         local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
         with open(local_temp_file, 'wb') as f:
             f.write(os.urandom(1024))
-        dest_temp_file = host.put(local_temp_file, 'temp_file')
+        dest_temp_file = self.host.put(local_temp_file, 'temp_file')
         os.remove(local_temp_file)
-        assert host.isfile(dest_temp_file)
-        host.get('temp_file', local_temp_file)
+        assert self.host.isfile(dest_temp_file)
+        self.host.get('temp_file', local_temp_file)
         assert os.path.isfile(local_temp_file)
         os.remove(local_temp_file)
 
     def test_download_file(self):
         pass
 
+    def test_timeout(self):
+        self.host.run(['sleep', '4'])
+        with pytest.raises(Exception) as _:
+            self.host.run(['sleep', '4'], sync_request_timeout=2)
+        self.host.run(['sleep', '4'])

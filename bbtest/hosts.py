@@ -10,20 +10,19 @@ import shutil
 import tarfile
 import tempfile
 import time
-
+from ftplib import FTP
+import rpyc
+import glob
+import psutil
+from psutil import NoSuchProcess
 try:
     from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
 except Exception:
     pass
 
-from ftplib import FTP
-import rpyc
-import glob
-
-import psutil
-from psutil import NoSuchProcess
-
 from bbtest import target
+
+SYNC_REQUEST_TIMEOUT = 60
 
 logger = logging.getLogger('bblog')
 
@@ -322,6 +321,7 @@ class RemoteHost(BaseHost):
         except Exception as e:
             raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
         try:
+            rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
             self._rpyc = rpyc.classic.connect(self.ip)
         except Exception as e:
             raise ConnectionError(f'Failed to connect to RPyC server on host {ip} - {e}')
@@ -360,6 +360,11 @@ class RemoteHost(BaseHost):
         relative_remote = self._relative_remote(remote)
         self.ftp.retrbinary(f'RETR {relative_remote}', open(local, 'wb').write)
         return local
+
+    def run(self, args, **kwargs):
+        self._rpyc._config['sync_request_timeout'] = kwargs.pop('timeout', SYNC_REQUEST_TIMEOUT)
+        return super().run(args, **kwargs)
+        self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """

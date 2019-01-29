@@ -18,6 +18,6 @@
 
 -
   class: linux
-  ip: 172.16.28.33
+  ip: 172.16.28.68
   user: root
   pw: Password1
