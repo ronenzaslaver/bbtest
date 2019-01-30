@@ -10,9 +10,8 @@ The destination host (==topo) is set by pytest.
 import pytest
 import subprocess
 import os
-import rpyc
 
-from bbtest import BBPytest
+from bbtest import RemoteHost, BBPytest, hosts
 from tests.test_utils import get_temp_dir
 from tests.mytodo_box import MyToDoBox
 
@@ -60,7 +59,9 @@ class TestHosts(BBPytest):
         pass
 
     def test_timeout(self):
-        self.host.run(['sleep', '4'])
+        self.host.run(['sleep', '2'])
         with pytest.raises(Exception) as _:
-            self.host.run(['sleep', '4'], timeout=2)
-        self.host.run(['sleep', '4'])
+            self.host.run(['sleep', '2'], timeout=1)
+        if isinstance(self.host, RemoteHost):
+            with pytest.raises(Exception) as _:
+                self.host.run(['sleep', '2'], sync_request_timeout=1)

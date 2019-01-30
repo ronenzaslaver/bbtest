@@ -26,10 +26,10 @@ os_2_class = {'local': LocalHost,
 
 def pytest_addoption(parser):
     parser.addoption('--topo', action='store', default='', help='path to bbtest lab topology file')
-    parser.addoption('--os', action='store', default='win', help='OS of target machine - local, windows, linux oe mac')
-    parser.addoption('--ip', action='store', default='localhost', help='IP address of target machine')
-    parser.addoption('--user', action='store', default='', help='Username for target machine')
-    parser.addoption('--pw', action='store', default='', help='Password for target machine')
+    parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
+    parser.addoption('--ip', action='store', default='', help='IP address of target machine')
+    parser.addoption('--user', action='store', default='Administrator', help='Username for target machine')
+    parser.addoption('--pw', action='store', default='Password1', help='Password for target machine')
 
 
 @pytest.fixture(scope='class')

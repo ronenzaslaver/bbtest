@@ -40,6 +40,11 @@ class BaseHost(object):
         super().__init__()
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
+    @property
+    def os(self):
+        """Returns a lower case string identifying the OS"""
+        return self.target.os()
+
     def install(self):
         """ install host for bbtest
 
@@ -54,10 +59,6 @@ class BaseHost(object):
     def clean(self):
         """ Restore host to its original installed state """
         pass
-
-    @property
-    def os(self):
-        raise NotImplementedError('Missing method implementation')
 
     @property
     def bit(self):
@@ -101,7 +102,8 @@ class BaseHost(object):
 
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
-        output = self.target.run(args, **kwargs)
+        shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
+        output = self.target.run(args, **shutils_kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -136,11 +138,6 @@ class LocalHost(BaseHost):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.target = target
-
-    @property
-    def os(self):
-        """Returns a lower case string identifying the OS"""
-        return platform.platform().lower()
 
     @property
     def bit(self):
@@ -291,10 +288,6 @@ class RemoteHost(BaseHost):
     """
 
     @property
-    def os(self):
-        return self.modules.bbtest.LocalHost().os
-
-    @property
     def bit(self):
         return self.modules.bbtest.LocalHost().bit
 
@@ -361,13 +354,17 @@ class RemoteHost(BaseHost):
         self.ftp.retrbinary(f'RETR {relative_remote}', open(local, 'wb').write)
         return local
 
-    def run(self, args, **kwargs_in):
-        kwargs = kwargs_in.copy()
-        for key in self._rpyc._config:
-            kwargs.pop(key, None)
-        self._rpyc._config['sync_request_timeout'] = kwargs.pop('timeout', SYNC_REQUEST_TIMEOUT)
-        output = super().run(args, **kwargs)
-        self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
+    def run(self, args, **kwargs):
+        rpyc_kwargs = {k: v for k, v in kwargs.items() if k in self._rpyc._config}
+        for key, value in rpyc_kwargs.items():
+            self._rpyc._config[key] = value
+        self._rpyc._config['sync_request_timeout'] = kwargs.pop('timeout', self._rpyc._config['sync_request_timeout'])
+        try:
+            output = super().run(args, **kwargs)
+        except Exception as e:
+            raise e
+        finally:
+            self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         return output
 
     def mkdtemp(self, **kwargs):

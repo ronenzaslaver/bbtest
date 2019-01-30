@@ -1,8 +1,14 @@
 
+import platform
 import subprocess
 import logging
 
 logger = logging.getLogger('bblog')
+
+
+def os():
+    """Returns a lower case string identifying the OS"""
+    return platform.platform().lower()
 
 
 def run(args, **kwargs_in):
