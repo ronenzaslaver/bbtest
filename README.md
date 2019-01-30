@@ -14,6 +14,7 @@ First fork and clone this repo.  Then use `pipenv` to setup the python environme
 Open a shell in the cloned repo folder and type:
 
 ```bash
+$ pipenv --python 3.7
 $ pipenv shell
 $ pipenv install --dev
 ```
@@ -65,7 +66,7 @@ Now you can find your new package under YOURNAME/dev
 - Download
 Go to the destination host and run:
 ```bash
-python -m pip install -UI -i http://172.16.57.40/YOURNAME/dev --trusted-host 172.16.57.40 YOURPACKAGE
+python -m pip install -UI -i http://172.16.57.40/YOURNAME/dev --trusted-host 172.16.57.40 bbtest
 ```
 
 # Examples
