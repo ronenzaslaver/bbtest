@@ -1,4 +1,5 @@
 
+import os
 import platform
 import subprocess
 import logging
@@ -6,9 +7,24 @@ import logging
 logger = logging.getLogger('bblog')
 
 
-def os():
-    """Returns a lower case string identifying the OS"""
-    return platform.platform().lower()
+def os_path_isfile(path):
+    return os.path.isfile(path)
+
+
+def os_path_getsize(path):
+    return os.path.getsize(path)
+
+
+def platform_platform():
+    return platform.platform()
+
+
+def platform_machine():
+    return platform.machine()
+
+
+def platform_system():
+    return platform.system()
 
 
 def run(args, **kwargs_in):
@@ -35,7 +51,7 @@ def download_file(src_url, dst_path):
     :return: destination path
     """
     logger.info(f'Downloading file from: {src_url}')
-    with src_url.open() as in_file:
+    with src_url.open(mode='rb') as in_file:
         with open(dst_path, 'wb') as out_file:
             out_file.write(in_file.read())
     logger.info(f'Downloaded file path on disk: {dst_path}')

@@ -4,8 +4,8 @@ from .hosts import *
 from .testcases import *
 
 __all__ = ['BBPytest', 'BBTestCase',
-           'Lab',
-           'BaseHost', 'WindowsHost', 'LinuxHost', 'FedoraHost', 'DebianHost', 'OSXHost',
+           'Lab', 'BaseHost',
+           'RemoteHost', 'WindowsHost', 'LinuxHost', 'FedoraHost', 'DebianHost', 'OSXHost',
            'LocalHost', 'LocalWindowsHost', 'LocalFedoraHost', 'LocalDebianHost', 'LocalOSXHost',
            'BlackBox', 'HomeBox']
 

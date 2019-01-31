@@ -17,6 +17,7 @@ dohq-artifactory = "*"
 psutil = "*"
 rpyc = "*"
 pyyaml = "*"
+pexpect = "*"
 
 [requires]
 python_version = "3.7"

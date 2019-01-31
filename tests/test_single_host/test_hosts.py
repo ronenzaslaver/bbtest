@@ -10,8 +10,9 @@ The destination host (==topo) is set by pytest.
 import pytest
 import subprocess
 import os
+import pathlib
 
-from bbtest import RemoteHost, BBPytest, hosts
+from bbtest import RemoteHost, LocalHost, BBPytest
 from tests.test_utils import get_temp_dir
 from tests.mytodo_box import MyToDoBox
 
@@ -45,18 +46,22 @@ class TestHosts(BBPytest):
             box.add('')
 
     def test_put_get_files(self):
-        local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
-        with open(local_temp_file, 'wb') as f:
-            f.write(os.urandom(1024))
+        local_temp_file = self._create_temp_file()
         dest_temp_file = self.host.put(local_temp_file, 'temp_file')
-        os.remove(local_temp_file)
         assert self.host.isfile(dest_temp_file)
+        os.remove(local_temp_file)
         self.host.get('temp_file', local_temp_file)
         assert os.path.isfile(local_temp_file)
         os.remove(local_temp_file)
 
-    def test_download_file(self):
-        pass
+    def test_download_files(self):
+        local_temp_file = self._create_temp_file()
+        dest_temp_file = os.path.join(self.host.root_path, 'temp_file')
+        self.host.download_file(pathlib.Path(local_temp_file), dest_temp_file)
+        assert self.host.isfile(dest_temp_file)
+        assert self.host.getsize(dest_temp_file) == 1024
+        os.remove(local_temp_file)
+
 
     def test_timeout(self):
         self.host.run(['sleep', '2'])
@@ -65,3 +70,16 @@ class TestHosts(BBPytest):
         if isinstance(self.host, RemoteHost):
             with pytest.raises(Exception) as _:
                 self.host.run(['sleep', '2'], sync_request_timeout=1)
+        else:
+            self.host.run(['sleep', '2'], sync_request_timeout=1)
+
+    def test_os_platform(self):
+        assert self.host.os in ['windows', 'linux']
+        assert self.host.os_bits in [32, 64]
+        assert self.host.platform in ['windows', 'debian']
+
+    def _create_temp_file(self):
+        local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
+        with open(local_temp_file, 'wb') as f:
+            f.write(os.urandom(1024))
+        return local_temp_file

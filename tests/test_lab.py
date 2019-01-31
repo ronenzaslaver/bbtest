@@ -1,5 +1,9 @@
+"""
+Basic lab tests - create lab from topology, cleanup and destroy lab, default fixtures or classical unittest...
+"""
 
 import pytest
+from bbtest import BBTestCase
 
 from bbtest import BBPytest, LocalHost, BlackBox, BaseHost, Lab
 from bbtest.exceptions import ImproperlyConfigured
@@ -96,3 +100,26 @@ class MultiBox(BBPytest):
     def test_multi_boxes(self):
         assert len(self.lab.boxes[EmptyBox.NAME]) == 2
         assert len(self.lab.boxes[YetAnotherEmptyBox.NAME]) == 2
+
+
+class TestBBTestCase(BBTestCase):
+    """ Test classical unittest.TestCase - empty (no) fixtures, rely on setup/teardown. """
+
+    @pytest.fixture(scope='class', autouse=True)
+    def lab_factory(request):
+        pass
+
+    @pytest.fixture(autouse=True)
+    def clean_lab_factory(request):
+        pass
+
+    topo = {
+        'host1': {
+            'class': LocalHost,
+            'boxes': [EmptyBox]
+         },
+    }
+
+    def test_bbtestbase(self):
+        assert len(self.lab.boxes[EmptyBox.NAME]) == 1
+        assert self.lab.boxes[EmptyBox.NAME][0].host.ip == '127.0.0.1'

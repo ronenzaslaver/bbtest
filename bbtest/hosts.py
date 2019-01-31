@@ -15,6 +15,7 @@ import rpyc
 import glob
 import psutil
 from psutil import NoSuchProcess
+import re
 try:
     from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
 except Exception:
@@ -40,11 +41,6 @@ class BaseHost(object):
         super().__init__()
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
-    @property
-    def os(self):
-        """Returns a lower case string identifying the OS"""
-        return self.target.os()
-
     def install(self):
         """ install host for bbtest
 
@@ -61,27 +57,8 @@ class BaseHost(object):
         pass
 
     @property
-    def bit(self):
-        raise NotImplementedError('Missing method implementation')
-
-    @property
     def name(self):
         raise NotImplementedError('Missing method implementation')
-
-    @property
-    def package_type(self):
-        # TODO - define by os type and not by class name
-        host_2_package_type = {
-            WindowsHost: 'msi',
-            LocalWindowsHost: 'msi',
-            FedoraHost: 'rpm',
-            LocalFedoraHost: 'rpm',
-            DebianHost: 'deb',
-            LocalDebianHost: 'deb',
-            OSXHost: 'pkg',
-            LocalOSXHost: 'pkg'
-        }
-        return host_2_package_type[self.__class__]
 
     @property
     def is_winodws(self):
@@ -91,8 +68,26 @@ class BaseHost(object):
     def is_linux(self):
         return 'linux' in self.os
 
+    @property
+    def os(self):
+        """ Returns a lower case string identifying the OS. """
+        return self.target.platform_system().lower()
+
+    @property
+    def os_bits(self):
+        """ Returns the OS bits architecture - 32 or 64. """
+        return int(self.target.platform_machine()[-2:])
+
+    @property
+    def platform(self):
+        """ Returns the platform name - windows/debian/fedora. """
+        return re.findall('.*(windows|debian).*', self.target.platform_platform().lower())[0]
+
     def isfile(self, path):
-        raise NotImplementedError('Missing method implementation')
+        return self.target.os_path_isfile(path)
+
+    def getsize(self, path):
+        return self.target.os_path_getsize(path)
 
     def rmtree(self, path, ignore_errors=True, onerror=None):
         raise NotImplementedError('Missing method implementation')
@@ -127,8 +122,8 @@ class BaseHost(object):
     def join(self, *args):
         return self.SEP.join(args)
 
-    def download_file(self, src_path, dst_path):
-        return self.target.download_file(src_path, dst_path)
+    def download_file(self, src_url, dst_path):
+        return self.target.download_file(src_url, dst_path)
 
 
 class LocalHost(BaseHost):
@@ -138,10 +133,6 @@ class LocalHost(BaseHost):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.target = target
-
-    @property
-    def bit(self):
-        return platform.machine()[-2:]
 
     @property
     def name(self):
@@ -183,9 +174,6 @@ class LocalHost(BaseHost):
         except OSError:
             pass
 
-    def isfile(self, path):
-        return os.path.isfile(path)
-
     @staticmethod
     def is_process_running(proc_name, timeout=1):
         for _ in range(0, timeout):
@@ -211,7 +199,7 @@ class LocalHost(BaseHost):
             raise NotImplementedError('File extension is not supported')
 
     def _relative_remote(self, remote):
-        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, ''))
+        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, '').lstrip('/'))
 
 
 class LocalWindowsHost(LocalHost):
@@ -286,10 +274,6 @@ class LocalOSXHost(LocalHost):
 class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
-
-    @property
-    def bit(self):
-        return self.modules.bbtest.LocalHost().bit
 
     @property
     def name(self):
@@ -384,9 +368,6 @@ class RemoteHost(BaseHost):
 
     def is_process_running(self, process, timeout=1):
         return self.modules.bbtest.LocalHost.is_process_running(process, timeout)
-
-    def isfile(self, path):
-        return self.modules.bbtest.LocalHost().isfile(path)
 
     def untar_file(self, path):
         return self.modules.bbtest.LocalHost().untar_file(path)

@@ -11,13 +11,13 @@
   pw: ''
 
 -
-  class: win
-  ip: 172.16.30.49
-  user: 'administrator'
-  pw: 'Password1'
-
--
   class: linux
-  ip: 172.16.28.68
-  user: root
-  pw: Password1
+  ip: localhost
+  user: yoram
+  pw: Tera0917
+
+#-
+#  class: win
+#  ip: 192.168.15.23
+#  user: yoram-s
+#  pw: Tera0818

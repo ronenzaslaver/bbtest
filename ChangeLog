@@ -1,0 +1,142 @@
+CHANGES
+=======
+
+* add readme notes on mac and fedora
+* fix documentation
+* remove examples
+* move os() to target
+* fix bug in run with timeout
+* add timeout to run()
+* add timeout for is\_process\_running
+* installation documentation
+* add is\_service\_running()
+* refine get/set file
+* fix get\_package\_version()
+* fix is\_process\_running()
+* remove host install - should be installed manually
+* adding package classifiers
+* post merge requirments refres
+* adding devpi client
+* fix all comments in pull request #1
+* ftp tests - WIP
+* run host tests on multiple hosts from topo file
+* add base class for unittest
+* pytest IV
+* pure pytest III
+* pure pytest II
+* first draft of pure pytest with fixtures
+* WIP with Linn
+* fix pytest lab\_factory
+* cybereason cleanup
+* Linux install test - WIP.
+* fix all comments in pull request #1
+* ftp tests - WIP
+* cybereason cleanup
+* A missing "f"
+* no virtualenv on remote
+* Linux install test - WIP.
+* How to build requirments.txt
+* ROOT\_PATH & root\_path now make sense
+* WIP: A better setup.py
+* run host tests on multiple hosts from topo file
+* add base class for unittest
+* pytest IV
+* pure pytest III
+* cybereason cleanup
+* A missing "f"
+* no virtualenv on remote
+* run interface change to mimic subprocess.run
+* move run error check from target to hosts
+* pure pytest II
+* first draft of pure pytest with fixtures
+* WIP with Linn
+* test run error code
+* create target.py to hold all helpers that should run on target machine
+* Fix host's ROOT\_PATH
+* Revert "Remove unused SpyServerBox"
+* cybereason install test passes on remote windows
+* Remove unused SpyServerBox
+* bbtest passes on remote win, linux AND OSX
+* 100% coverage for labs.py
+* Remove pipenv dependency - issue #15
+* 100% coverage for labs.py
+* Remove pipenv dependency - issue #15
+* fixed all comments (but pipenv depandancy) in pull request #14
+* improve pytest conftest
+* test on actual remote win and linux machine pass
+* Update docs
+* test on actual remote win machine pass
+* Improve the todo example
+* remove warnings
+* WIP linux
+* first implementation of bbtest install on remote host
+* fixed host.run() to convert args from tuple to list
+* Added Sensor version and PylumId validations
+* Using RPyC when host.run
+* Oh boy..
+* WIP: Code review WinRm, RPYC, etc
+* fix typo in test
+* ftp + rpyc + winrm demo
+* added test validators
+* basic file server put and get
+* Test personalization file created
+* start work on WindowsHost
+* Implemeted personalization action
+* all tests pass on Windows
+* Added download functionality to PersonalizationBox
+* test boxes
+* revert to my todo.py app on tests
+* Better order in CR boxes
+* Cleanup
+* Fixing Roy's name
+* Dirty merge cleanup
+* improved docs
+* Prepare WindowsHost for virtualization integration
+* Improving HomeBox so it can put and run
+* Use run\_file in the Installer test
+* WIP - move to Ronen
+* Improving docs
+* New version of the docs
+* PASSED
+* start stub implementation of senser install
+* Installer tests pass
+* No need to setup PYTHONPATH
+* WIP: installer example test fails on the last line
+* Better error message on lab mis configuration
+* WIP: first version of the installer example
+* Removing 7 chars of obvious code
+* Now with IPython!
+* a cleaner way to import bbtest
+* Improved README.md
+* prep for sensor install testing
+* first todo tests pass from cmd, fail from ide
+* move cr up to root level and rename to cybereason
+* This should solve the docs hosting on gh
+* more docs build
+* Improve docs instructions
+* Fixing docs github hosting
+* Fix public doc folder
+* Delete CNAME
+* Create CNAME
+* Improve the Todo example doics
+* use github pages to server the docs
+* Rename remove to uninstall
+* Fixing the boxes mkdtemp
+* WIP: Improving the ToDo docs
+* start unittests for bbtest itself
+* revert to simple example, not fully tested
+* Beter filename in the todo example
+* grammer
+* Remove the Overview section of the docs
+* better docs, still not there
+* Use TestCases asserts
+* Adding sphinx
+* add remove for boxes and use it to remove home dir
+* Add temp home to boxes
+* ToDoTest successfully pass on Ubuntu (#2)
+*  missing files
+* Improved lab models
+* Removing dad code and fixing file names
+* Moving folders around
+* add test\_install (for sensor install) (#1)
+* Initial
