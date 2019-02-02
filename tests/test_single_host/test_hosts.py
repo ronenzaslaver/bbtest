@@ -12,7 +12,7 @@ import subprocess
 import os
 import pathlib
 
-from bbtest import RemoteHost, LocalHost, BBPytest
+from bbtest import RemoteHost, BBPytest, HomeBox
 from tests.test_utils import get_temp_dir
 from tests.mytodo_box import MyToDoBox
 
@@ -23,11 +23,12 @@ class TestHosts(BBPytest):
         self.host = self.lab.hosts['host1']
 
     def test_builtin_command(self):
+        box = self.lab.add_box(HomeBox, self.host)
         kwargs = {}
         # todo move to hosts...
         if self.host.is_winodws:
             kwargs['shell'] = True
-        assert self.host.run(['echo', 'Hello'], **kwargs) == ['Hello']
+        assert box.run(['echo', 'Hello'], **kwargs) == ['Hello']
 
     def test_python_script(self):
         # Test no output.
@@ -55,6 +56,18 @@ class TestHosts(BBPytest):
         os.remove(local_temp_file)
         self.host.rmfile(dest_temp_file)
         assert not self.host.isfile(dest_temp_file)
+
+    def test_box_put_get_files(self):
+        box = self.lab.add_box(HomeBox, self.host)
+        local_temp_file = self._create_temp_file()
+        dest_temp_file = box.put(local_temp_file, 'temp_file')
+        assert box.isfile('temp_file')
+        os.remove(local_temp_file)
+        box.get('temp_file', local_temp_file)
+        assert os.path.isfile(local_temp_file)
+        os.remove(local_temp_file)
+        box.rmfile('temp_file')
+        assert not box.isfile('temp_file')
 
     def test_download_files(self):
         local_temp_file = self._create_temp_file()

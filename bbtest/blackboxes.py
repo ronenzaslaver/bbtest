@@ -3,8 +3,6 @@ To take part in a test a component needs to be wrapped in a BlackBox.
 """
 
 import logging
-from os import path
-import stat
 
 logger = logging.getLogger('bblog')
 
@@ -62,37 +60,16 @@ class HomeBox(BlackBox):
     def run(self, args, **kwargs):
         return self.host.run(args, cwd=self.path, **kwargs)
 
-    def put(self, src, dest, *args, **kwargs):
-        """Put a file in the host's home directory """
-        return self.host.put(
-            src, self.host.join(self.path, dest), *args, **kwargs)
+    def put(self, local, remote):
+        """Put a file in the box's home directory """
+        return self.host.put(local, self.host.join(self.path, remote))
 
-    def run_file(self, src_path, background=False, params=None):
-        """Copy the source to the box, run it, and return its output."""
-        basename = path.basename(src_path)
-        self.put(src_path, basename)
+    def get(self, remote, local):
+        """ Get file from the box's home directory. """
+        return self.host.get(self.host.join(self.path, remote), local)
 
-        if self.host.os.startswith('linux'):
-            self.run(['chmod', '777', basename])
-        args = [f'./{basename}']
-        args.extend(params)
-        self.run(args)
+    def isfile(self, path):
+        return self.host.isfile(self.host.join(self.path, path))
 
-
-class SpyServerBox(BlackBox):
-    """A box that exposes a `url` and a `log` so that any messages POSTed to
-    url is appended to the log.
-
-    .. important:: It still doesn't work and the log never changes
-    """
-
-    NAME = 'serverspy'
-
-    log = ['Hello Sara!']
-    """log is an array of log messages where Each POSTed message is appended"""
-
-    def install(self):
-        self.url = "http://example.com"
-
-    def clean(self):
-        pass
+    def rmfile(self, path):
+        return self.host.rmfile(self.host.join(self.path, path))
