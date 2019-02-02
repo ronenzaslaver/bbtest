@@ -3,6 +3,7 @@ import os
 import platform
 import subprocess
 import logging
+import tempfile
 
 logger = logging.getLogger('bblog')
 
@@ -15,6 +16,17 @@ def os_path_getsize(path):
     return os.path.getsize(path)
 
 
+def os_remove(path):
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+
+
+def os_chmod(path, mode):
+    os.chmod(path, mode)
+
+
 def platform_platform():
     return platform.platform()
 
@@ -25,6 +37,11 @@ def platform_machine():
 
 def platform_system():
     return platform.system()
+
+
+
+def tempfile_mkdtemp(**kwargs):
+    return tempfile.mkdtemp(**kwargs)
 
 
 def run(args, **kwargs_in):

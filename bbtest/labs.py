@@ -25,7 +25,7 @@ class Lab():
                 # TODO: allocate a host, use params['image']
                 host = host_class()
             self.hosts[host_name] = host
-            # self.hosts[host_name].install() todo uncomment after install script runs on remote machine
+            self.hosts[host_name].install(package=params.get('package', None))
             # let there be boxes!
             for box_class in params['boxes']:
                 self.add_box(box_class, host)

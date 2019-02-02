@@ -1,8 +1,10 @@
 """
 To take part in a test a component needs to be wrapped in a BlackBox.
 """
+
 import logging
 from os import path
+import stat
 
 logger = logging.getLogger('bblog')
 
@@ -31,7 +33,9 @@ class BlackBox():
 
     def mkdtemp(self, **kwagrs):
         """Create a temp directory"""
-        return self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
+        temp = self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
+        self.host.chmod_777(temp)
+        return temp
 
 
 class HomeBox(BlackBox):

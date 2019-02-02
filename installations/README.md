@@ -1,8 +1,9 @@
 # How to turn bare Ubuntu machine into bbtest host 
 
-Prerequisite:
-1. Firewall ports are allowed: 21 for FTP, 18812 for rpyc
+## Prerequisite:
+- Firewall ports are allowed: 21 for FTP, 18812 for rpyc
 
+## Install FTP
 Install vsftpd:
 ```bash
 apt install vsftpd
@@ -13,7 +14,7 @@ Set password for ftp:
 passwd ftp
 ```
 
-Copy /etc/vsftpd.conf and /etc/vsftpd.userlist from here.
+Copy /etc/vsftpd.conf and /etc/vsftpd.userlist from here under /etc.
 
 Allow ftp user to ftp - make sure it does not appear in /etc/vsftpd/ftpusers
 
@@ -22,46 +23,7 @@ Restart vsftpd
 systemctl restart vsftpd.service
 ```
 
-Install python3.7 (Debian)
-```bash
-add-apt-repository ppa:deadsnakes/ppa
-apt-get update
-apt install python3.7
-apt install python3.7-dev
-apt install python3-pip
-```
-
-Install python3.7 (OSX)
-```bash
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install python3
-```
-
-
-Install rpyc and bbtest
-```bash
-/usr/bin/python3.7 -m pip install rpyc
-export username=name of devpi user name
-/usr/bin/python3.7 -m pip install -UI -i http://172.16.57.40/$username/dev/ --trusted-host 172.16.57.40 bbtest
-```
-
-Make sure rpyc port is open in machine's firewall
-```bash
-(Fedora):
-sudo firewall-cmd --zone=public --add-port=18812/tcp --permanent
-sudo firewall-cmd --reload
-```
-
-Start rpyc server
-```bash
-rpyc_classic.py --host 0.0.0.0
-```
-
-Personalization Box preparation:
-Machine should have python2 installed with protobuf package.
-
-
-Notes about CentOS FTP:
+### Notes about CentOS FTP:
 1. FTP: There might be a vsftpd application already installed - check under /etc/vsftpd/
    if so, skip installation of the app, and start by copying the vsftpd.* files to /etc/vsftpd
 2. FTP: Enable putting files into ftp-home-directory:
@@ -75,7 +37,7 @@ pasv_max_port=10100
 pasv_min_port=10090
 ```
 
-Notes about Mac FTP:
+### Notes about Mac FTP:
 1. Built-in FTP was removed in recent OSX versions (e.g. Mojave)
    We could not set up FTP on Mojave. Failed to setup vsftpd
 2. Enable FTP on OSX Sierra:
@@ -83,7 +45,17 @@ Notes about Mac FTP:
 sudo -s launchctl load -w /System/Library/LaunchDaemons/ftp.plist
 ```
 
-Notes about CentOS Python3.7:
+## Python 3.7
+Install python3.7 (Debian)
+```bash
+add-apt-repository ppa:deadsnakes/ppa
+apt-get update
+apt install python3.7
+apt install python3.7-dev
+apt install python3-pip
+```
+
+### Notes about CentOS Python3.7
 There's currently no yum package for python3.7. We need to build it from source:
 
 maybe redundant - need to check and update the doc:
@@ -102,3 +74,31 @@ cd Python-3.7.2/
 make
 make install
 ```
+
+### Notes about OSX Python3.7
+```bash
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install python3
+```
+
+## Install rpyc and bbtest
+```bash
+/usr/bin/python3.7 -m pip install rpyc
+export username=name of devpi user name
+/usr/bin/python3.7 -m pip install -UI -i http://172.16.57.40/$username/dev/ --trusted-host 172.16.57.40 bbtest
+```
+
+Make sure rpyc port is open in machine's firewall
+```bash
+(Fedora):
+sudo firewall-cmd --zone=public --add-port=18812/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+Start rpyc server
+```bash
+rpyc_classic.py --host 0.0.0.0
+```
+
+## Personalization Box preparation:
+Machine should have python2 installed with protobuf package.

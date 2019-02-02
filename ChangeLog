@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* refactor os and platform properties
 * add readme notes on mac and fedora
 * fix documentation
 * remove examples

@@ -30,7 +30,7 @@ $ pytest tests
 ## Remote hosts
 To run tests on remote machines you'll need a [devpi] server to mirror PyPi
 and an FTP server and RPyC server on remote machine. You can find some tips on FTP and Python installations in the
-INSTALLATIONS.md file. 
+[INSTALLATIONS.md](installations/README.md) file. 
 
 - Download and install python 3.7 and RPyC:
 ```bash

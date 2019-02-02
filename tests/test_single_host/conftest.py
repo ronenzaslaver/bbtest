@@ -25,27 +25,30 @@ os_2_class = {'local': LocalHost,
 
 
 def pytest_addoption(parser):
-    parser.addoption('--topo', action='store', default='', help='path to bbtest lab topology file')
+    parser.addoption('--topo', action='store', default='/home/yoram/workspace/python/bbtest/tests/test_single_host/topo.yaml', help='path to bbtest lab topology file')
     parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
     parser.addoption('--ip', action='store', default='', help='IP address of target machine')
     parser.addoption('--user', action='store', default='', help='Username for target machine')
     parser.addoption('--pw', action='store', default='', help='Password for target machine')
+    parser.addoption('--pypi', action='store', default='', help='pypi server to install bbtest package from')
 
 
 @pytest.fixture(scope='class')
 def topo(request):
-    request.cls.topo = {'host1': {'class': os_2_class[request.param[0]],
-                        'boxes': []}}
-    request.cls.address_book = {'host1': {'ip': request.param[1],
-                                'auth': (request.param[2], request.param[3])}}
+    request.cls.topo = {'host1': {'class': os_2_class[request.param['os']],
+                                  'package': 'bbtest',
+                                  'boxes': []}}
+    request.cls.address_book = {'host1': {'ip': request.param['ip'],
+                                          'auth': request.param.get('auth', None),
+                                          'pypi': request.param.get('pypi', None)}}
 
 
 def pytest_generate_tests(metafunc):
     if metafunc.config.getoption('--topo'):
         with open(metafunc.config.getoption('--topo')) as f:
-            topos_in = yaml.safe_load(f)
-        topos = [list(t.values()) for t in topos_in]
+            topos = yaml.safe_load(f)
     else:
-        topos = [[metafunc.config.getoption('--os'), metafunc.config.getoption('--ip'),
-                  metafunc.config.getoption('--user'), metafunc.config.getoption('--pw')]]
+        topos = [{'os': metafunc.config.getoption('--os'),
+                  'ip': metafunc.config.getoption('--ip'),
+                  'auth': (metafunc.config.getoption('--user'), metafunc.config.getoption('--pw'))}]
     metafunc.parametrize('topo', topos, indirect=True)

@@ -3,7 +3,7 @@ Hosts in the network.
 """
 import logging
 import os
-import platform
+import stat
 import socket
 import subprocess
 import shutil
@@ -22,6 +22,7 @@ except Exception:
     pass
 
 from bbtest import target
+from .exceptions import ImproperlyConfigured
 
 SYNC_REQUEST_TIMEOUT = 60
 
@@ -39,9 +40,11 @@ class BaseHost(object):
 
     def __init__(self, *args, **kwargs):
         super().__init__()
+        self.args = args
+        self.kwargs = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
-    def install(self):
+    def install(self, *args, **kwargs):
         """ install host for bbtest
 
         We separate install from init so we can create an install hosts in different order.
@@ -89,11 +92,24 @@ class BaseHost(object):
     def getsize(self, path):
         return self.target.os_path_getsize(path)
 
+    def rmfile(self, path):
+        return self.target.os_remove(path)
+
     def rmtree(self, path, ignore_errors=True, onerror=None):
         raise NotImplementedError('Missing method implementation')
 
-    def rmfile(self, path):
-        raise NotImplementedError('Missing method implementation')
+    def mkdtemp(self, **kwargs):
+        """ same args as tempfile.mkdtemp """
+        if 'dir' not in kwargs:
+            kwargs['dir'] = self.root_path
+        return self.target.tempfile_mkdtemp(**kwargs)
+
+    def chmod(self, path, mode):
+        self.target.os_chmod(path, mode)
+
+    def chmod_777(self, path):
+        # on my ubuntu 18.0.4 chmod with 0x777 didn't set write permission for owner?
+        self.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
@@ -123,7 +139,9 @@ class BaseHost(object):
         return self.SEP.join(args)
 
     def download_file(self, src_url, dst_path):
-        return self.target.download_file(src_url, dst_path)
+        dst = self.target.download_file(src_url, dst_path)
+        self.chmod_777(dst)
+        return dst
 
 
 class LocalHost(BaseHost):
@@ -140,27 +158,17 @@ class LocalHost(BaseHost):
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
-        return shutil.copyfile(local, self._relative_remote(remote))
+        dst = shutil.copyfile(local, self._relative_remote(remote))
+        self.chmod_777(dst)
+        return dst
 
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
 
     @staticmethod
-    def mkdtemp(**kwargs):
-        """ same args as tempfile.mkdtemp """
-        return tempfile.mkdtemp(**kwargs)
-
-    @staticmethod
     def rmtree(path, ignore_errors=True, onerror=None):
         return shutil.rmtree(path, ignore_errors, onerror)
-
-    @staticmethod
-    def rmfile(path):
-        try:
-            os.remove(path)
-        except OSError:
-            pass
 
     @staticmethod
     def rmfiles(path):
@@ -297,40 +305,54 @@ class RemoteHost(BaseHost):
                 self.ftp.login()
         except Exception as e:
             raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
-        try:
-            rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
-            self._rpyc = rpyc.classic.connect(self.ip)
-        except Exception as e:
-            raise ConnectionError(f'Failed to connect to RPyC server on host {ip} - {e}')
-        self.modules = self._rpyc.modules
-        self.target = self.modules.bbtest.target
+        rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
+        self._start_rpyc()
 
-    def install(self, bbtest_version=None):
-        """ Install bbtest package on remote host.
+    def install(self, package=None, version=None):
+        """ Install bbtes=Nonet tests package on remote host.
 
-        :param bbtest_version: bbtest version to install.
+        :param package: bbtest tests package to install. If None do not install
+        :param version: package version to install, if None install latest
         """
+
         super().install()
-        root_dir = os.path.dirname(os.path.dirname(os.path.join(os.path.dirname(__file__), 'src')))
-        dist_dir = os.path.join(root_dir, 'dist')
-        if not bbtest_version:
-            def _extract_version(f):
-                return float(f.split('-')[-1].split('.tar.gz')[0])
-            bbtest_packages = glob.glob(os.path.join(dist_dir, 'bbtest-*.tar.gz'))
+        if not package:
+            return
+
+        pypi = self.kwargs.get('pypi', None)
+        if not pypi:
+            raise ImproperlyConfigured(f'need to install package {package} but no pypi')
+        if pypi.startswith('http'):
+            bbtest_remote = ''
+        else:
+            if not version:
+                def _extract_version(f):
+                    return f.split('-')[-1].split('.tar.gz')[0]
+                bbtest_packages = glob.glob(os.path.join(pypi, package + '-*.tar.gz'))
+                try:
+                    bbtest_package = max(bbtest_packages, key=_extract_version)
+                except Exception as e:
+                    raise Exception(f'Failed to find bbtest package - {e}')
+            else:
+                bbtest_package = os.path.join(pypi, package + '-' + version)
+            bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
+        self.run_python3(['-m', 'pip', 'install', '-U', bbtest_remote])
+        if self.is_linux:
             try:
-                bbtest_package = max(bbtest_packages, key=_extract_version)
-            except Exception as e:
-                raise Exception(f'Failed to find bbtest package - {e}')
-        bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
-        args = ['py', '-3'] if 'win' in self.modules.platform.platform().lower() else ['python3']
-        args.extend(['-m', 'pip', 'install', '-U', bbtest_remote])
-        self.modules.subprocess.run(args, stdout=subprocess.PIPE)
+                self.run(['systemctl', 'restart', 'rpycserver.service'])
+            except Exception as _:
+                pass
+            time.sleep(1)
+            self._start_rpyc()
+
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
         relative_remote = self._relative_remote(remote)
         self.ftp.storbinary(f'STOR {relative_remote}', open(local, 'rb'))
-        return os.path.join(self.root_path, relative_remote).replace('\\', '/')
+        dst = os.path.join(self.root_path, relative_remote).replace('\\', '/')
+        self.chmod_777(dst)
+        return dst
 
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
@@ -351,17 +373,8 @@ class RemoteHost(BaseHost):
             self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         return output
 
-    def mkdtemp(self, **kwargs):
-        """ same args as tempfile.mkdtemp """
-        if 'dir' not in kwargs:
-            kwargs['dir'] = self.root_path
-        return self.modules.bbtest.LocalHost.mkdtemp(**kwargs)
-
     def rmtree(self, *args, **kwargs):
         return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
-
-    def rmfile(self, path):
-        return self.modules.bbtest.LocalHost.rmfile(path)
 
     def rmfiles(self, name):
         return self.modules.bbtest.LocalHost.rmfiles(name)
@@ -371,6 +384,14 @@ class RemoteHost(BaseHost):
 
     def untar_file(self, path):
         return self.modules.bbtest.LocalHost().untar_file(path)
+
+    def _start_rpyc(self):
+        try:
+            self._rpyc = rpyc.classic.connect(self.ip)
+        except Exception as e:
+            raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} - {e}')
+        self.modules = self._rpyc.modules
+        self.target = self.modules.bbtest.target
 
     def _relative_remote(self, remote):
         return remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')

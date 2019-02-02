@@ -53,6 +53,8 @@ class TestHosts(BBPytest):
         self.host.get('temp_file', local_temp_file)
         assert os.path.isfile(local_temp_file)
         os.remove(local_temp_file)
+        self.host.rmfile(dest_temp_file)
+        assert not self.host.isfile(dest_temp_file)
 
     def test_download_files(self):
         local_temp_file = self._create_temp_file()
@@ -61,6 +63,7 @@ class TestHosts(BBPytest):
         assert self.host.isfile(dest_temp_file)
         assert self.host.getsize(dest_temp_file) == 1024
         os.remove(local_temp_file)
+        self.host.rmfile(dest_temp_file)
 
 
     def test_timeout(self):
