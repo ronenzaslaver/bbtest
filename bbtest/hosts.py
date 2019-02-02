@@ -60,10 +60,6 @@ class BaseHost(object):
         pass
 
     @property
-    def name(self):
-        raise NotImplementedError('Missing method implementation')
-
-    @property
     def is_winodws(self):
         return 'windows' in self.os
 
@@ -85,6 +81,14 @@ class BaseHost(object):
     def platform(self):
         """ Returns the platform name - windows/debian/fedora. """
         return re.findall('.*(windows|debian).*', self.target.platform_platform().lower())[0]
+
+    @property
+    def hostname(self):
+        return self.target.socket_gethostname()
+
+    @property
+    def name(self):
+        return self.kwargs.get('name', self.hostname)
 
     def isfile(self, path):
         return self.target.os_path_isfile(path)
@@ -149,12 +153,8 @@ class LocalHost(BaseHost):
     ip = '127.0.0.1'
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.target = target
-
-    @property
-    def name(self):
-        return socket.gethostname()
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -282,10 +282,6 @@ class LocalOSXHost(LocalHost):
 class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
-
-    @property
-    def name(self):
-        return self.modules.bbtest.LocalHost().name
 
     def __init__(self, ip=None, auth=None, *args, **kwargs):
         """ Initialise remote host - open FTP and rpyc connections.

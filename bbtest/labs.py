@@ -20,10 +20,10 @@ class Lab():
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `boxes` key")
             host_class = params['class']
             try:
-                host = host_class(**address_book[host_name])
+                host = host_class(name = host_name, **address_book[host_name])
             except KeyError:
                 # TODO: allocate a host, use params['image']
-                host = host_class()
+                host = host_class(name = host_name)
             self.hosts[host_name] = host
             self.hosts[host_name].install(package=params.get('package', None))
             # let there be boxes!

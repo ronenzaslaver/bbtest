@@ -4,6 +4,7 @@ import platform
 import subprocess
 import logging
 import tempfile
+import socket
 
 logger = logging.getLogger('bblog')
 
@@ -42,6 +43,10 @@ def platform_system():
 
 def tempfile_mkdtemp(**kwargs):
     return tempfile.mkdtemp(**kwargs)
+
+
+def socket_gethostname():
+    return socket.gethostname()
 
 
 def run(args, **kwargs_in):

@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* add operations to HomeBox - get, isfile, rmfile
+* improved install - fully implemnted on ubuntu
 * refactor os and platform properties
 * add readme notes on mac and fedora
 * fix documentation

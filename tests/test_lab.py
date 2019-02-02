@@ -3,8 +3,9 @@ Basic lab tests - create lab from topology, cleanup and destroy lab, default fix
 """
 
 import pytest
-from bbtest import BBTestCase
+import socket
 
+from bbtest import BBTestCase
 from bbtest import BBPytest, LocalHost, BlackBox, BaseHost, Lab
 from bbtest.exceptions import ImproperlyConfigured
 
@@ -48,13 +49,14 @@ class TestBaseHost(BBPytest):
 
     topo = {
         'host1': {
-            'class': BaseHost,
+            'class': LocalHost,
             'boxes': []
          },
     }
 
     def test_base_host(self):
-        pass
+        assert self.lab.hosts['host1'].name == 'host1'
+        assert self.lab.hosts['host1'].hostname == socket.gethostname()
 
 
 class TestNoBox(BBPytest):
