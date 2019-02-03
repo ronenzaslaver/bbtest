@@ -1,12 +1,22 @@
 # How to turn bare Ubuntu machine into bbtest host 
 
 ## Prerequisite:
-- Firewall ports are allowed: 21 for FTP, 18812 for rpyc
+- Firewall ports should be allowed: 21 for FTP, 18812 for rpyc and 10090-10100 for FTP passive mode
+```bash
+sudo firewall-cmd --zone=public --add-port=21/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=18812/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=10090-10100/tcp --permanent
+sudo firewall-cmd --reload
+```
 
 ## Install FTP
 Install vsftpd:
 ```bash
 apt install vsftpd
+```
+or
+```bash
+yum install vsftpd
 ```
 
 Set password for ftp:
@@ -14,7 +24,14 @@ Set password for ftp:
 passwd ftp
 ```
 
-Copy /etc/vsftpd.conf and /etc/vsftpd.userlist from here under /etc.
+Copy /etc/vsftpd.conf and /etc/vsftpd.userlist from here under /etc (debian) or /etc/vsftpd (fedora).
+After copying, you might need to convert the files from dos to unix format (install and run dos2unis util).
+
+Edit the vsftpd.conf file and uncomment one of the options of the following settings (see instructions insdie the file). 
+```bash
+userlist_file
+pam_service_name
+```
 
 Allow ftp user to ftp - make sure it does not appear in /etc/vsftpd/ftpusers
 
@@ -24,17 +41,9 @@ systemctl restart vsftpd.service
 ```
 
 ### Notes about CentOS FTP:
-1. FTP: There might be a vsftpd application already installed - check under /etc/vsftpd/
-   if so, skip installation of the app, and start by copying the vsftpd.* files to /etc/vsftpd
-2. FTP: Enable putting files into ftp-home-directory:
+- FTP: Enable putting files into ftp-home-directory:
 ```bash
 sudo setsebool -P allow_ftpd_full_access 1
-```
-3. You might also need the following configurations in vsftpd.conf. Not sure this is mandatory
-```bash
-pasv_enable=Yes
-pasv_max_port=10100
-pasv_min_port=10090
 ```
 
 ### Notes about Mac FTP:
@@ -86,13 +95,6 @@ brew install python3
 /usr/bin/python3.7 -m pip install rpyc
 export username=name of devpi user name
 /usr/bin/python3.7 -m pip install -UI -i http://172.16.57.40/$username/dev/ --trusted-host 172.16.57.40 bbtest
-```
-
-Make sure rpyc port is open in machine's firewall
-```bash
-(Fedora):
-sudo firewall-cmd --zone=public --add-port=18812/tcp --permanent
-sudo firewall-cmd --reload
 ```
 
 Start rpyc server

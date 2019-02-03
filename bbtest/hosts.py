@@ -4,7 +4,6 @@ Hosts in the network.
 import logging
 import os
 import stat
-import socket
 import subprocess
 import shutil
 import tarfile
@@ -80,7 +79,7 @@ class BaseHost(object):
     @property
     def platform(self):
         """ Returns the platform name - windows/debian/fedora. """
-        return re.findall('.*(windows|debian).*', self.target.platform_platform().lower())[0]
+        return re.findall('.*(windows|debian|centos).*', self.target.platform_platform().lower())[0]
 
     @property
     def hostname(self):
@@ -261,14 +260,6 @@ class LocalLinuxHost(LocalHost):
         return True if os.system(f'service {service_name} status') == 0 else False
 
 
-class LocalFedoraHost(LocalLinuxHost):
-    pass
-
-
-class LocalDebianHost(LocalLinuxHost):
-    pass
-
-
 class LocalOSXHost(LocalHost):
 
     def is_service_running(self, service_name):
@@ -319,7 +310,7 @@ class RemoteHost(BaseHost):
         if not pypi:
             raise ImproperlyConfigured(f'need to install package {package} but no pypi')
         if pypi.startswith('http'):
-            bbtest_remote = ''
+            bbtest_remote = f'-i {pypi} {package}'.split()
         else:
             if not version:
                 def _extract_version(f):
@@ -331,8 +322,8 @@ class RemoteHost(BaseHost):
                     raise Exception(f'Failed to find bbtest package - {e}')
             else:
                 bbtest_package = os.path.join(pypi, package + '-' + version)
-            bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
-        self.run_python3(['-m', 'pip', 'install', '-U', bbtest_remote])
+            bbtest_remote = [self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])]
+        self.run_python3(['-m', 'pip', 'install', '-U'] + bbtest_remote)
         if self.is_linux:
             try:
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
@@ -397,9 +388,6 @@ class WindowsHost(RemoteHost):
     """ A remote windows host """
     ROOT_PATH = 'c:/temp'
 
-    def __init__(self, ip="localhost", auth=("user", "pass")):
-        super().__init__(ip, auth)
-
     def get_package_version(self, package_name):
         return self.modules.bbtest.LocalWindowsHost().get_package_version(package_name)
 
@@ -419,14 +407,6 @@ class LinuxHost(RemoteHost):
 
     def is_service_running(self, service):
         return self.modules.bbtest.LocalLinuxHost.is_service_running(service)
-
-
-class FedoraHost(LinuxHost):
-    pass
-
-
-class DebianHost(LinuxHost):
-    pass
 
 
 class OSXHost(RemoteHost):

@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* differentiate between name and hostname
 * add operations to HomeBox - get, isfile, rmfile
 * improved install - fully implemnted on ubuntu
 * refactor os and platform properties

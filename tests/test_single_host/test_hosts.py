@@ -92,7 +92,7 @@ class TestHosts(BBPytest):
     def test_os_platform(self):
         assert self.host.os in ['windows', 'linux']
         assert self.host.os_bits in [32, 64]
-        assert self.host.platform in ['windows', 'debian']
+        assert self.host.platform in ['windows', 'debian', 'centos']
 
     def _create_temp_file(self):
         local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
