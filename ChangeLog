@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* test on remote centos with devpi, no service yet
 * differentiate between name and hostname
 * add operations to HomeBox - get, isfile, rmfile
 * improved install - fully implemnted on ubuntu

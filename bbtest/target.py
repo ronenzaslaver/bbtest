@@ -5,6 +5,7 @@ import subprocess
 import logging
 import tempfile
 import socket
+import shutil
 
 logger = logging.getLogger('bblog')
 
@@ -40,7 +41,6 @@ def platform_system():
     return platform.system()
 
 
-
 def tempfile_mkdtemp(**kwargs):
     return tempfile.mkdtemp(**kwargs)
 
@@ -49,7 +49,11 @@ def socket_gethostname():
     return socket.gethostname()
 
 
-def run(args, **kwargs_in):
+def shutil_rmtree(path, ignore_errors=True, onerror=None):
+    return shutil.rmtree(path, ignore_errors, onerror)
+
+
+def subprocess_run(args, **kwargs_in):
     """ run command on target via subprocess.run
 
     args and keywargs_in behave the same as args and keyvargs in subprocess.run.

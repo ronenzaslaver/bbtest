@@ -25,7 +25,7 @@ os_2_class = {'local': LocalHost,
 
 
 def pytest_addoption(parser):
-    parser.addoption('--topo', action='store', default='c:/Users/yoram.shamir/PycharmProjects/bbtest/tests/test_single_host/topo.yaml', help='path to bbtest lab topology file')
+    parser.addoption('--topo', action='store', default='/home/yoram/workspace/python/bbtest/tests/test_single_host/topo.yaml', help='path to bbtest lab topology file')
     parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
     parser.addoption('--ip', action='store', default='', help='IP address of target machine')
     parser.addoption('--user', action='store', default='', help='Username for target machine')

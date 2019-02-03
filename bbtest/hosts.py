@@ -99,7 +99,7 @@ class BaseHost(object):
         return self.target.os_remove(path)
 
     def rmtree(self, path, ignore_errors=True, onerror=None):
-        raise NotImplementedError('Missing method implementation')
+        return self.target.shutil_rmtree(path, ignore_errors, onerror)
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
@@ -117,7 +117,7 @@ class BaseHost(object):
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
-        output = self.target.run(args, **shutils_kwargs)
+        output = self.target.subprocess_run(args, **shutils_kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -164,10 +164,6 @@ class LocalHost(BaseHost):
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
-
-    @staticmethod
-    def rmtree(path, ignore_errors=True, onerror=None):
-        return shutil.rmtree(path, ignore_errors, onerror)
 
     @staticmethod
     def rmfiles(path):
@@ -323,7 +319,10 @@ class RemoteHost(BaseHost):
             else:
                 bbtest_package = os.path.join(pypi, package + '-' + version)
             bbtest_remote = [self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])]
-        self.run_python3(['-m', 'pip', 'install', '-U'] + bbtest_remote)
+        # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
+        # update of bbtest on remote host.
+        # todo: consider replace all code below with atomic commands directly over self.modeules
+        rc = self.run_python3(['-m', 'pip', 'install', '-U'] + bbtest_remote)
         if self.is_linux:
             try:
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
@@ -359,9 +358,6 @@ class RemoteHost(BaseHost):
         finally:
             self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         return output
-
-    def rmtree(self, *args, **kwargs):
-        return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
 
     def rmfiles(self, name):
         return self.modules.bbtest.LocalHost.rmfiles(name)

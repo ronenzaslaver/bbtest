@@ -3,10 +3,18 @@
 # ip: IP address of host
 # auth: list of FTP user, leave empty for anonymous, FTP password, leave empty for anonymous
 
-#-
-#  os: local
-#  ip: ''
-#
+-
+  os: local
+  ip: ''
+
+-
+  os: linux
+  ip: localhost
+  pypi: /home/yoram/workspace/python/bbtest/dist
+  auth:
+    - bbtest
+    - bbtest
+
 #-
 #  os: win
 #  ip: localhost
@@ -15,10 +23,10 @@
 #    - bbtest
 #    - bb1024@test
 
--
-  os: linux
-  ip: 172.16.28.89
-  pypi: http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40
-  auth:
-    - ftp
-    - ftp
+#-
+#  os: linux
+#  ip: 172.16.28.89
+#  pypi: http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40
+#  auth:
+#    - ftp
+#    - ftp
