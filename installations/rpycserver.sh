@@ -9,11 +9,11 @@ status=0
 
 start() {
     cd /home/bbtest
-    rpyc_classic.py --host 0.0.0.0
+    /usr/local/bin/rpyc_classic.py --host 0.0.0.0
 }
 
 stop() {
-	killall rpyc_classic.py
+	pkill rpyc_classic.py
 }
 
 status() {

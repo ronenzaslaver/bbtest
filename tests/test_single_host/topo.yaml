@@ -7,26 +7,26 @@
   os: local
   ip: ''
 
+#-
+#  os: linux
+#  ip: localhost
+#  pypi: /home/yoram/workspace/python/bbtest/dist
+#  auth:
+#    - bbtest
+#    - bbtest
+
+-
+  os: win
+  ip: localhost
+  pypi: C:/Users/yoram.shamir/PycharmProjects/bbtest/dist
+  auth:
+    - bbtest
+    - bb1024@test
+
 -
   os: linux
-  ip: localhost
-  pypi: /home/yoram/workspace/python/bbtest/dist
+  ip: 172.16.28.89
+  pypi: http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40
   auth:
     - bbtest
     - bbtest
-
-#-
-#  os: win
-#  ip: localhost
-#  pypi: C:/Users/yoram.shamir/PycharmProjects/bbtest/dist
-#  auth:
-#    - bbtest
-#    - bb1024@test
-
-#-
-#  os: linux
-#  ip: 172.16.28.89
-#  pypi: http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40
-#  auth:
-#    - ftp
-#    - ftp

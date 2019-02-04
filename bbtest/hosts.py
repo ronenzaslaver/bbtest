@@ -311,7 +311,7 @@ class RemoteHost(BaseHost):
             if not version:
                 def _extract_version(f):
                     return f.split('-')[-1].split('.tar.gz')[0]
-                bbtest_packages = glob.glob(os.path.join(pypi, package + '-*.tar.gz'))
+                bbtest_packages = glob.glob(os.path.join(pypi, package + '-*'))
                 try:
                     bbtest_package = max(bbtest_packages, key=_extract_version)
                 except Exception as e:

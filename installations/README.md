@@ -8,6 +8,8 @@ sudo firewall-cmd --zone=public --add-port=18812/tcp --permanent
 sudo firewall-cmd --zone=public --add-port=10090-10100/tcp --permanent
 sudo firewall-cmd --reload
 ```
+Important note - after copying files to the target host machine you might need to convert the files from dos to unix
+format, if this is the case install and run dos2unis util.
 
 ## Install FTP
 Install vsftpd:
@@ -19,13 +21,7 @@ or
 yum install vsftpd
 ```
 
-Set password for ftp:
-```bash
-passwd ftp
-```
-
 Copy /etc/vsftpd.conf and /etc/vsftpd.userlist from here under /etc (debian) or /etc/vsftpd (fedora).
-After copying, you might need to convert the files from dos to unix format (install and run dos2unis util).
 
 Edit the vsftpd.conf file and uncomment one of the options of the following settings (see instructions insdie the file). 
 ```bash
@@ -104,3 +100,21 @@ rpyc_classic.py --host 0.0.0.0
 
 ## Personalization Box preparation:
 Machine should have python2 installed with protobuf package.
+
+
+## Add bbtest user
+```bash
+useradd bbtest
+chmod 777 /home/bbtest/
+passwd bbtest # set to bbtest
+usermod --shell /usr/bin/bash bbtest
+usermod --shell /home/bbtest bbtest
+```
+Add bbtest user to vsftpd.conf and user_list, restart vsftpd service.
+
+## Install rpycserver
+Copy install_rpyc_as_linux_service.sh, rpycserver.service and rpycserver.sh from here under /home/bbtest.
+```bash
+cd /home/bbtest
+install_rpyc_as_linux_service.sh
+```
