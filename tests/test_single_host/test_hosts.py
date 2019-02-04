@@ -30,6 +30,11 @@ class TestHosts(BBPytest):
             kwargs['shell'] = True
         assert box.run(['echo', 'Hello'], **kwargs) == ['Hello']
 
+    def test_python_commands(self):
+        assert '3' in self.host.run_python3(['--version'])[0]
+        # Fun fact - python --version prints the output to stderr so the output is empty string...
+        assert self.host.run_python2(['--version']) == []
+
     def test_python_script(self):
         # Test no output.
         box = self.lab.add_box(MyToDoBox, self.host)

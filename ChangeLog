@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* CentOS service WIP -> move to Idan
+* move rmtree to target
 * test on remote centos with devpi, no service yet
 * differentiate between name and hostname
 * add operations to HomeBox - get, isfile, rmfile

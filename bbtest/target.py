@@ -29,6 +29,10 @@ def os_chmod(path, mode):
     os.chmod(path, mode)
 
 
+def os_walk(top, **kwargs):
+    return os.walk(top, **kwargs)
+
+
 def platform_platform():
     return platform.platform()
 

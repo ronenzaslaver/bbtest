@@ -101,6 +101,16 @@ class BaseHost(object):
     def rmtree(self, path, ignore_errors=True, onerror=None):
         return self.target.shutil_rmtree(path, ignore_errors, onerror)
 
+    def rmfiles(self, top):
+        try:
+            for root, dirs, files in self.target.os_walk(top):
+                for file in files:
+                    self.rmfile(os.path.join(root, file))
+                for dir in dirs:
+                    self.rmtree(os.path.join(root, dir))
+        except OSError:
+            pass
+
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
         if 'dir' not in kwargs:
@@ -164,18 +174,6 @@ class LocalHost(BaseHost):
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
-
-    @staticmethod
-    def rmfiles(path):
-        logger.debug(f"rmfiles with '{path}'")
-        try:
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-                for dir in dirs:
-                    LocalHost.rmtree(os.path.join(root, dir))
-        except OSError:
-            pass
 
     @staticmethod
     def is_process_running(proc_name, timeout=1):
@@ -358,9 +356,6 @@ class RemoteHost(BaseHost):
         finally:
             self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         return output
-
-    def rmfiles(self, name):
-        return self.modules.bbtest.LocalHost.rmfiles(name)
 
     def is_process_running(self, process, timeout=1):
         return self.modules.bbtest.LocalHost.is_process_running(process, timeout)
