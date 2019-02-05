@@ -88,31 +88,19 @@ class BaseHost(object):
 
     @property
     def hostname(self):
-        return self.target.socket_gethostname()
+        return self.modules.socket.gethostname()
 
     @property
     def name(self):
         return self.kwargs.get('name', self.hostname)
 
-    def isfile(self, path):
-        return self.target.os_path_isfile(path)
-
-    def getsize(self, path):
-        return self.target.os_path_getsize(path)
-
-    def rmfile(self, path):
-        return self.target.os_remove(path)
-
-    def rmtree(self, path, ignore_errors=True, onerror=None):
-        return self.target.shutil_rmtree(path, ignore_errors, onerror)
-
     def rmfiles(self, top):
         try:
-            for root, dirs, files in self.target.os_walk(top):
+            for root, dirs, files in self.modules.os.walk(top):
                 for file in files:
-                    self.rmfile(os.path.join(root, file))
+                    self.modules.os.remove(os.path.join(root, file))
                 for dir in dirs:
-                    self.rmtree(os.path.join(root, dir))
+                    self.modules.shutil.rmtree(os.path.join(root, dir))
         except OSError:
             pass
 
@@ -120,14 +108,11 @@ class BaseHost(object):
         """ same args as tempfile.mkdtemp """
         if 'dir' not in kwargs:
             kwargs['dir'] = self.root_path
-        return self.target.tempfile_mkdtemp(**kwargs)
-
-    def chmod(self, path, mode):
-        self.target.os_chmod(path, mode)
+        return self.modules.tempfile.mkdtemp(**kwargs)
 
     def chmod_777(self, path):
         # on my ubuntu 18.0.4 chmod with 0x777 didn't set write permission for owner?
-        self.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+        self.modules.os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
@@ -169,6 +154,7 @@ class LocalHost(BaseHost):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.modules = rpyc.core.service.ModuleNamespace(getmodule)
+        self.target = target
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """

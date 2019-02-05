@@ -41,8 +41,8 @@ class MyToDoBox(HomeBox):
     def do_nothing(self):
         return self.run(['nothing'])
 
-    def uninstall(self):
-        return self.host.rmtree(self.path)
-
     def clean(self):
-        return self.host.rmfile(self.host.join(self.path, 'todo.txt'))
+        try:
+            self.host.modules.os.remove(self.host.join(self.path, 'todo.txt'))
+        except FileNotFoundError as _:
+            pass

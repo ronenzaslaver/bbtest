@@ -49,7 +49,10 @@ class HomeBox(BlackBox):
 
     def uninstall(self):
         """Remove the home path"""
-        self.host.rmtree(self.path)
+        try:
+            self.host.modules.shutil.rmtree(self.path)
+        except OSError:
+            pass
         super().uninstall()
 
     def clean(self):
@@ -69,7 +72,7 @@ class HomeBox(BlackBox):
         return self.host.get(self.host.join(self.path, remote), local)
 
     def isfile(self, path):
-        return self.host.isfile(self.host.join(self.path, path))
+        return self.host.modules.os.path.isfile(self.host.join(self.path, path))
 
     def rmfile(self, path):
-        return self.host.rmfile(self.host.join(self.path, path))
+        return self.host.modules.os.remove(self.host.join(self.path, path))

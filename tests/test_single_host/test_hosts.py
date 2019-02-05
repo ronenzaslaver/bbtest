@@ -54,18 +54,18 @@ class TestHosts(BBPytest):
     def test_put_get_files(self):
         local_temp_file = self._create_temp_file()
         dest_temp_file = self.host.put(local_temp_file, 'temp_file')
-        assert self.host.isfile(dest_temp_file)
+        assert self.host.modules.os.path.isfile(dest_temp_file)
         os.remove(local_temp_file)
         self.host.get('temp_file', local_temp_file)
         assert os.path.isfile(local_temp_file)
         os.remove(local_temp_file)
-        self.host.rmfile(dest_temp_file)
-        assert not self.host.isfile(dest_temp_file)
+        self.host.modules.os.remove(dest_temp_file)
+        assert not self.host.modules.os.path.isfile(dest_temp_file)
 
     def test_box_put_get_files(self):
         box = self.lab.add_box(HomeBox, self.host)
         local_temp_file = self._create_temp_file()
-        dest_temp_file = box.put(local_temp_file, 'temp_file')
+        box.put(local_temp_file, 'temp_file')
         assert box.isfile('temp_file')
         os.remove(local_temp_file)
         box.get('temp_file', local_temp_file)
@@ -78,10 +78,10 @@ class TestHosts(BBPytest):
         local_temp_file = self._create_temp_file()
         dest_temp_file = os.path.join(self.host.root_path, 'temp_file')
         self.host.download_file(pathlib.Path(local_temp_file), dest_temp_file)
-        assert self.host.isfile(dest_temp_file)
-        assert self.host.getsize(dest_temp_file) == 1024
+        assert self.host.modules.os.path.isfile(dest_temp_file)
+        assert self.host.modules.os.path.getsize(dest_temp_file) == 1024
         os.remove(local_temp_file)
-        self.host.rmfile(dest_temp_file)
+        self.host.modules.os.remove(dest_temp_file)
 
     def test_timeout(self):
         self.host.run(['sleep', '2'])
