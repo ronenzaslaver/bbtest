@@ -7,21 +7,21 @@
   os: local
   ip: ''
 
--
-  os: linux
-  ip: localhost
-  pypi: /home/yoram/workspace/python/bbtest/dist
-  auth:
-    - bbtest
-    - bbtest
-
 #-
-#  os: win
+#  os: linux
 #  ip: localhost
-#  pypi: C:/Users/yoram.shamir/PycharmProjects/bbtest/dist
+#  pypi: /home/yoram/workspace/python/bbtest/dist
 #  auth:
 #    - bbtest
-#    - bb1024@test
+#    - bbtest
+
+-
+  os: win
+  ip: localhost
+  pypi: C:/Users/yoram.shamir/PycharmProjects/bbtest/dist
+  auth:
+    - bbtest
+    - bb1024@test
 
 #-
 #  os: linux

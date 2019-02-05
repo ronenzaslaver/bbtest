@@ -83,7 +83,6 @@ class TestHosts(BBPytest):
         os.remove(local_temp_file)
         self.host.rmfile(dest_temp_file)
 
-
     def test_timeout(self):
         self.host.run(['sleep', '2'])
         with pytest.raises(Exception) as _:

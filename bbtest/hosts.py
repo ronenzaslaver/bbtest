@@ -23,9 +23,14 @@ except Exception:
 from bbtest import target
 from .exceptions import ImproperlyConfigured
 
-SYNC_REQUEST_TIMEOUT = 60
+SYNC_REQUEST_TIMEOUT = 120
 
 logger = logging.getLogger('bblog')
+
+
+def getmodule(name):
+    """imports an arbitrary module"""
+    return __import__(name, None, None, "*")
 
 
 class BaseHost(object):
@@ -69,17 +74,17 @@ class BaseHost(object):
     @property
     def os(self):
         """ Returns a lower case string identifying the OS. """
-        return self.target.platform_system().lower()
+        return self.modules.platform.system().lower()
 
     @property
     def os_bits(self):
         """ Returns the OS bits architecture - 32 or 64. """
-        return int(self.target.platform_machine()[-2:])
+        return int(self.modules.platform.machine()[-2:])
 
     @property
     def platform(self):
         """ Returns the platform name - windows/debian/fedora. """
-        return re.findall('.*(windows|debian|centos).*', self.target.platform_platform().lower())[0]
+        return re.findall('.*(windows|debian|centos).*', self.modules.platform.platform().lower())[0]
 
     @property
     def hostname(self):
@@ -163,7 +168,7 @@ class LocalHost(BaseHost):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.target = target
+        self.modules = rpyc.core.service.ModuleNamespace(getmodule)
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """

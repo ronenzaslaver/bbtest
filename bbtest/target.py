@@ -10,53 +10,6 @@ import shutil
 logger = logging.getLogger('bblog')
 
 
-def os_path_isfile(path):
-    return os.path.isfile(path)
-
-
-def os_path_getsize(path):
-    return os.path.getsize(path)
-
-
-def os_remove(path):
-    try:
-        os.remove(path)
-    except OSError:
-        pass
-
-
-def os_chmod(path, mode):
-    os.chmod(path, mode)
-
-
-def os_walk(top, **kwargs):
-    return os.walk(top, **kwargs)
-
-
-def platform_platform():
-    return platform.platform()
-
-
-def platform_machine():
-    return platform.machine()
-
-
-def platform_system():
-    return platform.system()
-
-
-def tempfile_mkdtemp(**kwargs):
-    return tempfile.mkdtemp(**kwargs)
-
-
-def socket_gethostname():
-    return socket.gethostname()
-
-
-def shutil_rmtree(path, ignore_errors=True, onerror=None):
-    return shutil.rmtree(path, ignore_errors, onerror)
-
-
 def subprocess_run(args, **kwargs_in):
     """ run command on target via subprocess.run
 
