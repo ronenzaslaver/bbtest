@@ -42,7 +42,7 @@ $ rpyc_classic.py --host 0.0.0.0
 
 ```bash
 $ devpi upload
-$ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
+$ pytest --os (win|linux) --ip <IP> [--user <USER> --password <PASSWORD>]
 ```
 
 The build above uses a `requirments.txt` file which need to be updated every

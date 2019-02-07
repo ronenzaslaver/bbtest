@@ -25,14 +25,6 @@ os_2_class = {'local': LocalHost,
               'osx': OSXHost}
 
 
-def pytest_addoption(parser):
-    parser.addoption('--topo', action='store', default=os.environ.get('BBTEST_TOPO_YAML', ''), help='path to bbtest lab topology file')
-    parser.addoption('--os', action='store', default='local', help='OS of target machine - local, windows, linux oe mac')
-    parser.addoption('--ip', action='store', default='', help='IP address of target machine')
-    parser.addoption('--user', action='store', default='', help='Username for target machine')
-    parser.addoption('--pw', action='store', default='', help='Password for target machine')
-
-
 @pytest.fixture(scope='class')
 def topo(request):
     request.cls.topo = {'pip_index': request.param.get('pip-index', None),
@@ -51,5 +43,5 @@ def pytest_generate_tests(metafunc):
         topos = [{'pip_index': metafunc.config.getoption('--pip-index'),
                   'os': metafunc.config.getoption('--os'),
                   'ip': metafunc.config.getoption('--ip'),
-                  'auth': (metafunc.config.getoption('--user'), metafunc.config.getoption('--pw'))}]
+                  'auth': (metafunc.config.getoption('--user'), metafunc.config.getoption('--password'))}]
     metafunc.parametrize('topo', topos, indirect=True)

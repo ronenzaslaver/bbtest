@@ -270,15 +270,15 @@ class RemoteHost(BaseHost):
         super().__init__(*args, **kwargs)
         self.ip = str(ip)
         self.auth = auth
+        self.ftp = FTP(self.ip)
         try:
-            self.ftp = FTP(self.ip)
             if auth:
-                self.ftp.login(auth[0], auth[1])
+                self.ftp.login(self.auth['user'], self.auth['password'])
             else:
                 # Assume anonymous
                 self.ftp.login()
         except Exception as e:
-            raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
+            raise ConnectionError(f'Failed to connect to FTP server on host {self.ip} - {e}')
         rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         self._start_rpyc()
 
