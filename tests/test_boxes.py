@@ -14,10 +14,12 @@ class TestHomeBox(BBPytest):
     """
 
     topo = {
-        'host1': {
-            'class': LocalHost,
-            'boxes': [HomeBox, HomeBox],
-         },
+        'hosts': {
+            'host1': {
+                'class': LocalHost,
+                'boxes': [HomeBox, HomeBox]
+            }
+        }
     }
 
     def test_home_box(self):

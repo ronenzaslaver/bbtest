@@ -24,6 +24,9 @@ from bbtest import target
 from .exceptions import ImproperlyConfigured
 
 SYNC_REQUEST_TIMEOUT = 120
+PROCESS_QUERY_RETRIES=os.environ.get('BBTEST_PROCESS_QUERY_RETRIES', 1)
+INSTALL_RECONNECT_WAIT=os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
+platform_shotname_re = re.compile('.*(windows|debian|centos).*')
 
 logger = logging.getLogger('bblog')
 
@@ -43,7 +46,6 @@ class BaseHost(object):
     SEP = '/'
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
         self.args = args
         self.kwargs = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
@@ -83,8 +85,8 @@ class BaseHost(object):
 
     @property
     def platform(self):
-        """ Returns the platform name - windows/debian/fedora. """
-        return re.findall('.*(windows|debian|centos).*', self.modules.platform.platform().lower())[0]
+        """ Returns the platform short, beautify, name - windows/debian/fedora. """
+        return platform_shotname_re.findall(self.modules.platform.platform().lower())[0]
 
     @property
     def hostname(self):
@@ -167,8 +169,8 @@ class LocalHost(BaseHost):
         return shutil.copyfile(self._relative_remote(remote), local)
 
     @staticmethod
-    def is_process_running(proc_name, timeout=1):
-        for _ in range(0, timeout):
+    def is_process_running(proc_name, retries=PROCESS_QUERY_RETRIES):
+        for _ in range(0, retries):
             for proc in psutil.process_iter():
                 if proc.name() == proc_name:
                     return True
@@ -317,7 +319,7 @@ class RemoteHost(BaseHost):
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
             except Exception as _:
                 pass
-            time.sleep(1)
+            time.sleep(INSTALL_RECONNECT_WAIT)
             self._start_rpyc()
 
 

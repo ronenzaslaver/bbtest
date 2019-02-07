@@ -13,17 +13,23 @@ class Lab():
         """
         self.boxes = {}
         self.hosts = {}
-        for host_name, params in topology.items():
+        self.pypi = topology.get('pypi', None)
+        self.auth = topology.get('auth', None)
+
+        if 'hosts' not in topology:
+            return
+
+        for host_name, params in topology['hosts'].items():
             if 'class' not in params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
             if 'boxes' not in params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `boxes` key")
             host_class = params['class']
             try:
-                host = host_class(name = host_name, **address_book[host_name])
+                host = host_class(name=host_name, pypi=self.pypi, **address_book[host_name])
             except KeyError:
                 # TODO: allocate a host, use params['image']
-                host = host_class(name = host_name)
+                host = host_class(name=host_name, pypi=self.pypi)
             self.hosts[host_name] = host
             self.hosts[host_name].install(package=params.get('package', None))
             # let there be boxes!
