@@ -12,18 +12,9 @@ We've added a class property `LAB` that holds a dictionary defining the lab envi
 
 ## Prerequisites
 - Install Python 3.7.2
-- Install pipenv under Python 3.7.2 ```($ pip install pipenv)```
-- If you use bashrc on Windows, add the following aliases to your ~/.bashrc to make sure prompts are displayed properly:
-```bash
-alias python='winpty --mouse python.exe'
-alias ipython='winpty --mouse ipython.exe'
-alias devpi='winpty --mouse devpi.exe'
-alias ftp='winpty --mouse ftp'
-```
-Don't forget to:
-```bash 
-$ source ~/.bashrc
-```
+- Install pipenv under Python 3.7.2 - ```$ pip install pipenv```
+- If you use Git Bash on Windows, we recommend using the [.bashrc](installations/.bashrc) sample
+to make sure prompts are displayed properly. Don't forget to:```bash $ source ~/.bashrc```
 
 ## Install runner
 First fork and clone this repo.  Then use `pipenv` to setup the python environment.
@@ -36,19 +27,16 @@ $ pipenv install
 $ pipenv install --dev
 ```
 
-Make sure Python interpreter points to pipenv on your IDE (We are using PyCharm).
+Make sure Python interpreter points to pipenv on your IDE.
 
-In PyCharm, go to File --> Settings --> Project Interpreter --> Click on Setting (top right, wheel icon)
+For PyCharm users:
+
+Go to File --> Settings --> Project Interpreter --> Click on Setting (top right, wheel icon)
 --> Add --> Choose Pipenv Environment --> In Pipenv executable, point to pipenv.exe
 (Pycharm should auto detect). Default path: C:\Python37\Scripts\pipenv.exe
 
-Note: If Pipenv Environment is missing, make sure your Pycharm is up to date.
+Note: If Pipenv Environment is missing, make sure your Pycharm version supports pipenv.
 
-Then take a look at pytest custom options and run tests: 
-```bash
-$ pytest --help
-$ pytest [custom options] tests
-```
 To run tests on local machine simply run
 ```bash
 $ pytest tests --os=local
