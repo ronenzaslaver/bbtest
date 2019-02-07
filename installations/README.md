@@ -66,12 +66,12 @@ There's currently no yum package for python3.7. We need to build it from source:
 maybe redundant - need to check and update the doc:
 ```bash
 yum install -y epel-release  
-yum install centos-release-scl
-yum install gcc openssl-devel bzip2-devel
+yum install -y centos-release-scl
+yum install -y gcc openssl-devel bzip2-devel
 ```
 must:
 ```bash
-yum install libffi-devel
+yum install -y libffi-devel
 wget https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
 tar xzf Python-3.7.2.tgz
 cd Python-3.7.2/

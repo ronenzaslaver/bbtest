@@ -10,63 +10,105 @@ We've added a class property `LAB` that holds a dictionary defining the lab envi
 
 # Contributing
 
+## Prerequisites
+- Install Python 3.7.2
+- Install pipenv under Python 3.7.2 - ```$ pip install pipenv```
+- If you use Git Bash on Windows, we recommend using the [.bashrc](installations/.bashrc) sample
+to make sure prompts are displayed properly. Don't forget to:```bash $ source ~/.bashrc```
+
+## Install runner
 First fork and clone this repo.  Then use `pipenv` to setup the python environment.
 Open a shell in the cloned repo folder and type:
 
 ```bash
 $ pipenv --python 3.7
 $ pipenv shell
+$ pipenv install
 $ pipenv install --dev
 ```
-Then take a look at pytest custom options and run tests: 
-```bash
-$ pytest --help
-$ pytest [custom options] tests
-```
+
+Make sure Python interpreter points to pipenv on your IDE.
+
+For PyCharm users:
+
+Go to File --> Settings --> Project Interpreter --> Click on Setting (top right, wheel icon)
+--> Add --> Choose Pipenv Environment --> In Pipenv executable, point to pipenv.exe
+(Pycharm should auto detect). Default path: C:\Python37\Scripts\pipenv.exe
+
+Note: If Pipenv Environment is missing, make sure your Pycharm version supports pipenv.
+
 To run tests on local machine simply run
 ```bash
-$ pytest tests
+$ pytest tests --os=local
 ```
-## Remote hosts
-To run tests on remote machines you'll need a [devpi] server to mirror PyPi
-and an FTP server and RPyC server on remote machine. You can find some tips on FTP and Python installations in the
-[INSTALLATIONS.md](installations/README.md) file. 
+## Install remote host
+To turn a remote machine into a bbtest host you will need to install an FTP server and RPyC server on the machine.
+You can find some tips on FTP and Python installations in the [INSTALLATIONS.md](installations/README.md) file.
+- Start FTP server on the remote machine with root directory set to "temp" directory (c:\temp, /tmp).
+- Make sure python2 and python3 are recognized as short to Python 2 and Python 3 respectively 
 
-- Download and install python 3.7 and RPyC:
+Once FTP and Python 3.7 are installed, download and start python RPyC server:
 ```bash
 $ pip3 install rpyc
 $ rpyc_classic.py --host 0.0.0.0
 ```
-- Start FTP server on the remote machine with root directory set to "temp" directory (c:\temp, /tmp).
-- Now you can run tests on the remote host:
 
+Now it's time to install bbtest package and run tests. When you run tests, bbtest runner will need to update bbtest
+package on the remote host. This is done as part of the host installation process as part of the test class setup
+process. The update is performed using "pip install -U bbtest" and the user can set a pypi index to get bbtest package
+from or install from local package.
+
+### Install from pypi
+If you select to use pypi server you need to upload the new bbtest package to the server. We recommend to use
+[devpi](https://devpi.net/docs/devpi/devpi/stable/%2Bd/index.html) server to mirror PyPi and store bbtest package amd
+devpi package is installed as part of bbtest pipenv.
+
+- Create user on devpi server:
+Cybereason pypi server is cyber-devpi.cyberdomain.local.
+Note: Sometimes the devpi command fails (fail to login, fail to use, etc.) in Windows Git Bash. If this happens, try 
+running the commands in native Windows CMD.
 ```bash
-$ devpi upload
-$ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
+$ devpi use http://<devpi server>/
+$ devpi user -c <your name> password=<your password>
+$ devpi login <your name> <your password>
+$ devpi index -c dev bases=root/pypi
+$ devpi use http://<devpi server>/<your name>/dev
 ```
-
-The build above uses a `requirments.txt` file which need to be updated every
-time a new package is added. Just run `pipenv lock -r > requirments.txt` and 
-don't forget to commit the change.
-
-## Working with devpi
-- Register and login:
-```bash
-devpi use http://cyber-devpi.cyberdomain.local/
-devpi user -c YOURNAMEv
-devpi login YOURNAME
-devpi index -c dev bases=root/pypi
-devpi use http://cyber-devpi.cyberdomain.local/YOURNAME/dev
-```
+ 
 - Upload
 ```bash
-devpi upload
+$ devpi upload
 ```
-Now you can find your new package under YOURNAME/dev
-- Download
-Go to the destination host and run:
+The upload command creates bbtest package under  dist/ folder (e.g. dist/bbtest-0.0.1.dev191.zip) and uploads the
+package to devpi server under http://<devpi server>/<your name>/dev index.
+
+Note: The build above uses a `requirments.txt` file which need to be updated every time a new package is added. Just run
+`pipenv lock -r > requirments.txt` and don't forget to commit the change.
+
+Set the full path to this index as the pypi parameter to pyest
 ```bash
-python -m pip install -UI -i http://172.16.57.40/YOURNAME/dev --trusted-host 172.16.57.40 bbtest
+$ pytest tests --pypi="-i http://<devpi server>/<your name>/dev --trusted-host <devpi server>" --<other remote host parames>
+```
+
+### Install from local package
+Note: If you select to install from pypi, you should skip this step.
+ 
+If you select to install from local package you need to create new bbtest package on the runner machine
+```bash
+$ cd <bbtest project root folder>
+$ python setup.py sdist
+```
+A new package will be created under dist/ folder (e.g. dist/bbtest-0.0.1.dev191.tar.gz).
+
+Set the full path to this file as the pypi parameter to pyest
+```bash
+$ pytest --pypi=<full path to bbtest package> --<other remote host params, see below>
+```
+
+## Run tests
+Now you can run tests on the remote host:
+```bash
+$ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>] --pypi=<see above>
 ```
 
 # Examples
