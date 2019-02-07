@@ -3,28 +3,37 @@ Hosts in the network.
 """
 import logging
 import os
-import platform
-import socket
+import stat
 import subprocess
 import shutil
 import tarfile
 import tempfile
-
+import time
+from ftplib import FTP
+import rpyc
+import glob
+import psutil
+from psutil import NoSuchProcess
+import re
 try:
     from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
 except Exception:
     pass
 
-from ftplib import FTP
-import rpyc
-import glob
-
-import psutil
-from psutil import NoSuchProcess
-
 from bbtest import target
+from .exceptions import ImproperlyConfigured
+
+SYNC_REQUEST_TIMEOUT = 120
+PROCESS_QUERY_RETRIES = os.environ.get('BBTEST_PROCESS_QUERY_RETRIES', 1)
+INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
+platform_shotname_re = re.compile('.*(windows|debian|centos).*')
 
 logger = logging.getLogger('bblog')
+
+
+def getmodule(name):
+    """imports an arbitrary module"""
+    return __import__(name, None, None, "*")
 
 
 class BaseHost(object):
@@ -37,10 +46,11 @@ class BaseHost(object):
     SEP = '/'
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        self.args = args
+        self.kwargs = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
-    def install(self):
+    def install(self, *args, **kwargs):
         """ install host for bbtest
 
         We separate install from init so we can create an install hosts in different order.
@@ -56,41 +66,60 @@ class BaseHost(object):
         pass
 
     @property
-    def os(self):
-        raise NotImplementedError('Missing method implementation')
-
-    @property
-    def bit(self):
-        raise NotImplementedError('Missing method implementation')
-
-    @property
-    def name(self):
-        raise NotImplementedError('Missing method implementation')
-
-    @property
-    def package_type(self):
-        raise NotImplementedError('Non Windows OS')
-
-    @property
     def is_winodws(self):
-        return 'win' in self.os
+        return 'windows' in self.os
 
     @property
     def is_linux(self):
         return 'linux' in self.os
 
-    def isfile(self, path):
-        raise NotImplementedError('Missing method implementation')
+    @property
+    def os(self):
+        """ Returns a lower case string identifying the OS. """
+        return self.modules.platform.system().lower()
 
-    def rmtree(self, path, ignore_errors=True, onerror=None):
-        raise NotImplementedError('Missing method implementation')
+    @property
+    def os_bits(self):
+        """ Returns the OS bits architecture - 32 or 64. """
+        return int(self.modules.platform.machine()[-2:])
 
-    def rmfile(self, path):
-        raise NotImplementedError('Missing method implementation')
+    @property
+    def platform(self):
+        """ Returns the platform short, beautify, name - windows/debian/fedora. """
+        return platform_shotname_re.findall(self.modules.platform.platform().lower())[0]
+
+    @property
+    def hostname(self):
+        return self.modules.socket.gethostname()
+
+    @property
+    def name(self):
+        return self.kwargs.get('name', self.hostname)
+
+    def rmfiles(self, top):
+        try:
+            for root, dirs, files in self.modules.os.walk(top):
+                for file in files:
+                    self.modules.os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    self.modules.shutil.rmtree(os.path.join(root, dir))
+        except OSError:
+            pass
+
+    def mkdtemp(self, **kwargs):
+        """ same args as tempfile.mkdtemp """
+        if 'dir' not in kwargs:
+            kwargs['dir'] = self.root_path
+        return self.modules.tempfile.mkdtemp(**kwargs)
+
+    def chmod_777(self, path):
+        # on my ubuntu 18.0.4 chmod with 0x777 didn't set write permission for owner?
+        self.modules.os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
-        output = self.target.run(args, **kwargs)
+        shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
+        output = self.target.subprocess_run(args, **shutils_kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -114,80 +143,38 @@ class BaseHost(object):
     def join(self, *args):
         return self.SEP.join(args)
 
+    def download_file(self, src_url, dst_path):
+        dst = self.target.download_file(src_url, dst_path)
+        self.chmod_777(dst)
+        return dst
+
 
 class LocalHost(BaseHost):
     """Suppose to be an os-agnostic local host."""
     ip = '127.0.0.1'
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
+        self.modules = rpyc.core.service.ModuleNamespace(getmodule)
         self.target = target
 
-    @property
-    def os(self):
-        """Returns a lower case string identifying the OS"""
-        return platform.platform().lower()
+    def put(self, local, remote):
+        """ Put file on target host relative to root path. """
+        dst = shutil.copyfile(local, self._relative_remote(remote))
+        self.chmod_777(dst)
+        return dst
 
-    @property
-    def package_type(self):
-        if 'win' in self.os:
-            return 'msi'
-        elif 'ubuntu' in self.os:
-            return 'deb'
-        raise NotImplementedError('Missing method implementation')
-
-    @property
-    def bit(self):
-        return platform.machine()[-2:]
-
-    @property
-    def name(self):
-        return socket.gethostname()
+    def get(self, remote, local):
+        """ Get file from target host relative to root path. """
+        return shutil.copyfile(self._relative_remote(remote), local)
 
     @staticmethod
-    def put(local, remote):
-        return shutil.copyfile(local, remote)
-
-    @staticmethod
-    def get(remote, local):
-        return shutil.copyfile(remote, local)
-
-    @staticmethod
-    def mkdtemp(**kwargs):
-        """ same args as tempfile.mkdtemp """
-        return tempfile.mkdtemp(**kwargs)
-
-    @staticmethod
-    def rmtree(path, ignore_errors=True, onerror=None):
-        return shutil.rmtree(path, ignore_errors, onerror)
-
-    @staticmethod
-    def rmfile(path):
-        try:
-            os.remove(path)
-        except OSError:
-            pass
-
-    @staticmethod
-    def rmfiles(path):
-        logger.debug(f"rmfiles with '{path}'")
-        try:
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-                for dir in dirs:
-                    LocalHost.rmtree(os.path.join(root, dir))
-        except OSError:
-            pass
-
-    def isfile(self, path):
-        return os.path.isfile(path)
-
-    @staticmethod
-    def is_process_running(process):
-        for process in psutil.process_iter():
-            if process.name() == process:
-                return True
+    def is_process_running(proc_name, retries=PROCESS_QUERY_RETRIES):
+        for _ in range(0, retries):
+            for proc in psutil.process_iter():
+                if proc.name() == proc_name:
+                    return True
+            time.sleep(1)
         return False
 
     @staticmethod
@@ -205,15 +192,17 @@ class LocalHost(BaseHost):
             # todo add the actual file extension to exception
             raise NotImplementedError('File extension is not supported')
 
+    def _relative_remote(self, remote):
+        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, '').lstrip('/'))
+
 
 class LocalWindowsHost(LocalHost):
 
     """A collection of windows utilities and validators """
     ROOT_PATH = 'c:/temp'
-    package_type = 'msi'
 
     @staticmethod
-    def is_version_installed(version):
+    def get_package_version(package_name):
         products = OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
         try:
             i = 0
@@ -221,14 +210,14 @@ class LocalWindowsHost(LocalHost):
                 product_key_name = EnumKey(products, i)
                 product_values = OpenKey(products, product_key_name)
                 try:
-                    if QueryValueEx(product_values, 'DisplayName')[0] == 'Cybereason Sensor':
-                        return QueryValueEx(product_values, 'DisplayVersion')[0] == version
+                    if QueryValueEx(product_values, 'DisplayName')[0] == package_name:
+                        return QueryValueEx(product_values, 'DisplayVersion')[0]
                 except FileNotFoundError:
                     # product has no 'DisplayName' attribute
                     pass
                 i = i+1
         except WindowsError:
-            return False
+            raise RuntimeError('Cybereason version not found')
 
     @staticmethod
     def is_service_running(service_name):
@@ -253,26 +242,24 @@ class LocalLinuxHost(LocalHost):
 
     ROOT_PATH = '/tmp'
 
+    @staticmethod
+    def is_service_running(service_name):
+        return True if os.system(f'service {service_name} status') == 0 else False
+
+
+class LocalOSXHost(LocalHost):
+
+    def is_service_running(self, service_name):
+        command = f'sudo launchctl list | awk \'$3=="{service_name}" {{ print $2 }}\''
+        if self.run(command, shell=True)[0] == '0':
+            return True
+        else:
+            return False
+
 
 class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
-
-    @property
-    def os(self):
-        return self.modules.bbtest.LocalHost().os
-
-    @property
-    def bit(self):
-        return self.modules.bbtest.LocalHost().bit
-
-    @property
-    def package_type(self):
-        return self.modules.bbtest.LocalHost().package_type
-
-    @property
-    def name(self):
-        return self.modules.bbtest.LocalHost().name
 
     def __init__(self, ip=None, auth=None, *args, **kwargs):
         """ Initialise remote host - open FTP and rpyc connections.
@@ -292,82 +279,100 @@ class RemoteHost(BaseHost):
                 self.ftp.login()
         except Exception as e:
             raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
-        try:
-            self._rpyc = rpyc.classic.connect(self.ip)
-        except Exception as e:
-            raise ConnectionError(f'Failed to connect to RPyC server on host {ip} - {e}')
-        self.modules = self._rpyc.modules
-        self.target = self.modules.bbtest.target
-        print(self.target)
+        rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
+        self._start_rpyc()
 
-    def install(self, bbtest_version=None):
-        """ Install bbtest package on remote host.
+    def install(self, package=None, version=None):
+        """ Install bbtes=Nonet tests package on remote host.
 
-        :param bbtest_version: bbtest version to install.
+        :param package: bbtest tests package to install. If None do not install
+        :param version: package version to install, if None install latest
         """
+
         super().install()
-        root_dir = os.path.dirname(os.path.dirname(os.path.join(os.path.dirname(__file__), 'src')))
-        dist_dir = os.path.join(root_dir, 'dist')
-        if not bbtest_version:
-            def _extract_version(f):
-                return float(f.split('-')[-1].split('.tar.gz')[0])
-            bbtest_packages = glob.glob(os.path.join(dist_dir, 'bbtest-*.tar.gz'))
+        if not package:
+            return
+
+        pip_index = self.kwargs.get('pip_index', None)
+        if not pip_index:
+            raise ImproperlyConfigured(f'need to install package {package} but no pypi')
+        if pip_index.startswith('http'):
+            bbtest_remote = f'-i {pip_index} {package}'.split()
+        else:
+            if not version:
+                def _extract_version(f):
+                    return f.split('-')[-1].split('.tar.gz')[0]
+                bbtest_packages = glob.glob(os.path.join(pip_index, package + '-*'))
+                try:
+                    bbtest_package = max(bbtest_packages, key=_extract_version)
+                except Exception as e:
+                    raise Exception(f'Failed to find bbtest package - {e}')
+            else:
+                bbtest_package = os.path.join(pip_index, package + '-' + version)
+            bbtest_remote = [self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])]
+        # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
+        # update of bbtest on remote host.
+        # todo: consider replace all code below with atomic commands directly over self.modeules
+        rc = self.run_python3(['-m', 'pip', 'install', '-U'] + bbtest_remote)
+        if self.is_linux:
             try:
-                bbtest_package = max(bbtest_packages, key=_extract_version)
-            except Exception as e:
-                raise Exception(f'Failed to find bbtest package - {e}')
-        bbtest_remote = self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])
-        args = ['py', '-3'] if 'win' in self.modules.platform.platform().lower() else ['python3']
-        args.extend(['-m', 'pip', 'install', '-UI', bbtest_remote])
-        self.modules.subprocess.run(args, stdout=subprocess.PIPE)
+                self.run(['systemctl', 'restart', 'rpycserver.service'])
+            except Exception as _:
+                pass
+            time.sleep(INSTALL_RECONNECT_WAIT)
+            self._start_rpyc()
 
     def put(self, local, remote):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
-        self.ftp.storbinary(f'STOR {ftp_remote}', open(local, 'rb'))
-        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
+        """ Put file on target host relative to root path. """
+        relative_remote = self._relative_remote(remote)
+        self.ftp.storbinary(f'STOR {relative_remote}', open(local, 'rb'))
+        dst = os.path.join(self.root_path, relative_remote).replace('\\', '/')
+        self.chmod_777(dst)
+        return dst
 
     def get(self, remote, local):
-        ftp_remote = remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
-        self.ftp.retrbinary(f'RETR {ftp_remote}', open(local, 'wb').write)
-        return os.path.join(self.root_path, ftp_remote).replace('\\', '/')
+        """ Get file from target host relative to root path. """
+        relative_remote = self._relative_remote(remote)
+        self.ftp.retrbinary(f'RETR {relative_remote}', open(local, 'wb').write)
+        return local
 
-    def mkdtemp(self, **kwargs):
-        """ same args as tempfile.mkdtemp """
-        if 'dir' not in kwargs:
-            kwargs['dir'] = self.root_path
-        return self.modules.bbtest.LocalHost.mkdtemp(**kwargs)
+    def run(self, args, **kwargs):
+        rpyc_kwargs = {k: v for k, v in kwargs.items() if k in self._rpyc._config}
+        for key, value in rpyc_kwargs.items():
+            self._rpyc._config[key] = value
+        self._rpyc._config['sync_request_timeout'] = kwargs.pop('timeout', self._rpyc._config['sync_request_timeout'])
+        try:
+            output = super().run(args, **kwargs)
+        except Exception as e:
+            raise e
+        finally:
+            self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
+        return output
 
-    def rmtree(self, *args, **kwargs):
-        return self.modules.bbtest.LocalHost.rmtree(*args, **kwargs)
-
-    def rmfile(self, path):
-        return self.modules.bbtest.LocalHost.rmfile(path)
-
-    def rmfiles(self, name):
-        return self.modules.bbtest.LocalHost.rmfiles(name)
-
-    def is_process_running(self, process):
-        return self.modules.bbtest.LocalHost.is_process_running(process)
-
-    def download_file(self, src_path, dst_path):
-        return self.target.download_file(src_path, dst_path)
-
-    def isfile(self, path):
-        return self.modules.bbtest.LocalHost().isfile(path)
+    def is_process_running(self, process, timeout=1):
+        return self.modules.bbtest.LocalHost.is_process_running(process, timeout)
 
     def untar_file(self, path):
         return self.modules.bbtest.LocalHost().untar_file(path)
+
+    def _start_rpyc(self):
+        try:
+            self._rpyc = rpyc.classic.connect(self.ip)
+        except Exception as e:
+            raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} - {e}')
+        self.modules = self._rpyc.modules
+        self.target = self.modules.bbtest.target
+
+    def _relative_remote(self, remote):
+        return remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
 
 
 class WindowsHost(RemoteHost):
     """ A remote windows host """
     ROOT_PATH = 'c:/temp'
 
-    def __init__(self, ip="localhost", auth=("user", "pass")):
-        super().__init__(ip, auth)
-
-    def is_version_installed(self, name, version):
-        return self.modules.bbtest.LocalWindowsHost.is_version_installed(name, version)
+    def get_package_version(self, package_name):
+        return self.modules.bbtest.LocalWindowsHost().get_package_version(package_name)
 
     def open_key(self, parent_key, key):
         return self.modules.bbtest.LocalHost.open_key(parent_key, key)
@@ -384,8 +389,12 @@ class LinuxHost(RemoteHost):
     ROOT_PATH = '/tmp'
 
     def is_service_running(self, service):
-        raise NotImplementedError('Missing method implementation')
+        return self.modules.bbtest.LocalLinuxHost.is_service_running(service)
 
 
-class OSXHost(LinuxHost):
-    pass
+class OSXHost(RemoteHost):
+
+    ROOT_PATH = '/tmp'
+
+    def is_service_running(self, service):
+        return self.modules.bbtest.LocalOSXHost().is_service_running(service)

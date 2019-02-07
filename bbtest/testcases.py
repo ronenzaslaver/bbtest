@@ -42,12 +42,11 @@ class BBPytest(object):
             cls.lab.destroy()
 
     def setup_lab(self):
-        """ Setup black box testing lab between test cases. """
-        if self.lab:
-            self.lab.clean()
+        """ Setup black box testing lab before test cases. """
+        pass
 
     def clean_lab(self):
-        """ Clean black box testing lab between test cases. """
+        """ Clean black box testing lab after test cases. """
         if self.lab:
             self.lab.clean()
 

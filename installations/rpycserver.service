@@ -1,0 +1,11 @@
+[Unit]
+Description=bbtest RPyC service
+Requires=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/bbtest/rpycserver.sh start
+ExecStop=/home/bbtest/rpycserver.sh stop
+
+[Install]
+WantedBy=multi-user.target

@@ -10,8 +10,9 @@ The destination host (==topo) is set by pytest.
 import pytest
 import subprocess
 import os
+import pathlib
 
-from bbtest import BBPytest
+from bbtest import RemoteHost, BBPytest, HomeBox
 from tests.test_utils import get_temp_dir
 from tests.mytodo_box import MyToDoBox
 
@@ -22,11 +23,17 @@ class TestHosts(BBPytest):
         self.host = self.lab.hosts['host1']
 
     def test_builtin_command(self):
+        box = self.lab.add_box(HomeBox, self.host)
         kwargs = {}
         # todo move to hosts...
         if self.host.is_winodws:
             kwargs['shell'] = True
-        assert self.host.run(['echo', 'Hello'], **kwargs) == ['Hello']
+        assert box.run(['echo', 'Hello'], **kwargs) == ['Hello']
+
+    def test_python_commands(self):
+        assert '3' in self.host.run_python3(['--version'])[0]
+        # Fun fact - python --version prints the output to stderr so the output is empty string...
+        assert self.host.run_python2(['--version']) == []
 
     def test_python_script(self):
         # Test no output.
@@ -45,14 +52,54 @@ class TestHosts(BBPytest):
             box.add('')
 
     def test_put_get_files(self):
-        """ Work in progress """
-        host = self.lab.hosts['host1']
+        local_temp_file = self._create_temp_file()
+        dest_temp_file = self.host.put(local_temp_file, 'temp_file')
+        assert self.host.modules.os.path.isfile(dest_temp_file)
+        os.remove(local_temp_file)
+        self.host.get('temp_file', local_temp_file)
+        assert os.path.isfile(local_temp_file)
+        os.remove(local_temp_file)
+        self.host.modules.os.remove(dest_temp_file)
+        assert not self.host.modules.os.path.isfile(dest_temp_file)
+
+    def test_box_put_get_files(self):
+        box = self.lab.add_box(HomeBox, self.host)
+        local_temp_file = self._create_temp_file()
+        box.put(local_temp_file, 'temp_file')
+        assert box.isfile('temp_file')
+        os.remove(local_temp_file)
+        box.get('temp_file', local_temp_file)
+        assert os.path.isfile(local_temp_file)
+        os.remove(local_temp_file)
+        box.rmfile('temp_file')
+        assert not box.isfile('temp_file')
+
+    def test_download_files(self):
+        local_temp_file = self._create_temp_file()
+        dest_temp_file = os.path.join(self.host.root_path, 'temp_file')
+        self.host.download_file(pathlib.Path(local_temp_file), dest_temp_file)
+        assert self.host.modules.os.path.isfile(dest_temp_file)
+        assert self.host.modules.os.path.getsize(dest_temp_file) == 1024
+        os.remove(local_temp_file)
+        self.host.modules.os.remove(dest_temp_file)
+
+    def test_timeout(self):
+        self.host.run(['sleep', '2'])
+        with pytest.raises(Exception) as _:
+            self.host.run(['sleep', '2'], timeout=1)
+        if isinstance(self.host, RemoteHost):
+            with pytest.raises(Exception) as _:
+                self.host.run(['sleep', '2'], sync_request_timeout=1)
+        else:
+            self.host.run(['sleep', '2'], sync_request_timeout=1)
+
+    def test_os_platform(self):
+        assert self.host.os in ['windows', 'linux']
+        assert self.host.os_bits in [32, 64]
+        assert self.host.platform in ['windows', 'debian', 'centos']
+
+    def _create_temp_file(self):
         local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
         with open(local_temp_file, 'wb') as f:
             f.write(os.urandom(1024))
-        host.put(local_temp_file, 'temp_file')
-        print(host.root_path)
-        os.remove(local_temp_file)
-        host.get('temp_file', local_temp_file)
-        os.path.isfile(local_temp_file)
-        os.remove(local_temp_file)
+        return local_temp_file
