@@ -47,7 +47,7 @@ class BaseHost(object):
 
     def __init__(self, *args, **kwargs):
         self.args = args
-        self.kwargs = kwargs
+        self.params = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
     def install(self, *args, **kwargs):
@@ -94,7 +94,7 @@ class BaseHost(object):
 
     @property
     def name(self):
-        return self.kwargs.get('name', self.hostname)
+        return self.params.get('name', self.hostname)
 
     def rmfiles(self, top):
         try:
@@ -293,7 +293,7 @@ class RemoteHost(BaseHost):
         if not package:
             return
 
-        pip_index = self.kwargs.get('pip_index', None)
+        pip_index = self.params.get('pip_index', None)
         if not pip_index:
             raise ImproperlyConfigured(f'need to install package {package} but no pypi')
         if pip_index.startswith('http'):
