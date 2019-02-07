@@ -1,11 +1,6 @@
 
-import os
-import platform
 import subprocess
 import logging
-import tempfile
-import socket
-import shutil
 
 logger = logging.getLogger('bblog')
 

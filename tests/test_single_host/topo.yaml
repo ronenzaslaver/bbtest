@@ -1,7 +1,7 @@
 # List of hosts to run tests on.
 # os: the OS of the host - local, win, linux or osx
-# pypi: pypi server IP and arguments 'http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40' or full path to
-#       package location on disk.
+# pip-index: pypi server IP and arguments 'http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40' or full path to
+#            package location on disk.
 # ip: IP address of host
 # auth: list of FTP user, leave empty for anonymous, FTP password, leave empty for anonymous
 #

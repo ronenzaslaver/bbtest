@@ -31,13 +31,11 @@ def pytest_addoption(parser):
     parser.addoption('--ip', action='store', default='', help='IP address of target machine')
     parser.addoption('--user', action='store', default='', help='Username for target machine')
     parser.addoption('--pw', action='store', default='', help='Password for target machine')
-    parser.addoption('--pypi', action='store', default='',
-                     help='pypi server or full path to local package to install bbtest package from')
 
 
 @pytest.fixture(scope='class')
 def topo(request):
-    request.cls.topo = {'pypi': request.param.get('pypi', None),
+    request.cls.topo = {'pip_index': request.param.get('pip-index', None),
                         'hosts': {'host1': {'class': os_2_class[request.param['os']],
                                             'package': 'bbtest',
                                             'boxes': []}}}
@@ -50,7 +48,7 @@ def pytest_generate_tests(metafunc):
         with open(metafunc.config.getoption('--topo')) as f:
             topos = yaml.safe_load(f)
     else:
-        topos = [{'pypi': metafunc.config.getoption('--pypi'),
+        topos = [{'pip_index': metafunc.config.getoption('--pip-index'),
                   'os': metafunc.config.getoption('--os'),
                   'ip': metafunc.config.getoption('--ip'),
                   'auth': (metafunc.config.getoption('--user'), metafunc.config.getoption('--pw'))}]

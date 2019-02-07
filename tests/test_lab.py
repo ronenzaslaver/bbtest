@@ -117,6 +117,7 @@ class MultiBox(BBPytest):
 class TestBBTestCase(BBTestCase):
     """ Test classical unittest.TestCase - empty (no) fixtures, rely on setup/teardown. """
 
+    # Nullifies the pytest conftest and let unittest.TestCase kick in.
     @pytest.fixture(scope='class', autouse=True)
     def lab_factory(request):
         pass

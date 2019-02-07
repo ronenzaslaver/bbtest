@@ -24,8 +24,8 @@ from bbtest import target
 from .exceptions import ImproperlyConfigured
 
 SYNC_REQUEST_TIMEOUT = 120
-PROCESS_QUERY_RETRIES=os.environ.get('BBTEST_PROCESS_QUERY_RETRIES', 1)
-INSTALL_RECONNECT_WAIT=os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
+PROCESS_QUERY_RETRIES = os.environ.get('BBTEST_PROCESS_QUERY_RETRIES', 1)
+INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
 platform_shotname_re = re.compile('.*(windows|debian|centos).*')
 
 logger = logging.getLogger('bblog')
@@ -293,22 +293,22 @@ class RemoteHost(BaseHost):
         if not package:
             return
 
-        pypi = self.kwargs.get('pypi', None)
-        if not pypi:
+        pip_index = self.kwargs.get('pip_index', None)
+        if not pip_index:
             raise ImproperlyConfigured(f'need to install package {package} but no pypi')
-        if pypi.startswith('http'):
-            bbtest_remote = f'-i {pypi} {package}'.split()
+        if pip_index.startswith('http'):
+            bbtest_remote = f'-i {pip_index} {package}'.split()
         else:
             if not version:
                 def _extract_version(f):
                     return f.split('-')[-1].split('.tar.gz')[0]
-                bbtest_packages = glob.glob(os.path.join(pypi, package + '-*'))
+                bbtest_packages = glob.glob(os.path.join(pip_index, package + '-*'))
                 try:
                     bbtest_package = max(bbtest_packages, key=_extract_version)
                 except Exception as e:
                     raise Exception(f'Failed to find bbtest package - {e}')
             else:
-                bbtest_package = os.path.join(pypi, package + '-' + version)
+                bbtest_package = os.path.join(pip_index, package + '-' + version)
             bbtest_remote = [self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])]
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
         # update of bbtest on remote host.
@@ -321,7 +321,6 @@ class RemoteHost(BaseHost):
                 pass
             time.sleep(INSTALL_RECONNECT_WAIT)
             self._start_rpyc()
-
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
