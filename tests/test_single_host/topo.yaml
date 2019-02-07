@@ -1,32 +1,24 @@
 # List of hosts to run tests on.
 # os: the OS of the host - local, win, linux or osx
+# pip-index: pypi server IP and arguments 'http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40' or full path to
+#            package location on disk.
 # ip: IP address of host
 # auth: list of FTP user, leave empty for anonymous, FTP password, leave empty for anonymous
+#
+# Example:
+#-
+#  os: linux
+#  ip: <host ip>
+#  pypi: <devpi ip>/<user name>/<index>/ --trusted-host <devpi ip>
+#  auth:
+#    - bbtest
+#    - bbtest
+#
+# NO NOT CHANGE THIS FILE as it is saved in github. Create your own copy of the file and make sure it is not pushed to
+# github. We recommend my_topo.yaml as it is already ignored in .gitignore.
+# Once you have your topo file you can set BBTEST_TOPO_YAML environment variable and conftest will take it from there.
+#
 
 -
   os: local
   ip: ''
-
-#-
-#  os: linux
-#  ip: localhost
-#  pypi: /home/yoram/workspace/python/bbtest/dist
-#  auth:
-#    - bbtest
-#    - bbtest
-
--
-  os: win
-  ip: localhost
-  pypi: C:/Users/yoram.shamir/PycharmProjects/bbtest/dist
-  auth:
-    - bbtest
-    - bb1024@test
-
--
-  os: linux
-  ip: 172.16.28.89
-  pypi: http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40
-  auth:
-    - bbtest
-    - bbtest

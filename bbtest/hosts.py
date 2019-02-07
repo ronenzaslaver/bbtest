@@ -23,9 +23,17 @@ except Exception:
 from bbtest import target
 from .exceptions import ImproperlyConfigured
 
-SYNC_REQUEST_TIMEOUT = 60
+SYNC_REQUEST_TIMEOUT = 120
+PROCESS_QUERY_RETRIES = os.environ.get('BBTEST_PROCESS_QUERY_RETRIES', 1)
+INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
+platform_shotname_re = re.compile('.*(windows|debian|centos).*')
 
 logger = logging.getLogger('bblog')
+
+
+def getmodule(name):
+    """imports an arbitrary module"""
+    return __import__(name, None, None, "*")
 
 
 class BaseHost(object):
@@ -38,9 +46,8 @@ class BaseHost(object):
     SEP = '/'
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
         self.args = args
-        self.kwargs = kwargs
+        self.params = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
     def install(self, *args, **kwargs):
@@ -69,50 +76,45 @@ class BaseHost(object):
     @property
     def os(self):
         """ Returns a lower case string identifying the OS. """
-        return self.target.platform_system().lower()
+        return self.modules.platform.system().lower()
 
     @property
     def os_bits(self):
         """ Returns the OS bits architecture - 32 or 64. """
-        return int(self.target.platform_machine()[-2:])
+        return int(self.modules.platform.machine()[-2:])
 
     @property
     def platform(self):
-        """ Returns the platform name - windows/debian/fedora. """
-        return re.findall('.*(windows|debian|centos).*', self.target.platform_platform().lower())[0]
+        """ Returns the platform short, beautify, name - windows/debian/fedora. """
+        return platform_shotname_re.findall(self.modules.platform.platform().lower())[0]
 
     @property
     def hostname(self):
-        return self.target.socket_gethostname()
+        return self.modules.socket.gethostname()
 
     @property
     def name(self):
-        return self.kwargs.get('name', self.hostname)
+        return self.params.get('name', self.hostname)
 
-    def isfile(self, path):
-        return self.target.os_path_isfile(path)
-
-    def getsize(self, path):
-        return self.target.os_path_getsize(path)
-
-    def rmfile(self, path):
-        return self.target.os_remove(path)
-
-    def rmtree(self, path, ignore_errors=True, onerror=None):
-        return self.target.shutil_rmtree(path, ignore_errors, onerror)
+    def rmfiles(self, top):
+        try:
+            for root, dirs, files in self.modules.os.walk(top):
+                for file in files:
+                    self.modules.os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    self.modules.shutil.rmtree(os.path.join(root, dir))
+        except OSError:
+            pass
 
     def mkdtemp(self, **kwargs):
         """ same args as tempfile.mkdtemp """
         if 'dir' not in kwargs:
             kwargs['dir'] = self.root_path
-        return self.target.tempfile_mkdtemp(**kwargs)
-
-    def chmod(self, path, mode):
-        self.target.os_chmod(path, mode)
+        return self.modules.tempfile.mkdtemp(**kwargs)
 
     def chmod_777(self, path):
         # on my ubuntu 18.0.4 chmod with 0x777 didn't set write permission for owner?
-        self.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+        self.modules.os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
 
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
@@ -153,6 +155,7 @@ class LocalHost(BaseHost):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.modules = rpyc.core.service.ModuleNamespace(getmodule)
         self.target = target
 
     def put(self, local, remote):
@@ -166,20 +169,8 @@ class LocalHost(BaseHost):
         return shutil.copyfile(self._relative_remote(remote), local)
 
     @staticmethod
-    def rmfiles(path):
-        logger.debug(f"rmfiles with '{path}'")
-        try:
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-                for dir in dirs:
-                    LocalHost.rmtree(os.path.join(root, dir))
-        except OSError:
-            pass
-
-    @staticmethod
-    def is_process_running(proc_name, timeout=1):
-        for _ in range(0, timeout):
+    def is_process_running(proc_name, retries=PROCESS_QUERY_RETRIES):
+        for _ in range(0, retries):
             for proc in psutil.process_iter():
                 if proc.name() == proc_name:
                     return True
@@ -302,22 +293,22 @@ class RemoteHost(BaseHost):
         if not package:
             return
 
-        pypi = self.kwargs.get('pypi', None)
-        if not pypi:
+        pip_index = self.params.get('pip_index', None)
+        if not pip_index:
             raise ImproperlyConfigured(f'need to install package {package} but no pypi')
-        if pypi.startswith('http'):
-            bbtest_remote = f'-i {pypi} {package}'.split()
+        if pip_index.startswith('http'):
+            bbtest_remote = f'-i {pip_index} {package}'.split()
         else:
             if not version:
                 def _extract_version(f):
                     return f.split('-')[-1].split('.tar.gz')[0]
-                bbtest_packages = glob.glob(os.path.join(pypi, package + '-*'))
+                bbtest_packages = glob.glob(os.path.join(pip_index, package + '-*'))
                 try:
                     bbtest_package = max(bbtest_packages, key=_extract_version)
                 except Exception as e:
                     raise Exception(f'Failed to find bbtest package - {e}')
             else:
-                bbtest_package = os.path.join(pypi, package + '-' + version)
+                bbtest_package = os.path.join(pip_index, package + '-' + version)
             bbtest_remote = [self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])]
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
         # update of bbtest on remote host.
@@ -328,9 +319,8 @@ class RemoteHost(BaseHost):
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
             except Exception as _:
                 pass
-            time.sleep(1)
+            time.sleep(INSTALL_RECONNECT_WAIT)
             self._start_rpyc()
-
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -358,9 +348,6 @@ class RemoteHost(BaseHost):
         finally:
             self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         return output
-
-    def rmfiles(self, name):
-        return self.modules.bbtest.LocalHost.rmfiles(name)
 
     def is_process_running(self, process, timeout=1):
         return self.modules.bbtest.LocalHost.is_process_running(process, timeout)

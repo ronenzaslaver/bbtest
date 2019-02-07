@@ -27,18 +27,20 @@ class TestNoLab(BBPytest):
 class TestImproperlyConfigured(BBPytest):
 
     topo = {
-        'host1': {
-         },
+        'hosts': {
+            'host1': {
+            }
+        }
     }
 
     @pytest.fixture(scope='class', autouse=True)
     def lab_factory(request):
         with pytest.raises(ImproperlyConfigured) as _:
             Lab(request.topo)
-        request.topo['host1']['class'] = BaseHost
+        request.topo['hosts']['host1']['class'] = BaseHost
         with pytest.raises(ImproperlyConfigured) as _:
             Lab(request.topo)
-        request.topo['host1']['boxes'] = []
+        request.topo['hosts']['host1']['boxes'] = []
         Lab(request.topo)
 
     def test_no_class(self):
@@ -48,10 +50,12 @@ class TestImproperlyConfigured(BBPytest):
 class TestBaseHost(BBPytest):
 
     topo = {
-        'host1': {
-            'class': LocalHost,
-            'boxes': []
-         },
+        'hosts': {
+            'host1': {
+                'class': LocalHost,
+                'boxes': []
+            }
+        }
     }
 
     def test_base_host(self):
@@ -62,10 +66,12 @@ class TestBaseHost(BBPytest):
 class TestNoBox(BBPytest):
 
     topo = {
-        'host1': {
-            'class': LocalHost,
-            'boxes': []
-         },
+        'hosts': {
+            'host1': {
+                'class': LocalHost,
+                'boxes': []
+            }
+        }
     }
 
     def test_no_box(self):
@@ -75,10 +81,12 @@ class TestNoBox(BBPytest):
 class TestSingleBox(BBPytest):
 
     topo = {
-        'host1': {
-            'class': LocalHost,
-            'boxes': [EmptyBox]
-         },
+        'hosts': {
+            'host1': {
+                'class': LocalHost,
+                'boxes': [EmptyBox]
+            }
+        }
     }
 
     def test_single_box(self):
@@ -89,14 +97,16 @@ class TestSingleBox(BBPytest):
 class MultiBox(BBPytest):
 
     topo = {
-        'host1': {
-            'class': LocalHost,
-            'boxes': [EmptyBox, EmptyBox]
-         },
-        'host2': {
-            'class': LocalHost,
-            'boxes': [YetAnotherEmptyBox, YetAnotherEmptyBox]
-         },
+        'hosts': {
+            'host1': {
+                'class': LocalHost,
+                'boxes': [EmptyBox, EmptyBox]
+            },
+            'host2': {
+                'class': LocalHost,
+                'boxes': [YetAnotherEmptyBox, YetAnotherEmptyBox]
+            }
+        }
     }
 
     def test_multi_boxes(self):
@@ -107,6 +117,7 @@ class MultiBox(BBPytest):
 class TestBBTestCase(BBTestCase):
     """ Test classical unittest.TestCase - empty (no) fixtures, rely on setup/teardown. """
 
+    # Nullifies the pytest conftest and let unittest.TestCase kick in.
     @pytest.fixture(scope='class', autouse=True)
     def lab_factory(request):
         pass
@@ -116,10 +127,12 @@ class TestBBTestCase(BBTestCase):
         pass
 
     topo = {
-        'host1': {
-            'class': LocalHost,
-            'boxes': [EmptyBox]
-         },
+        'hosts': {
+            'host1': {
+                'class': LocalHost,
+                'boxes': [EmptyBox]
+            }
+        }
     }
 
     def test_bbtestbase(self):
