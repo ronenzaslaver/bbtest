@@ -1,8 +1,13 @@
 CHANGES
 =======
 
+* A better name for the host params
+* move pypi option to default conftest and rename pip-index
+* refactor topology structure - add room for lab level attributes
 * local modues namespace - done
+* local modues namespace - WIP
 * refactor rmfiles
+* CentOS service WIP -> move to Idan
 * move rmtree to target
 * test on remote centos with devpi, no service yet
 * differentiate between name and hostname

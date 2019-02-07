@@ -46,7 +46,7 @@ $ pytest --os (win|linux) --ip <IP> [--user <USER> --pw <PASSWORD>]
 ```
 
 The build above uses a `requirments.txt` file which need to be updated every
-time a new package is added. Just run `pipenv lock -r > requirments.txt` and 
+time a new package is added. Just run `pipenv lock -r > requirements.txt` and 
 don't forget to commit the change.
 
 ## Working with devpi
