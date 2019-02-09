@@ -87,7 +87,7 @@ class TestHosts(BBPytest):
         self.host.run(['sleep', '2'])
         with pytest.raises(Exception) as _:
             self.host.run(['sleep', '2'], timeout=1)
-        if isinstance(self.host, RemoteHost):
+        if self.host.is_remote:
             with pytest.raises(Exception) as _:
                 self.host.run(['sleep', '2'], sync_request_timeout=1)
         else:

@@ -20,11 +20,10 @@ try:
 except Exception:
     pass
 
-from bbtest import target
 from .exceptions import ImproperlyConfigured
 
 SYNC_REQUEST_TIMEOUT = 120
-PROCESS_QUERY_RETRIES = os.environ.get('BBTEST_PROCESS_QUERY_RETRIES', 1)
+DEFAULT_RPYC_SERVER_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911)
 INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
 platform_shotname_re = re.compile('.*(windows|debian|centos).*')
 
@@ -33,7 +32,11 @@ logger = logging.getLogger('bblog')
 
 def getmodule(name):
     """imports an arbitrary module"""
-    return __import__(name, None, None, "*")
+    try:
+        module = __import__(name, None, None, "*")
+    except Exception as _:
+        module = __import__(f'bbtest.{name}', None, None, "*")
+    return module
 
 
 class BaseHost(object):
@@ -96,6 +99,14 @@ class BaseHost(object):
     def name(self):
         return self.params.get('name', self.hostname)
 
+    @property
+    def is_local(self):
+        return isinstance(self, LocalHost)
+
+    @property
+    def is_remote(self):
+        return isinstance(self, RemoteHost)
+
     def rmfiles(self, top):
         try:
             for root, dirs, files in self.modules.os.walk(top):
@@ -119,7 +130,7 @@ class BaseHost(object):
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
-        output = self.target.subprocess_run(args, **shutils_kwargs)
+        output = self.modules.target.subprocess_run(args, **shutils_kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -144,7 +155,7 @@ class BaseHost(object):
         return self.SEP.join(args)
 
     def download_file(self, src_url, dst_path):
-        dst = self.target.download_file(src_url, dst_path)
+        dst = self.modules.target.download_file(src_url, dst_path)
         self.chmod_777(dst)
         return dst
 
@@ -156,7 +167,6 @@ class LocalHost(BaseHost):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.modules = rpyc.core.service.ModuleNamespace(getmodule)
-        self.target = target
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -167,15 +177,6 @@ class LocalHost(BaseHost):
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
-
-    @staticmethod
-    def is_process_running(proc_name, retries=PROCESS_QUERY_RETRIES):
-        for _ in range(0, retries):
-            for proc in psutil.process_iter():
-                if proc.name() == proc_name:
-                    return True
-            time.sleep(1)
-        return False
 
     @staticmethod
     def open_key(parent_key, key):
@@ -349,19 +350,15 @@ class RemoteHost(BaseHost):
             self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         return output
 
-    def is_process_running(self, process, timeout=1):
-        return self.modules.bbtest.LocalHost.is_process_running(process, timeout)
-
     def untar_file(self, path):
         return self.modules.bbtest.LocalHost().untar_file(path)
 
     def _start_rpyc(self):
         try:
-            self._rpyc = rpyc.classic.connect(self.ip)
+            self._rpyc = rpyc.classic.connect(self.ip, port=DEFAULT_RPYC_SERVER_PORT)
         except Exception as e:
             raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} - {e}')
         self.modules = self._rpyc.modules
-        self.target = self.modules.bbtest.target
 
     def _relative_remote(self, remote):
         return remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
