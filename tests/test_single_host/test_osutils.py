@@ -22,5 +22,7 @@ class TestHosts(BBPytest):
 
     def test_is_process_running(self):
         assert not self.host.modules.osutils.is_process_running('no-such-process')
-        if self.host.is_remote:
-            assert self.host.modules.osutils.is_process_running('rpyc_classic.py')
+        if self.host.is_linux:
+            assert self.host.modules.osutils.is_process_running('not-implemented')
+        else:
+            assert self.host.modules.osutils.is_process_running('svchost.exe')

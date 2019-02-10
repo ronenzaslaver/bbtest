@@ -193,6 +193,10 @@ class LocalHost(BaseHost):
             # todo add the actual file extension to exception
             raise NotImplementedError('File extension is not supported')
 
+    def set_client_timeout(self, timeout):
+        # todo implement so users can set upper timeout (no need increase, just limit)
+        pass
+
     def _relative_remote(self, remote):
         return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, '').lstrip('/'))
 
@@ -274,7 +278,7 @@ class RemoteHost(BaseHost):
         self.ftp = FTP(self.ip)
         try:
             if auth:
-                self.ftp.login(self.auth['user'], self.auth['password'])
+                self.ftp.login(self.auth[0], self.auth[1])
             else:
                 # Assume anonymous
                 self.ftp.login()
@@ -341,17 +345,20 @@ class RemoteHost(BaseHost):
         rpyc_kwargs = {k: v for k, v in kwargs.items() if k in self._rpyc._config}
         for key, value in rpyc_kwargs.items():
             self._rpyc._config[key] = value
-        self._rpyc._config['sync_request_timeout'] = kwargs.pop('timeout', self._rpyc._config['sync_request_timeout'])
+        self.set_client_timeout(kwargs.pop('timeout', self._rpyc._config['sync_request_timeout']))
         try:
             output = super().run(args, **kwargs)
         except Exception as e:
             raise e
         finally:
-            self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
+            self.set_client_timeout(SYNC_REQUEST_TIMEOUT)
         return output
 
     def untar_file(self, path):
         return self.modules.bbtest.LocalHost().untar_file(path)
+
+    def set_client_timeout(self, timeout):
+        self._rpyc._config['sync_request_timeout'] = timeout
 
     def _start_rpyc(self):
         try:

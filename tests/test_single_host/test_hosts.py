@@ -84,14 +84,24 @@ class TestHosts(BBPytest):
         self.host.modules.os.remove(dest_temp_file)
 
     def test_timeout(self):
-        self.host.run(['sleep', '2'])
+        # Test timeout on run command.
+        self.host.run_python3(['-c', 'import time; time.sleep(2)'])
         with pytest.raises(Exception) as _:
-            self.host.run(['sleep', '2'], timeout=1)
+            self.host.run_python3(['-c', 'import time; time.sleep(2)'], timeout=1)
         if self.host.is_remote:
             with pytest.raises(Exception) as _:
-                self.host.run(['sleep', '2'], sync_request_timeout=1)
+                self.host.run_python3(['-c', 'import time; time.sleep(2)'], sync_request_timeout=1)
         else:
-            self.host.run(['sleep', '2'], sync_request_timeout=1)
+            self.host.run_python3(['-c', 'import time; time.sleep(2)'], sync_request_timeout=1)
+
+        # Test timeout on modules command.
+        self.host.modules.time.sleep(2)
+        self.host.set_client_timeout(1)
+        if self.host.is_remote:
+            with pytest.raises(Exception) as _:
+                self.host.modules.time.sleep(2)
+        else:
+            self.host.modules.time.sleep(2)
 
     def test_os_platform(self):
         assert self.host.os in ['windows', 'linux']
