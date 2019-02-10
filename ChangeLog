@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+* set_client_timeout
+* first version of customized rpyc_server.py
+* fix broken ftp
+* move up to version 0.2.0
 * A better name for the host params
 * move pypi option to default conftest and rename pip-index
 * refactor topology structure - add room for lab level attributes

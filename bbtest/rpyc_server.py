@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import os
 from plumbum import cli
@@ -85,5 +86,9 @@ class BbtestServer(cli.Application):
         server.start()
 
 
+def main():
+    BbtestServer()
+
+
 if __name__ == "__main__":
-    BbtestServer.run()
+    main()

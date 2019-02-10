@@ -1,3 +1,4 @@
+#!/bin/bash
 # todo: Should we re-write in python so it will be cross-platform?
 
 # todo: Get from mandatory user input
