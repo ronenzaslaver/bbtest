@@ -4,8 +4,10 @@ chardet==3.0.4
 dohq-artifactory==0.4.105
 idna==2.8
 pathlib==1.0.1
+pexpect==4.6.0
 plumbum==1.6.7
 psutil==5.5.0
+ptyprocess==0.6.0
 python-dateutil==2.7.5
 pyyaml==3.13
 requests==2.21.0

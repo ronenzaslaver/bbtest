@@ -1,14 +1,26 @@
 """
 Default conftest for bbtest tests cases.
 Copy this file to each and every folder that contains bbtest test cases.
+Then feel free to change it based on your use case...
 """
 
+import os
 import pytest
 
 
 def pytest_addoption(parser):
     parser.addoption('--pip-index', action='store', default='',
                      help='url of python package index to use or full path to local directory')
+    parser.addoption('--topo', action='store', default=os.environ.get('BBTEST_TOPO_YAML', ''),
+                     help='path to bbtest lab topology file')
+    parser.addoption('--os', action='store', default='local',
+                     help='OS of remote host - local, windows, linux oe mac')
+    parser.addoption('--ip', action='store', default='',
+                     help='IP address of remote host')
+    parser.addoption('--user', action='store', default='',
+                     help='Username for remote host')
+    parser.addoption('--password', action='store', default='',
+                     help='Password for remote host')
 
 
 @pytest.fixture(scope='class', autouse=True)
