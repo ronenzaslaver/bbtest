@@ -11,8 +11,6 @@ import tempfile
 import time
 import rpyc
 import glob
-import psutil
-from psutil import NoSuchProcess
 import re
 try:
     from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
@@ -219,13 +217,6 @@ class LocalWindowsHost(LocalHost):
         except WindowsError:
             raise RuntimeError('Cybereason version not found')
 
-    @staticmethod
-    def is_service_running(service_name):
-        try:
-            return psutil.win_service_get(service_name).status() == 'running'
-        except NoSuchProcess:
-            return False
-
     def get_active_macs(self):
         """
         :return: list of MACs of all active NICs sorted by DeviceID
@@ -242,19 +233,10 @@ class LocalLinuxHost(LocalHost):
 
     ROOT_PATH = '/tmp'
 
-    @staticmethod
-    def is_service_running(service_name):
-        return True if os.system(f'service {service_name} status') == 0 else False
-
 
 class LocalOSXHost(LocalHost):
 
-    def is_service_running(self, service_name):
-        command = f'sudo launchctl list | awk \'$3=="{service_name}" {{ print $2 }}\''
-        if self.run(command, shell=True)[0] == '0':
-            return True
-        else:
-            return False
+    ROOT_PATH = '/tmp'
 
 
 class RemoteHost(BaseHost):
@@ -367,21 +349,12 @@ class WindowsHost(RemoteHost):
     def get_active_macs(self):
         return self.modules.bbtest.LocalWindowsHost().get_active_macs()
 
-    def is_service_running(self, service):
-        return self.modules.bbtest.LocalWindowsHost.is_service_running(service)
-
 
 class LinuxHost(RemoteHost):
 
     ROOT_PATH = '/tmp'
 
-    def is_service_running(self, service):
-        return self.modules.bbtest.LocalLinuxHost.is_service_running(service)
-
 
 class OSXHost(RemoteHost):
 
     ROOT_PATH = '/tmp'
-
-    def is_service_running(self, service):
-        return self.modules.bbtest.LocalOSXHost().is_service_running(service)
