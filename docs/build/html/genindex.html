@@ -14,6 +14,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
    
@@ -41,6 +42,7 @@
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
@@ -59,12 +61,16 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox.add">add() (examples.todo.tests.todo_box.ToDoBox method)</a>
+      <li><a href="API.html#bbtest.labs.Lab.add_box">add_box() (bbtest.labs.Lab method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#bbtest.testcases.BBTestCase.address_book">address_book (bbtest.testcases.BBTestCase attribute)</a>
+      <li><a href="API.html#bbtest.testcases.BBPytest.address_book">address_book (bbtest.testcases.BBPytest attribute)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.testcases.BBTestCase.address_book">(bbtest.testcases.BBTestCase attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -73,24 +79,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.hosts.BaseHost">BaseHost (class in bbtest.hosts)</a>
 </li>
+      <li><a href="API.html#bbtest.testcases.BBPytest">BBPytest (class in bbtest.testcases)</a>
+</li>
       <li><a href="API.html#module-bbtest.blackboxes">bbtest.blackboxes (module)</a>
 </li>
       <li><a href="API.html#module-bbtest.hosts">bbtest.hosts (module)</a>
 </li>
-      <li><a href="API.html#module-bbtest.labs">bbtest.labs (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#module-bbtest.labs">bbtest.labs (module)</a>
+</li>
       <li><a href="API.html#module-bbtest.testcases">bbtest.testcases (module)</a>
 </li>
       <li><a href="API.html#bbtest.testcases.BBTestCase">BBTestCase (class in bbtest.testcases)</a>
 </li>
-      <li><a href="API.html#bbtest.hosts.BaseHost.bit">bit (bbtest.hosts.BaseHost attribute)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.bit">(bbtest.hosts.LocalHost attribute)</a>
-</li>
-      </ul></li>
       <li><a href="API.html#bbtest.blackboxes.BlackBox">BlackBox (class in bbtest.blackboxes)</a>
 </li>
   </ul></td>
@@ -99,32 +101,38 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.hosts.BaseHost.chmod_777">chmod_777() (bbtest.hosts.BaseHost method)</a>
+</li>
       <li><a href="API.html#bbtest.blackboxes.BlackBox.clean">clean() (bbtest.blackboxes.BlackBox method)</a>
 
       <ul>
         <li><a href="API.html#bbtest.blackboxes.HomeBox.clean">(bbtest.blackboxes.HomeBox method)</a>
 </li>
-        <li><a href="API.html#bbtest.blackboxes.SpyServerBox.clean">(bbtest.blackboxes.SpyServerBox method)</a>
-</li>
         <li><a href="API.html#bbtest.hosts.BaseHost.clean">(bbtest.hosts.BaseHost method)</a>
 </li>
         <li><a href="API.html#bbtest.labs.Lab.clean">(bbtest.labs.Lab method)</a>
 </li>
-        <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox.clean">(examples.todo.tests.todo_box.ToDoBox method)</a>
-</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.testcases.BBPytest.clean_lab">clean_lab() (bbtest.testcases.BBPytest method)</a>
+</li>
+      <li><a href="API.html#bbtest.testcases.BBPytest.create_lab">create_lab() (bbtest.testcases.BBPytest class method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#bbtest.hosts.BaseHost.destroy">destroy() (bbtest.hosts.BaseHost method)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.labs.Lab.destroy">(bbtest.labs.Lab method)</a>
+      <li><a href="API.html#bbtest.labs.Lab.destroy">destroy() (bbtest.labs.Lab method)</a>
 </li>
-      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.testcases.BBPytest.destroy_lab">destroy_lab() (bbtest.testcases.BBPytest class method)</a>
+</li>
+      <li><a href="API.html#bbtest.hosts.BaseHost.download_file">download_file() (bbtest.hosts.BaseHost method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -136,10 +144,44 @@
   </ul></td>
 </tr></table>
 
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.blackboxes.HomeBox.get">get() (bbtest.blackboxes.HomeBox method)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.hosts.LocalHost.get">(bbtest.hosts.LocalHost method)</a>
+</li>
+        <li><a href="API.html#bbtest.hosts.RemoteHost.get">(bbtest.hosts.RemoteHost method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#bbtest.hosts.LocalWindowsHost.get_active_macs">get_active_macs() (bbtest.hosts.LocalWindowsHost method)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.hosts.WindowsHost.get_active_macs">(bbtest.hosts.WindowsHost method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.hosts.LocalWindowsHost.get_package_version">get_package_version() (bbtest.hosts.LocalWindowsHost static method)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.hosts.WindowsHost.get_package_version">(bbtest.hosts.WindowsHost method)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#bbtest.hosts.getmodule">getmodule() (in module bbtest.hosts)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.blackboxes.HomeBox">HomeBox (class in bbtest.blackboxes)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.hosts.BaseHost.hostname">hostname (bbtest.hosts.BaseHost attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -152,37 +194,39 @@
       <ul>
         <li><a href="API.html#bbtest.blackboxes.HomeBox.install">(bbtest.blackboxes.HomeBox method)</a>
 </li>
-        <li><a href="API.html#bbtest.blackboxes.SpyServerBox.install">(bbtest.blackboxes.SpyServerBox method)</a>
+        <li><a href="API.html#bbtest.hosts.BaseHost.install">(bbtest.hosts.BaseHost method)</a>
 </li>
-        <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox.install">(examples.todo.tests.todo_box.ToDoBox method)</a>
+        <li><a href="API.html#bbtest.hosts.RemoteHost.install">(bbtest.hosts.RemoteHost method)</a>
 </li>
       </ul></li>
       <li><a href="API.html#bbtest.hosts.LocalHost.ip">ip (bbtest.hosts.LocalHost attribute)</a>
 </li>
-      <li><a href="API.html#bbtest.hosts.LocalWindowsHost.is_package_installed">is_package_installed() (bbtest.hosts.LocalWindowsHost static method)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.is_package_installed">(bbtest.hosts.WindowsHost method)</a>
+      <li><a href="API.html#bbtest.hosts.BaseHost.is_linux">is_linux (bbtest.hosts.BaseHost attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="API.html#bbtest.hosts.BaseHost.is_local">is_local (bbtest.hosts.BaseHost attribute)</a>
+</li>
+      <li><a href="API.html#bbtest.hosts.BaseHost.is_remote">is_remote (bbtest.hosts.BaseHost attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#bbtest.hosts.LocalHost.is_process_running">is_process_running() (bbtest.hosts.LocalHost static method)</a>
-</li>
-      <li><a href="API.html#bbtest.hosts.LocalWindowsHost.is_service_running">is_service_running() (bbtest.hosts.LocalWindowsHost static method)</a>
+      <li><a href="API.html#bbtest.hosts.LinuxHost.is_service_running">is_service_running() (bbtest.hosts.LinuxHost method)</a>
 
       <ul>
+        <li><a href="API.html#bbtest.hosts.LocalLinuxHost.is_service_running">(bbtest.hosts.LocalLinuxHost static method)</a>
+</li>
+        <li><a href="API.html#bbtest.hosts.LocalOSXHost.is_service_running">(bbtest.hosts.LocalOSXHost method)</a>
+</li>
+        <li><a href="API.html#bbtest.hosts.LocalWindowsHost.is_service_running">(bbtest.hosts.LocalWindowsHost static method)</a>
+</li>
+        <li><a href="API.html#bbtest.hosts.OSXHost.is_service_running">(bbtest.hosts.OSXHost method)</a>
+</li>
         <li><a href="API.html#bbtest.hosts.WindowsHost.is_service_running">(bbtest.hosts.WindowsHost method)</a>
 </li>
       </ul></li>
-      <li><a href="API.html#bbtest.hosts.BaseHost.isfile">isfile() (bbtest.hosts.BaseHost method)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.isfile">(bbtest.hosts.LocalHost method)</a>
+      <li><a href="API.html#bbtest.hosts.BaseHost.is_winodws">is_winodws (bbtest.hosts.BaseHost attribute)</a>
 </li>
-        <li><a href="API.html#bbtest.hosts.RemoteHost.isfile">(bbtest.hosts.RemoteHost method)</a>
+      <li><a href="API.html#bbtest.blackboxes.HomeBox.isfile">isfile() (bbtest.blackboxes.HomeBox method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -197,19 +241,25 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.testcases.BBPytest.lab">lab (bbtest.testcases.BBPytest attribute)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.testcases.BBTestCase.lab">(bbtest.testcases.BBTestCase attribute)</a>
+</li>
+      </ul></li>
       <li><a href="API.html#bbtest.labs.Lab">Lab (class in bbtest.labs)</a>
 </li>
       <li><a href="API.html#bbtest.hosts.LinuxHost">LinuxHost (class in bbtest.hosts)</a>
-</li>
-      <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox.list">list() (examples.todo.tests.todo_box.ToDoBox method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.hosts.LocalHost">LocalHost (class in bbtest.hosts)</a>
 </li>
-      <li><a href="API.html#bbtest.hosts.LocalWindowsHost">LocalWindowsHost (class in bbtest.hosts)</a>
+      <li><a href="API.html#bbtest.hosts.LocalLinuxHost">LocalLinuxHost (class in bbtest.hosts)</a>
 </li>
-      <li><a href="API.html#bbtest.blackboxes.SpyServerBox.log">log (bbtest.blackboxes.SpyServerBox attribute)</a>
+      <li><a href="API.html#bbtest.hosts.LocalOSXHost">LocalOSXHost (class in bbtest.hosts)</a>
+</li>
+      <li><a href="API.html#bbtest.hosts.LocalWindowsHost">LocalWindowsHost (class in bbtest.hosts)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -220,13 +270,7 @@
       <li><a href="API.html#bbtest.blackboxes.BlackBox.mkdtemp">mkdtemp() (bbtest.blackboxes.BlackBox method)</a>
 
       <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.mkdtemp">(bbtest.hosts.LocalHost static method)</a>
-</li>
-        <li><a href="API.html#bbtest.hosts.LocalWindowsHost.mkdtemp">(bbtest.hosts.LocalWindowsHost static method)</a>
-</li>
-        <li><a href="API.html#bbtest.hosts.RemoteHost.mkdtemp">(bbtest.hosts.RemoteHost method)</a>
-</li>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.mkdtemp">(bbtest.hosts.WindowsHost method)</a>
+        <li><a href="API.html#bbtest.hosts.BaseHost.mkdtemp">(bbtest.hosts.BaseHost method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -236,29 +280,29 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.blackboxes.HomeBox.NAME">NAME (bbtest.blackboxes.HomeBox attribute)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.blackboxes.SpyServerBox.NAME">(bbtest.blackboxes.SpyServerBox attribute)</a>
 </li>
-        <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox.NAME">(examples.todo.tests.todo_box.ToDoBox attribute)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.hosts.BaseHost.name">name (bbtest.hosts.BaseHost attribute)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#bbtest.hosts.BaseHost.os">os (bbtest.hosts.BaseHost attribute)</a>
+      <li><a href="API.html#bbtest.hosts.LocalHost.open_key">open_key() (bbtest.hosts.LocalHost static method)</a>
 
       <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.os">(bbtest.hosts.LocalHost attribute)</a>
-</li>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.os">(bbtest.hosts.WindowsHost attribute)</a>
+        <li><a href="API.html#bbtest.hosts.WindowsHost.open_key">(bbtest.hosts.WindowsHost method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.hosts.BaseHost.os">os (bbtest.hosts.BaseHost attribute)</a>
+</li>
+      <li><a href="API.html#bbtest.hosts.BaseHost.os_bits">os_bits (bbtest.hosts.BaseHost attribute)</a>
+</li>
       <li><a href="API.html#bbtest.hosts.OSXHost">OSXHost (class in bbtest.hosts)</a>
 </li>
   </ul></td>
@@ -267,16 +311,8 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#bbtest.hosts.BaseHost.package_type">package_type (bbtest.hosts.BaseHost attribute)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.package_type">(bbtest.hosts.LocalHost attribute)</a>
+      <li><a href="API.html#bbtest.hosts.BaseHost.platform">platform (bbtest.hosts.BaseHost attribute)</a>
 </li>
-        <li><a href="API.html#bbtest.hosts.LocalWindowsHost.package_type">(bbtest.hosts.LocalWindowsHost attribute)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.blackboxes.HomeBox.put">put() (bbtest.blackboxes.HomeBox method)</a>
 
       <ul>
@@ -293,56 +329,36 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.hosts.RemoteHost">RemoteHost (class in bbtest.hosts)</a>
 </li>
-      <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox.remove">remove() (examples.todo.tests.todo_box.ToDoBox method)</a>
+      <li><a href="API.html#bbtest.blackboxes.HomeBox.rmfile">rmfile() (bbtest.blackboxes.HomeBox method)</a>
 </li>
-      <li><a href="API.html#bbtest.hosts.BaseHost.rmfile">rmfile() (bbtest.hosts.BaseHost method)</a>
+      <li><a href="API.html#bbtest.hosts.BaseHost.rmfiles">rmfiles() (bbtest.hosts.BaseHost method)</a>
+</li>
+      <li><a href="API.html#bbtest.hosts.LinuxHost.ROOT_PATH">ROOT_PATH (bbtest.hosts.LinuxHost attribute)</a>
 
       <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.rmfile">(bbtest.hosts.LocalHost static method)</a>
+        <li><a href="API.html#bbtest.hosts.LocalLinuxHost.ROOT_PATH">(bbtest.hosts.LocalLinuxHost attribute)</a>
 </li>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.rmfile">(bbtest.hosts.WindowsHost method)</a>
+        <li><a href="API.html#bbtest.hosts.LocalWindowsHost.ROOT_PATH">(bbtest.hosts.LocalWindowsHost attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="API.html#bbtest.hosts.LocalHost.rmfiles">rmfiles() (bbtest.hosts.LocalHost static method)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.rmfiles">(bbtest.hosts.WindowsHost method)</a>
+        <li><a href="API.html#bbtest.hosts.OSXHost.ROOT_PATH">(bbtest.hosts.OSXHost attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="API.html#bbtest.hosts.BaseHost.rmtree">rmtree() (bbtest.hosts.BaseHost method)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.rmtree">(bbtest.hosts.LocalHost static method)</a>
-</li>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.rmtree">(bbtest.hosts.WindowsHost method)</a>
+        <li><a href="API.html#bbtest.hosts.WindowsHost.ROOT_PATH">(bbtest.hosts.WindowsHost attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#bbtest.hosts.LocalWindowsHost.ROOT_PATH">ROOT_PATH (bbtest.hosts.LocalWindowsHost attribute)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.ROOT_PATH">(bbtest.hosts.WindowsHost attribute)</a>
-</li>
-      </ul></li>
       <li><a href="API.html#bbtest.blackboxes.HomeBox.run">run() (bbtest.blackboxes.HomeBox method)</a>
 
       <ul>
-        <li><a href="API.html#bbtest.hosts.LocalHost.run">(bbtest.hosts.LocalHost static method)</a>
+        <li><a href="API.html#bbtest.hosts.BaseHost.run">(bbtest.hosts.BaseHost method)</a>
 </li>
-        <li><a href="API.html#bbtest.hosts.WindowsHost.run">(bbtest.hosts.WindowsHost method)</a>
-</li>
-        <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox.run">(examples.todo.tests.todo_box.ToDoBox method)</a>
+        <li><a href="API.html#bbtest.hosts.RemoteHost.run">(bbtest.hosts.RemoteHost method)</a>
 </li>
       </ul></li>
-      <li><a href="API.html#bbtest.blackboxes.HomeBox.run_file">run_file() (bbtest.blackboxes.HomeBox method)</a>
+      <li><a href="API.html#bbtest.hosts.BaseHost.run_python2">run_python2() (bbtest.hosts.BaseHost method)</a>
 </li>
-      <li><a href="API.html#bbtest.hosts.LocalHost.run_python2">run_python2() (bbtest.hosts.LocalHost method)</a>
-
-      <ul>
-        <li><a href="API.html#bbtest.hosts.RemoteHost.run_python2">(bbtest.hosts.RemoteHost method)</a>
+      <li><a href="API.html#bbtest.hosts.BaseHost.run_python3">run_python3() (bbtest.hosts.BaseHost method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -351,13 +367,19 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.hosts.BaseHost.SEP">SEP (bbtest.hosts.BaseHost attribute)</a>
 </li>
-      <li><a href="API.html#bbtest.testcases.BBTestCase.setUp">setUp() (bbtest.testcases.BBTestCase method)</a>
+      <li><a href="API.html#bbtest.hosts.LocalHost.set_client_timeout">set_client_timeout() (bbtest.hosts.LocalHost method)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.hosts.RemoteHost.set_client_timeout">(bbtest.hosts.RemoteHost method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API.html#bbtest.testcases.BBTestCase.setUpClass">setUpClass() (bbtest.testcases.BBTestCase class method)</a>
+      <li><a href="API.html#bbtest.testcases.BBTestCase.setUp">setUp() (bbtest.testcases.BBTestCase method)</a>
 </li>
-      <li><a href="API.html#bbtest.blackboxes.SpyServerBox">SpyServerBox (class in bbtest.blackboxes)</a>
+      <li><a href="API.html#bbtest.testcases.BBPytest.setup_lab">setup_lab() (bbtest.testcases.BBPytest method)</a>
+</li>
+      <li><a href="API.html#bbtest.testcases.BBTestCase.setUpClass">setUpClass() (bbtest.testcases.BBTestCase class method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -367,12 +389,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.testcases.BBTestCase.tearDown">tearDown() (bbtest.testcases.BBTestCase method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API.html#bbtest.testcases.BBTestCase.tearDownClass">tearDownClass() (bbtest.testcases.BBTestCase class method)</a>
 </li>
-      <li><a href="examples/todo.html#examples.todo.tests.todo_box.ToDoBox">ToDoBox (class in examples.todo.tests.todo_box)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.testcases.BBPytest.topo">topo (bbtest.testcases.BBPytest attribute)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.testcases.BBTestCase.topo">(bbtest.testcases.BBTestCase attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -385,6 +411,14 @@
         <li><a href="API.html#bbtest.blackboxes.HomeBox.uninstall">(bbtest.blackboxes.HomeBox method)</a>
 </li>
         <li><a href="API.html#bbtest.hosts.BaseHost.uninstall">(bbtest.hosts.BaseHost method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#bbtest.hosts.LocalHost.untar_file">untar_file() (bbtest.hosts.LocalHost static method)</a>
+
+      <ul>
+        <li><a href="API.html#bbtest.hosts.RemoteHost.untar_file">(bbtest.hosts.RemoteHost method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -457,7 +491,7 @@
       &copy;2018, Yoram Shamir & Benny Daon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

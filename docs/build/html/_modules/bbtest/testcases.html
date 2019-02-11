@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -32,48 +33,93 @@
           <div class="body" role="main">
             
   <h1>Source code for bbtest.testcases</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Base classes for black box tests - one for pytest and one for unittest derived tests.</span>
+
+<span class="sd">The base classes should be identical so unittest users and pytest users will get the exact same services from the</span>
+<span class="sd">infrastructure.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 
 <span class="kn">from</span> <span class="nn">bbtest</span> <span class="k">import</span> <span class="n">Lab</span>
 
+
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;bblog&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BBPytest"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBPytest">[docs]</a><span class="k">class</span> <span class="nc">BBPytest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Base class for black box tests for pytest tests.</span>
+
+<span class="sd">    The setup/teardown methods within this class should be called from fixtures.</span>
+<span class="sd">    A default conftest file with default fixtures can be found under the tests sample folder.</span>
+
+<span class="sd">    We&#39;ve added a class property `topo` that holds a dictionary defining the lab environment.</span>
+<span class="sd">    Each test case can define a `topo` property used to setup a lab and store it in `self.lab`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">topo</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">address_book</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">lab</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BBPytest.create_lab"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBPytest.create_lab">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_lab</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Setups lab for black box testing. &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span> <span class="o">=</span> <span class="n">Lab</span><span class="p">(</span><span class="n">topology</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">topo</span><span class="p">,</span> <span class="n">address_book</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">address_book</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BBPytest.destroy_lab"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBPytest.destroy_lab">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">destroy_lab</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Destroy black box testing lab. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BBPytest.setup_lab"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBPytest.setup_lab">[docs]</a>    <span class="k">def</span> <span class="nf">setup_lab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Setup black box testing lab before test cases. &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="BBPytest.clean_lab"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBPytest.clean_lab">[docs]</a>    <span class="k">def</span> <span class="nf">clean_lab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Clean black box testing lab after test cases. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="BBTestCase"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase">[docs]</a><span class="k">class</span> <span class="nc">BBTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A black box test case based on :class:`unittest.TestCase`</span>
 
-<span class="sd">    We&#39;ve added a class property `LAB` that holds a dictionary defining the lab enviornment.</span>
-<span class="sd">    Each test case can define a `LAB` property used to setup a lab and store it in `self.lab`.</span>
+<span class="sd">    unitest calls the setup/teardown classes within this base class automatically.</span>
+
+<span class="sd">    We&#39;ve added a class property `topo` that holds a dictionary defining the lab enviornment.</span>
+<span class="sd">    Each test case can define a `topo` property used to setup a lab and store it in `self.lab`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">topo</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">address_book</span> <span class="o">=</span> <span class="p">{}</span>
-
-<div class="viewcode-block" id="BBTestCase.setUp"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;lab&#39;</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">flatten_boxes</span><span class="p">():</span>
-                <span class="n">box</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="BBTestCase.tearDown"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">tearDown</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;lab&#39;</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">flatten_boxes</span><span class="p">():</span>
-                <span class="n">box</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div>
+    <span class="n">lab</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="BBTestCase.setUpClass"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.setUpClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Setups a lab for black box testing. &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setUpClass</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot; Setups lab for black box testing. &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;LAB&#39;</span><span class="p">):</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span> <span class="o">=</span> <span class="n">Lab</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">LAB</span><span class="p">,</span> <span class="n">address_book</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">address_book</span><span class="p">)</span></div>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span> <span class="o">=</span> <span class="n">Lab</span><span class="p">(</span><span class="n">topology</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">topo</span><span class="p">,</span> <span class="n">address_book</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">address_book</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BBTestCase.tearDownClass"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.tearDownClass">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;lab&#39;</span><span class="p">):</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">tearDownClass</span><span class="p">()</span></div></div>
+        <span class="sd">&quot;&quot;&quot; Destroy black box testing lab. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BBTestCase.setUp"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Setup black box testing lab between test cases. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BBTestCase.tearDown"><a class="viewcode-back" href="../../API.html#bbtest.testcases.BBTestCase.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Clean black box testing lab between test cases. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>
@@ -135,7 +181,7 @@
       &copy;2018, Yoram Shamir & Benny Daon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

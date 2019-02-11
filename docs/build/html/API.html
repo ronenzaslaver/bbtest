@@ -13,6 +13,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Test a simple Installer" href="examples/installer.html" />
@@ -36,40 +37,103 @@
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-bbtest.testcases">
 <span id="the-test-case"></span><h2>The Test Case<a class="headerlink" href="#module-bbtest.testcases" title="Permalink to this headline">¶</a></h2>
+<p>Base classes for black box tests - one for pytest and one for unittest derived tests.</p>
+<p>The base classes should be identical so unittest users and pytest users will get the exact same services from the
+infrastructure.</p>
+<dl class="class">
+<dt id="bbtest.testcases.BBPytest">
+<em class="property">class </em><code class="descclassname">bbtest.testcases.</code><code class="descname">BBPytest</code><a class="reference internal" href="_modules/bbtest/testcases.html#BBPytest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBPytest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for black box tests for pytest tests.</p>
+<p>The setup/teardown methods within this class should be called from fixtures.
+A default conftest file with default fixtures can be found under the tests sample folder.</p>
+<p>We’ve added a class property <cite>topo</cite> that holds a dictionary defining the lab environment.
+Each test case can define a <cite>topo</cite> property used to setup a lab and store it in <cite>self.lab</cite>.</p>
+<dl class="attribute">
+<dt id="bbtest.testcases.BBPytest.address_book">
+<code class="descname">address_book</code><em class="property"> = {}</em><a class="headerlink" href="#bbtest.testcases.BBPytest.address_book" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.testcases.BBPytest.clean_lab">
+<code class="descname">clean_lab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBPytest.clean_lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBPytest.clean_lab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean black box testing lab after test cases.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bbtest.testcases.BBPytest.create_lab">
+<em class="property">classmethod </em><code class="descname">create_lab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBPytest.create_lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBPytest.create_lab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setups lab for black box testing.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="bbtest.testcases.BBPytest.destroy_lab">
+<em class="property">classmethod </em><code class="descname">destroy_lab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBPytest.destroy_lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBPytest.destroy_lab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroy black box testing lab.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.testcases.BBPytest.lab">
+<code class="descname">lab</code><em class="property"> = None</em><a class="headerlink" href="#bbtest.testcases.BBPytest.lab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.testcases.BBPytest.setup_lab">
+<code class="descname">setup_lab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBPytest.setup_lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBPytest.setup_lab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup black box testing lab before test cases.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.testcases.BBPytest.topo">
+<code class="descname">topo</code><em class="property"> = {}</em><a class="headerlink" href="#bbtest.testcases.BBPytest.topo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="bbtest.testcases.BBTestCase">
 <em class="property">class </em><code class="descclassname">bbtest.testcases.</code><code class="descname">BBTestCase</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase" title="Permalink to this definition">¶</a></dt>
 <dd><p>A black box test case based on <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code></p>
-<p>We’ve added a class property <cite>LAB</cite> that holds a dictionary defining the lab enviornment.
-Each test case can define a <cite>LAB</cite> property used to setup a lab and store it in <cite>self.lab</cite>.</p>
+<p>unitest calls the setup/teardown classes within this base class automatically.</p>
+<p>We’ve added a class property <cite>topo</cite> that holds a dictionary defining the lab enviornment.
+Each test case can define a <cite>topo</cite> property used to setup a lab and store it in <cite>self.lab</cite>.</p>
 <dl class="attribute">
 <dt id="bbtest.testcases.BBTestCase.address_book">
 <code class="descname">address_book</code><em class="property"> = {}</em><a class="headerlink" href="#bbtest.testcases.BBTestCase.address_book" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="bbtest.testcases.BBTestCase.lab">
+<code class="descname">lab</code><em class="property"> = None</em><a class="headerlink" href="#bbtest.testcases.BBTestCase.lab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="bbtest.testcases.BBTestCase.setUp">
 <code class="descname">setUp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase.setUp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+<dd><p>Setup black box testing lab between test cases.</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="bbtest.testcases.BBTestCase.setUpClass">
 <em class="property">classmethod </em><code class="descname">setUpClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase.setUpClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase.setUpClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Setups a lab for black box testing.</p>
+<dd><p>Setups lab for black box testing.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbtest.testcases.BBTestCase.tearDown">
 <code class="descname">tearDown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase.tearDown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+<dd><p>Clean black box testing lab between test cases.</p>
 </dd></dl>
 
 <dl class="classmethod">
 <dt id="bbtest.testcases.BBTestCase.tearDownClass">
 <em class="property">classmethod </em><code class="descname">tearDownClass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/testcases.html#BBTestCase.tearDownClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.testcases.BBTestCase.tearDownClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+<dd><p>Destroy black box testing lab.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.testcases.BBTestCase.topo">
+<code class="descname">topo</code><em class="property"> = {}</em><a class="headerlink" href="#bbtest.testcases.BBTestCase.topo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -127,27 +191,37 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 </dd></dl>
 
 <dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>remote</em>, <em>local</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get file from the box’s home directory.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="bbtest.blackboxes.HomeBox.install">
 <code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a temp dir and store it in <cite>self.path</cite></p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbtest.blackboxes.HomeBox.put">
-<code class="descname">put</code><span class="sig-paren">(</span><em>src</em>, <em>dest</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.put" title="Permalink to this definition">¶</a></dt>
-<dd><p>Put a file in the host’s home directory</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="bbtest.blackboxes.HomeBox.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.run" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.blackboxes.HomeBox.isfile">
+<code class="descname">isfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.isfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.isfile" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbtest.blackboxes.HomeBox.run_file">
-<code class="descname">run_file</code><span class="sig-paren">(</span><em>src_path</em>, <em>background=False</em>, <em>params=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.run_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.run_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy the source to the box, run it, and return its output.</p>
+<dt id="bbtest.blackboxes.HomeBox.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>local</em>, <em>remote</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put a file in the box’s home directory</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.rmfile">
+<code class="descname">rmfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.rmfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.rmfile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.blackboxes.HomeBox.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="bbtest.blackboxes.HomeBox.uninstall">
@@ -157,47 +231,18 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 
 </dd></dl>
 
-<dl class="class">
-<dt id="bbtest.blackboxes.SpyServerBox">
-<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">SpyServerBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a></p>
-<p>A box that exposes a <cite>url</cite> and a <cite>log</cite> so that any messages POSTed to
-url is appended to the log.</p>
-<div class="admonition important">
-<p class="first admonition-title">Important</p>
-<p class="last">It still doesn’t work and the log never changes</p>
-</div>
-<dl class="attribute">
-<dt id="bbtest.blackboxes.SpyServerBox.NAME">
-<code class="descname">NAME</code><em class="property"> = 'serverspy'</em><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.blackboxes.SpyServerBox.clean">
-<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.clean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.blackboxes.SpyServerBox.install">
-<code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#SpyServerBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.install" title="Permalink to this definition">¶</a></dt>
-<dd><p>Installing the black box on <cite>self.host</cite></p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="bbtest.blackboxes.SpyServerBox.log">
-<code class="descname">log</code><em class="property"> = ['Hello Sara!']</em><a class="headerlink" href="#bbtest.blackboxes.SpyServerBox.log" title="Permalink to this definition">¶</a></dt>
-<dd><p>log is an array of log messages where Each POSTed message is appended</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="module-bbtest.labs">
 <span id="the-lab"></span><h2>The Lab<a class="headerlink" href="#module-bbtest.labs" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="bbtest.labs.Lab">
-<em class="property">class </em><code class="descclassname">bbtest.labs.</code><code class="descname">Lab</code><span class="sig-paren">(</span><em>lab</em>, <em>address_book={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.labs.</code><code class="descname">Lab</code><span class="sig-paren">(</span><em>topology={}</em>, <em>address_book={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="bbtest.labs.Lab.add_box">
+<code class="descname">add_box</code><span class="sig-paren">(</span><em>box_class</em>, <em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.add_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="bbtest.labs.Lab.clean">
 <code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.clean" title="Permalink to this definition">¶</a></dt>
@@ -240,25 +285,52 @@ url is appended to the log.</p>
 <code class="descname">SEP</code><em class="property"> = '/'</em><a class="headerlink" href="#bbtest.hosts.BaseHost.SEP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="bbtest.hosts.BaseHost.bit">
-<code class="descname">bit</code><a class="headerlink" href="#bbtest.hosts.BaseHost.bit" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.chmod_777">
+<code class="descname">chmod_777</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.chmod_777"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.chmod_777" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbtest.hosts.BaseHost.clean">
 <code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.clean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.BaseHost.destroy">
-<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.destroy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Release the host</p>
+<dd><p>Restore host to its original installed state</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.BaseHost.isfile">
-<code class="descname">isfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.isfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.isfile" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.BaseHost.download_file">
+<code class="descname">download_file</code><span class="sig-paren">(</span><em>src_url</em>, <em>dst_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.download_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.download_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.BaseHost.hostname">
+<code class="descname">hostname</code><a class="headerlink" href="#bbtest.hosts.BaseHost.hostname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.install">
+<code class="descname">install</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>install host for bbtest</p>
+<p>We separate install from init so we can create an install hosts in different order.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.BaseHost.is_linux">
+<code class="descname">is_linux</code><a class="headerlink" href="#bbtest.hosts.BaseHost.is_linux" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.BaseHost.is_local">
+<code class="descname">is_local</code><a class="headerlink" href="#bbtest.hosts.BaseHost.is_local" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.BaseHost.is_remote">
+<code class="descname">is_remote</code><a class="headerlink" href="#bbtest.hosts.BaseHost.is_remote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.BaseHost.is_winodws">
+<code class="descname">is_winodws</code><a class="headerlink" href="#bbtest.hosts.BaseHost.is_winodws" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -266,38 +338,77 @@ url is appended to the log.</p>
 <code class="descname">join</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.join" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.mkdtemp">
+<code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
+<dd><p>same args as tempfile.mkdtemp</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.BaseHost.name">
+<code class="descname">name</code><a class="headerlink" href="#bbtest.hosts.BaseHost.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="bbtest.hosts.BaseHost.os">
 <code class="descname">os</code><a class="headerlink" href="#bbtest.hosts.BaseHost.os" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a lower case string identifying the OS.</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="bbtest.hosts.BaseHost.package_type">
-<code class="descname">package_type</code><a class="headerlink" href="#bbtest.hosts.BaseHost.package_type" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.BaseHost.os_bits">
+<code class="descname">os_bits</code><a class="headerlink" href="#bbtest.hosts.BaseHost.os_bits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the OS bits architecture - 32 or 64.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="bbtest.hosts.BaseHost.platform">
+<code class="descname">platform</code><a class="headerlink" href="#bbtest.hosts.BaseHost.platform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the platform short, beautify, name - windows/debian/fedora.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.rmfiles">
+<code class="descname">rmfiles</code><span class="sig-paren">(</span><em>top</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.rmfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.rmfiles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.BaseHost.rmfile">
-<code class="descname">rmfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.rmfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.rmfile" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.BaseHost.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.BaseHost.rmtree">
-<code class="descname">rmtree</code><span class="sig-paren">(</span><em>path</em>, <em>ignore_errors=True</em>, <em>onerror=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.rmtree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.rmtree" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.BaseHost.run_python2">
+<code class="descname">run_python2</code><span class="sig-paren">(</span><em>args_in</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.run_python2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.run_python2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.BaseHost.run_python3">
+<code class="descname">run_python3</code><span class="sig-paren">(</span><em>args_in</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.run_python3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.run_python3" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbtest.hosts.BaseHost.uninstall">
 <code class="descname">uninstall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost.uninstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost.uninstall" title="Permalink to this definition">¶</a></dt>
-<dd><p>the opposite of install,  uninstall our tools from the host</p>
+<dd><p>the opposite of install,  uninstall bbtest from host</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="bbtest.hosts.LinuxHost">
-<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LinuxHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LinuxHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LinuxHost" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LinuxHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LinuxHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LinuxHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.RemoteHost" title="bbtest.hosts.RemoteHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.RemoteHost</span></code></a></p>
+<dl class="attribute">
+<dt id="bbtest.hosts.LinuxHost.ROOT_PATH">
+<code class="descname">ROOT_PATH</code><em class="property"> = '/tmp'</em><a class="headerlink" href="#bbtest.hosts.LinuxHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.LinuxHost.is_service_running">
+<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LinuxHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LinuxHost.is_service_running" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -305,11 +416,11 @@ url is appended to the log.</p>
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
 <p>Suppose to be an os-agnostic local host.</p>
-<p>For now, supports only Win32 and Win64</p>
-<dl class="attribute">
-<dt id="bbtest.hosts.LocalHost.bit">
-<code class="descname">bit</code><a class="headerlink" href="#bbtest.hosts.LocalHost.bit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="method">
+<dt id="bbtest.hosts.LocalHost.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>remote</em>, <em>local</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get file from target host relative to root path.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="bbtest.hosts.LocalHost.ip">
@@ -317,60 +428,51 @@ url is appended to the log.</p>
 <dd></dd></dl>
 
 <dl class="staticmethod">
-<dt id="bbtest.hosts.LocalHost.is_process_running">
-<em class="property">static </em><code class="descname">is_process_running</code><span class="sig-paren">(</span><em>process_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.is_process_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.is_process_running" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.LocalHost.isfile">
-<code class="descname">isfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.isfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.isfile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalHost.mkdtemp">
-<em class="property">static </em><code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
-<dd><p>same args as tempfile.mkdtemp</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="bbtest.hosts.LocalHost.os">
-<code class="descname">os</code><a class="headerlink" href="#bbtest.hosts.LocalHost.os" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a lower case string identifying the OS</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="bbtest.hosts.LocalHost.package_type">
-<code class="descname">package_type</code><a class="headerlink" href="#bbtest.hosts.LocalHost.package_type" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.LocalHost.open_key">
+<em class="property">static </em><code class="descname">open_key</code><span class="sig-paren">(</span><em>parent_key</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.open_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.open_key" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbtest.hosts.LocalHost.put">
 <code class="descname">put</code><span class="sig-paren">(</span><em>local</em>, <em>remote</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.put" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalHost.rmfile">
-<em class="property">static </em><code class="descname">rmfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.rmfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.rmfile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalHost.rmfiles">
-<em class="property">static </em><code class="descname">rmfiles</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.rmfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.rmfiles" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalHost.rmtree">
-<em class="property">static </em><code class="descname">rmtree</code><span class="sig-paren">(</span><em>path</em>, <em>ignore_errors=True</em>, <em>onerror=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.rmtree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.rmtree" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalHost.run">
-<em class="property">static </em><code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs_in</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Put file on target host relative to root path.</p>
+</dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.LocalHost.run_python2">
-<code class="descname">run_python2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.run_python2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.run_python2" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.LocalHost.set_client_timeout">
+<code class="descname">set_client_timeout</code><span class="sig-paren">(</span><em>timeout</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.set_client_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.set_client_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="bbtest.hosts.LocalHost.untar_file">
+<em class="property">static </em><code class="descname">untar_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.untar_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.untar_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.hosts.LocalLinuxHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalLinuxHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalLinuxHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalLinuxHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.LocalHost" title="bbtest.hosts.LocalHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.LocalHost</span></code></a></p>
+<dl class="attribute">
+<dt id="bbtest.hosts.LocalLinuxHost.ROOT_PATH">
+<code class="descname">ROOT_PATH</code><em class="property"> = '/tmp'</em><a class="headerlink" href="#bbtest.hosts.LocalLinuxHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="bbtest.hosts.LocalLinuxHost.is_service_running">
+<em class="property">static </em><code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalLinuxHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalLinuxHost.is_service_running" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bbtest.hosts.LocalOSXHost">
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalOSXHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalOSXHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalOSXHost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.LocalHost" title="bbtest.hosts.LocalHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.LocalHost</span></code></a></p>
+<dl class="method">
+<dt id="bbtest.hosts.LocalOSXHost.is_service_running">
+<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalOSXHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalOSXHost.is_service_running" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -385,9 +487,22 @@ url is appended to the log.</p>
 <code class="descname">ROOT_PATH</code><em class="property"> = 'c:/temp'</em><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="bbtest.hosts.LocalWindowsHost.get_active_macs">
+<code class="descname">get_active_macs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost.get_active_macs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.get_active_macs" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of MACs of all active NICs sorted by DeviceID</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="staticmethod">
-<dt id="bbtest.hosts.LocalWindowsHost.is_package_installed">
-<em class="property">static </em><code class="descname">is_package_installed</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost.is_package_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.is_package_installed" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.LocalWindowsHost.get_package_version">
+<em class="property">static </em><code class="descname">get_package_version</code><span class="sig-paren">(</span><em>package_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost.get_package_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.get_package_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="staticmethod">
@@ -395,57 +510,79 @@ url is appended to the log.</p>
 <em class="property">static </em><code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.is_service_running" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalWindowsHost.mkdtemp">
-<em class="property">static </em><code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
-<dd><p>same args as tempfile.mkdtemp</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="bbtest.hosts.LocalWindowsHost.package_type">
-<code class="descname">package_type</code><em class="property"> = 'msi'</em><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.package_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="bbtest.hosts.OSXHost">
-<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">OSXHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#OSXHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.OSXHost" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">OSXHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#OSXHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.OSXHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.RemoteHost" title="bbtest.hosts.RemoteHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.RemoteHost</span></code></a></p>
+<dl class="attribute">
+<dt id="bbtest.hosts.OSXHost.ROOT_PATH">
+<code class="descname">ROOT_PATH</code><em class="property"> = '/tmp'</em><a class="headerlink" href="#bbtest.hosts.OSXHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.OSXHost.is_service_running">
+<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#OSXHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.OSXHost.is_service_running" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="bbtest.hosts.RemoteHost">
-<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">RemoteHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">RemoteHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
 <p>A remote host using RPyC</p>
 <dl class="method">
-<dt id="bbtest.hosts.RemoteHost.isfile">
-<code class="descname">isfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.isfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.isfile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="bbtest.hosts.RemoteHost.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>remote</em>, <em>local</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get file from target host relative to root path.</p>
+</dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.RemoteHost.mkdtemp">
-<code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
-<dd><p>same args as tempfile.mkdtemp</p>
+<dt id="bbtest.hosts.RemoteHost.install">
+<code class="descname">install</code><span class="sig-paren">(</span><em>package=None</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install bbtes=Nonet tests package on remote host.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>package</strong> – bbtest tests package to install. If None do not install</li>
+<li><strong>version</strong> – package version to install, if None install latest</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="bbtest.hosts.RemoteHost.put">
 <code class="descname">put</code><span class="sig-paren">(</span><em>local</em>, <em>remote</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.put"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put file on target host relative to root path.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.RemoteHost.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.run" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.RemoteHost.run_python2">
-<code class="descname">run_python2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.run_python2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.run_python2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Call run command with python2 as the process</p>
-</dd></dl>
+<dt id="bbtest.hosts.RemoteHost.set_client_timeout">
+<code class="descname">set_client_timeout</code><span class="sig-paren">(</span><em>timeout</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.set_client_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.set_client_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.RemoteHost.untar_file">
+<code class="descname">untar_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.untar_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.untar_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="bbtest.hosts.WindowsHost">
-<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">WindowsHost</code><span class="sig-paren">(</span><em>ip='localhost'</em>, <em>auth=('user'</em>, <em>'pass')</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">WindowsHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.RemoteHost" title="bbtest.hosts.RemoteHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.RemoteHost</span></code></a></p>
 <p>A remote windows host</p>
 <dl class="attribute">
@@ -454,46 +591,31 @@ url is appended to the log.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.WindowsHost.is_package_installed">
-<code class="descname">is_package_installed</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.is_package_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.is_package_installed" title="Permalink to this definition">¶</a></dt>
+<dt id="bbtest.hosts.WindowsHost.get_active_macs">
+<code class="descname">get_active_macs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.get_active_macs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.get_active_macs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="bbtest.hosts.WindowsHost.get_package_version">
+<code class="descname">get_package_version</code><span class="sig-paren">(</span><em>package_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.get_package_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.get_package_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="bbtest.hosts.WindowsHost.is_service_running">
-<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.is_service_running" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.is_service_running" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="bbtest.hosts.WindowsHost.mkdtemp">
-<code class="descname">mkdtemp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.mkdtemp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.mkdtemp" title="Permalink to this definition">¶</a></dt>
-<dd><p>same args as tempfile.mkdtemp</p>
+<dt id="bbtest.hosts.WindowsHost.open_key">
+<code class="descname">open_key</code><span class="sig-paren">(</span><em>parent_key</em>, <em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.open_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.open_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
-<dl class="attribute">
-<dt id="bbtest.hosts.WindowsHost.os">
-<code class="descname">os</code><a class="headerlink" href="#bbtest.hosts.WindowsHost.os" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.WindowsHost.rmfile">
-<code class="descname">rmfile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.rmfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.rmfile" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.WindowsHost.rmfiles">
-<code class="descname">rmfiles</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.rmfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.rmfiles" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.WindowsHost.rmtree">
-<code class="descname">rmtree</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.rmtree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.rmtree" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.WindowsHost.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<dl class="function">
+<dt id="bbtest.hosts.getmodule">
+<code class="descclassname">bbtest.hosts.</code><code class="descname">getmodule</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#getmodule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.getmodule" title="Permalink to this definition">¶</a></dt>
+<dd><p>imports an arbitrary module</p>
 </dd></dl>
 
 </div>
@@ -564,7 +686,7 @@ url is appended to the log.</p>
       &copy;2018, Yoram Shamir & Benny Daon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
