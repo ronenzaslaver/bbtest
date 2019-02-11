@@ -1,10 +1,10 @@
 # How to turn bare Ubuntu machine into bbtest host 
 
 ## Prerequisite:
-- Firewall ports should be allowed: 21 for FTP, 18812 for rpyc and 10090-10100 for FTP passive mode
+- Firewall ports should be allowed: 21 for FTP, 57911 for rpyc and 10090-10100 for FTP passive mode
 ```bash
 sudo firewall-cmd --zone=public --add-port=21/tcp --permanent
-sudo firewall-cmd --zone=public --add-port=18812/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=57911/tcp --permanent
 sudo firewall-cmd --zone=public --add-port=10090-10100/tcp --permanent
 sudo firewall-cmd --reload
 ```

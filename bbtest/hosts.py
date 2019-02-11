@@ -9,7 +9,6 @@ import shutil
 import tarfile
 import tempfile
 import time
-from ftplib import FTP
 import rpyc
 import glob
 import psutil
@@ -23,7 +22,7 @@ except Exception:
 from .exceptions import ImproperlyConfigured
 
 SYNC_REQUEST_TIMEOUT = 120
-DEFAULT_RPYC_SERVER_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911)
+DEFAULT_RPYC_SERVER_PORT = int(os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911))
 INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
 platform_shotname_re = re.compile('.*(windows|debian|centos).*')
 
@@ -155,6 +154,9 @@ class BaseHost(object):
         self.chmod_777(dst)
         return dst
 
+    def _relative_remote(self, remote):
+        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')).replace('\\', '/')
+
 
 class LocalHost(BaseHost):
     """Suppose to be an os-agnostic local host."""
@@ -192,9 +194,6 @@ class LocalHost(BaseHost):
     def set_client_timeout(self, timeout):
         # todo implement so users can set upper timeout (no need increase, just limit)
         pass
-
-    def _relative_remote(self, remote):
-        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, '').lstrip('/'))
 
 
 class LocalWindowsHost(LocalHost):
@@ -263,7 +262,7 @@ class RemoteHost(BaseHost):
     """
 
     def __init__(self, ip=None, auth=None, *args, **kwargs):
-        """ Initialise remote host - open FTP and rpyc connections.
+        """ Initialise remote host - open rpyc connections.
 
         :param ip:
         :param auth:
@@ -271,15 +270,6 @@ class RemoteHost(BaseHost):
         super().__init__(*args, **kwargs)
         self.ip = str(ip)
         self.auth = auth
-        self.ftp = FTP(self.ip)
-        try:
-            if auth:
-                self.ftp.login(self.auth[0], self.auth[1])
-            else:
-                # Assume anonymous
-                self.ftp.login()
-        except Exception as e:
-            raise ConnectionError(f'Failed to connect to FTP server on host {self.ip} - {e}')
         rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         self._start_rpyc()
 
@@ -314,7 +304,7 @@ class RemoteHost(BaseHost):
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
         # update of bbtest on remote host.
         # todo: consider replace all code below with atomic commands directly over self.modeules
-        rc = self.run_python3(['-m', 'pip', 'install', '-U'] + bbtest_remote)
+        rc = self.run_python3(['-m', 'pip', 'install', '-U', '--no-cache-dir'] + bbtest_remote)
         if self.is_linux:
             try:
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
@@ -325,16 +315,15 @@ class RemoteHost(BaseHost):
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
-        relative_remote = self._relative_remote(remote)
-        self.ftp.storbinary(f'STOR {relative_remote}', open(local, 'rb'))
-        dst = os.path.join(self.root_path, relative_remote).replace('\\', '/')
+        dst = self._relative_remote(remote)
+        rpyc.utils.classic.upload_file(self._rpyc, local, dst)
         self.chmod_777(dst)
         return dst
 
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         relative_remote = self._relative_remote(remote)
-        self.ftp.retrbinary(f'RETR {relative_remote}', open(local, 'wb').write)
+        rpyc.utils.classic.download_file(self._rpyc, relative_remote, local)
         return local
 
     def run(self, args, **kwargs):
@@ -357,14 +346,12 @@ class RemoteHost(BaseHost):
         self._rpyc._config['sync_request_timeout'] = timeout
 
     def _start_rpyc(self):
+        port = self.params.get('port', DEFAULT_RPYC_SERVER_PORT)
         try:
-            self._rpyc = rpyc.classic.connect(self.ip, port=DEFAULT_RPYC_SERVER_PORT)
+            self._rpyc = rpyc.classic.connect(self.ip, port=port)
         except Exception as e:
-            raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} - {e}')
+            raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} port {port} - {e}')
         self.modules = self._rpyc.modules
-
-    def _relative_remote(self, remote):
-        return remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
 
 
 class WindowsHost(RemoteHost):
