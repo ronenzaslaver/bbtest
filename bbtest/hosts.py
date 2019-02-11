@@ -32,11 +32,7 @@ logger = logging.getLogger('bblog')
 
 def getmodule(name):
     """imports an arbitrary module"""
-    try:
-        module = __import__(name, None, None, "*")
-    except Exception as _:
-        module = __import__(f'bbtest.{name}', None, None, "*")
-    return module
+    return __import__(name, None, None, "*")
 
 
 class BaseHost(object):
@@ -130,7 +126,7 @@ class BaseHost(object):
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
-        output = self.modules.target.subprocess_run(args, **shutils_kwargs)
+        output = self.modules.bbtest.target.subprocess_run(args, **shutils_kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -155,7 +151,7 @@ class BaseHost(object):
         return self.SEP.join(args)
 
     def download_file(self, src_url, dst_path):
-        dst = self.modules.target.download_file(src_url, dst_path)
+        dst = self.modules.bbtest.target.download_file(src_url, dst_path)
         self.chmod_777(dst)
         return dst
 

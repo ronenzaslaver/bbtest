@@ -1,8 +1,7 @@
 #!/bin/bash
 # todo: Should we re-write in python so it will be cross-platform?
 
-# todo: Get from mandatory user input
-export USER=yoram
+export USER=$1
 # todo: Get from optional user input
 export INDEX=dev
 export PASSWORD=123

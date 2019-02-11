@@ -8,6 +8,7 @@ from rpyc.utils.server import ThreadedServer
 from rpyc.utils.classic import DEFAULT_SERVER_PORT, DEFAULT_SERVER_SSL_PORT
 from rpyc.utils.authenticators import SSLAuthenticator
 
+from bbtest.hosts import getmodule
 
 DEFAULT_RPYC_SERVER_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911)
 DEFAULT_RPYC_SERVER_SSL_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_SSL_PORT', 57911)
@@ -16,11 +17,7 @@ DEFAULT_RPYC_SERVER_SSL_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_SSL_PO
 class BbtestSlave(rpyc.core.service.Slave):
     def getmodule(self, name):
         """imports an arbitrary module"""
-        try:
-            module = __import__(name, None, None, "*")
-        except Exception as _:
-            module = __import__(f'bbtest.{name}', None, None, "*")
-        return module
+        return getmodule(name)
 
 
 class BbtestService(BbtestSlave, rpyc.Service):
