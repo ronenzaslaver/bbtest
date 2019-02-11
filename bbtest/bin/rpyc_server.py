@@ -2,50 +2,18 @@
 
 import os
 from plumbum import cli
-import rpyc
 from rpyc.lib import setup_logger
 from rpyc.utils.server import ThreadedServer
 from rpyc.utils.classic import DEFAULT_SERVER_PORT, DEFAULT_SERVER_SSL_PORT
 from rpyc.utils.authenticators import SSLAuthenticator
 
-from bbtest.hosts import getmodule
+from bbtest.rpyc import BBtestService
 
 DEFAULT_RPYC_SERVER_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911)
 DEFAULT_RPYC_SERVER_SSL_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_SSL_PORT', 57911)
 
 
-class BbtestSlave(rpyc.core.service.Slave):
-    def getmodule(self, name):
-        """imports an arbitrary module"""
-        return getmodule(name)
-
-
-class BbtestService(BbtestSlave, rpyc.Service):
-    """The SlaveService allows the other side to perform arbitrary imports and
-    execution arbitrary code on the server. This is provided for compatibility
-    with the classic RPyC (2.6) modus operandi.
-
-    This service is very useful in local, secure networks, but it exposes
-    a **major security risk** otherwise."""
-    __slots__ = ()
-
-    def on_connect(self, conn):
-        self._conn = conn
-        self._conn._config.update(dict(
-            allow_all_attrs=True,
-            allow_pickle=True,
-            allow_getattr=True,
-            allow_setattr=True,
-            allow_delattr=True,
-            allow_exposed_attrs=False,
-            import_custom_exceptions=True,
-            instantiate_custom_exceptions=True,
-            instantiate_oldstyle_exceptions=True,
-        ))
-        super(BbtestService, self).on_connect(conn)
-
-
-class BbtestServer(cli.Application):
+class BBtestServer(cli.Application):
 
     host = cli.SwitchAttr(["--host"], str, default="127.0.0.1", group="Socket Options",
                           help="The host to bind to. Default is localhost")
@@ -79,12 +47,12 @@ class BbtestServer(cli.Application):
 
         setup_logger(self.quiet, self.logfile)
 
-        server = ThreadedServer(BbtestService, hostname=self.host, port=self.port, authenticator=self.authenticator)
+        server = ThreadedServer(BBtestService, hostname=self.host, port=self.port, authenticator=self.authenticator)
         server.start()
 
 
 def main():
-    BbtestServer()
+    BBtestServer().start()
 
 
 if __name__ == "__main__":

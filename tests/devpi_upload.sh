@@ -1,6 +1,9 @@
 #!/bin/bash
 # todo: Should we re-write in python so it will be cross-platform?
 
+export SKIP_GENERATE_AUTHORS=1
+export SKIP_WRITE_GIT_CHANGELOG=1
+
 export USER=$1
 # todo: Get from optional user input
 export INDEX=dev
