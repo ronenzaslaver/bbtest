@@ -9,7 +9,6 @@ import shutil
 import tarfile
 import tempfile
 import time
-from ftplib import FTP
 import rpyc
 import glob
 import psutil
@@ -20,11 +19,10 @@ try:
 except Exception:
     pass
 
-from bbtest import target
 from .exceptions import ImproperlyConfigured
 
 SYNC_REQUEST_TIMEOUT = 120
-PROCESS_QUERY_RETRIES = os.environ.get('BBTEST_PROCESS_QUERY_RETRIES', 1)
+DEFAULT_RPYC_SERVER_PORT = int(os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911))
 INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
 platform_shotname_re = re.compile('.*(windows|debian|centos).*')
 
@@ -96,6 +94,14 @@ class BaseHost(object):
     def name(self):
         return self.params.get('name', self.hostname)
 
+    @property
+    def is_local(self):
+        return isinstance(self, LocalHost)
+
+    @property
+    def is_remote(self):
+        return isinstance(self, RemoteHost)
+
     def rmfiles(self, top):
         try:
             for root, dirs, files in self.modules.os.walk(top):
@@ -119,7 +125,7 @@ class BaseHost(object):
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
-        output = self.target.subprocess_run(args, **shutils_kwargs)
+        output = self.modules.bbtest.target.subprocess_run(args, **shutils_kwargs)
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -144,9 +150,12 @@ class BaseHost(object):
         return self.SEP.join(args)
 
     def download_file(self, src_url, dst_path):
-        dst = self.target.download_file(src_url, dst_path)
+        dst = self.modules.bbtest.target.download_file(src_url, dst_path)
         self.chmod_777(dst)
         return dst
+
+    def _relative_remote(self, remote):
+        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')).replace('\\', '/')
 
 
 class LocalHost(BaseHost):
@@ -156,7 +165,6 @@ class LocalHost(BaseHost):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.modules = rpyc.core.service.ModuleNamespace(getmodule)
-        self.target = target
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -167,15 +175,6 @@ class LocalHost(BaseHost):
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
-
-    @staticmethod
-    def is_process_running(proc_name, retries=PROCESS_QUERY_RETRIES):
-        for _ in range(0, retries):
-            for proc in psutil.process_iter():
-                if proc.name() == proc_name:
-                    return True
-            time.sleep(1)
-        return False
 
     @staticmethod
     def open_key(parent_key, key):
@@ -192,8 +191,9 @@ class LocalHost(BaseHost):
             # todo add the actual file extension to exception
             raise NotImplementedError('File extension is not supported')
 
-    def _relative_remote(self, remote):
-        return os.path.join(self.root_path, remote.replace('\\', '/').replace(self.root_path, '').lstrip('/'))
+    def set_client_timeout(self, timeout):
+        # todo implement so users can set upper timeout (no need increase, just limit)
+        pass
 
 
 class LocalWindowsHost(LocalHost):
@@ -262,7 +262,7 @@ class RemoteHost(BaseHost):
     """
 
     def __init__(self, ip=None, auth=None, *args, **kwargs):
-        """ Initialise remote host - open FTP and rpyc connections.
+        """ Initialise remote host - open rpyc connections.
 
         :param ip:
         :param auth:
@@ -270,15 +270,6 @@ class RemoteHost(BaseHost):
         super().__init__(*args, **kwargs)
         self.ip = str(ip)
         self.auth = auth
-        try:
-            self.ftp = FTP(self.ip)
-            if auth:
-                self.ftp.login(auth[0], auth[1])
-            else:
-                # Assume anonymous
-                self.ftp.login()
-        except Exception as e:
-            raise ConnectionError(f'Failed to connect to FTP server on host {ip} - {e}')
         rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
         self._start_rpyc()
 
@@ -313,7 +304,7 @@ class RemoteHost(BaseHost):
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
         # update of bbtest on remote host.
         # todo: consider replace all code below with atomic commands directly over self.modeules
-        rc = self.run_python3(['-m', 'pip', 'install', '-U'] + bbtest_remote)
+        rc = self.run_python3(['-m', 'pip', 'install', '-U', '--no-cache-dir'] + bbtest_remote)
         if self.is_linux:
             try:
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
@@ -324,47 +315,43 @@ class RemoteHost(BaseHost):
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
-        relative_remote = self._relative_remote(remote)
-        self.ftp.storbinary(f'STOR {relative_remote}', open(local, 'rb'))
-        dst = os.path.join(self.root_path, relative_remote).replace('\\', '/')
+        dst = self._relative_remote(remote)
+        rpyc.utils.classic.upload_file(self._rpyc, local, dst)
         self.chmod_777(dst)
         return dst
 
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         relative_remote = self._relative_remote(remote)
-        self.ftp.retrbinary(f'RETR {relative_remote}', open(local, 'wb').write)
+        rpyc.utils.classic.download_file(self._rpyc, relative_remote, local)
         return local
 
     def run(self, args, **kwargs):
         rpyc_kwargs = {k: v for k, v in kwargs.items() if k in self._rpyc._config}
         for key, value in rpyc_kwargs.items():
             self._rpyc._config[key] = value
-        self._rpyc._config['sync_request_timeout'] = kwargs.pop('timeout', self._rpyc._config['sync_request_timeout'])
+        self.set_client_timeout(kwargs.pop('timeout', self._rpyc._config['sync_request_timeout']))
         try:
             output = super().run(args, **kwargs)
         except Exception as e:
             raise e
         finally:
-            self._rpyc._config['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
+            self.set_client_timeout(SYNC_REQUEST_TIMEOUT)
         return output
-
-    def is_process_running(self, process, timeout=1):
-        return self.modules.bbtest.LocalHost.is_process_running(process, timeout)
 
     def untar_file(self, path):
         return self.modules.bbtest.LocalHost().untar_file(path)
 
-    def _start_rpyc(self):
-        try:
-            self._rpyc = rpyc.classic.connect(self.ip)
-        except Exception as e:
-            raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} - {e}')
-        self.modules = self._rpyc.modules
-        self.target = self.modules.bbtest.target
+    def set_client_timeout(self, timeout):
+        self._rpyc._config['sync_request_timeout'] = timeout
 
-    def _relative_remote(self, remote):
-        return remote.replace('\\', '/').replace(self.root_path, '').lstrip('/')
+    def _start_rpyc(self):
+        port = self.params.get('port', DEFAULT_RPYC_SERVER_PORT)
+        try:
+            self._rpyc = rpyc.classic.connect(self.ip, port=port)
+        except Exception as e:
+            raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} port {port} - {e}')
+        self.modules = self._rpyc.modules
 
 
 class WindowsHost(RemoteHost):

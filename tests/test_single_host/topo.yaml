@@ -1,15 +1,16 @@
-# List of hosts to run tests on.
+# List of single host topologies to run tests on.
+#
 # os: the OS of the host - local, win, linux or osx
 # pip-index: pypi server IP and arguments 'http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40' or full path to
 #            package location on disk.
 # ip: IP address of host
-# auth: list of FTP user, leave empty for anonymous, FTP password, leave empty for anonymous
+# auth: list of (FTP user, FTP password) leave empty for anonymous
 #
 # Example:
 #-
 #  os: linux
 #  ip: <host ip>
-#  pypi: <devpi ip>/<user name>/<index>/ --trusted-host <devpi ip>
+#  pip-index: <devpi ip>/<user name>/<index>/ --trusted-host <devpi ip>
 #  auth:
 #    - bbtest
 #    - bbtest
