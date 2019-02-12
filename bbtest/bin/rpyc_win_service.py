@@ -102,7 +102,8 @@ def main():
     site_packages = os.path.join(os.path.dirname(sys.executable), 'Lib', 'site-packages')
     src = os.path.join(os.path.join(site_packages, 'pywin32_system32', 'pywintypes37.dll'))
     dst = os.path.join(os.path.join(site_packages, 'win32', 'pywintypes37.dll'))
-    shutil.copy(src, dst)
+    if not os.path.isfile(dst):
+        shutil.copy(src, dst)
     BBtestWinServiceAdapter.service_main()
 
 
