@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API" href="../API.html" />
@@ -45,66 +46,15 @@ The client host runs a <a class="reference internal" href="../API.html#bbtest.bl
 that creates a temporary folder on install and store it in <cite>self.path</cite>.
 On clean - which happens before every test method - it removes all the files
 from home and on unistall, removes the dir.</p>
-<p>For a server we use <a class="reference internal" href="../API.html#bbtest.blackboxes.SpyServerBox" title="bbtest.blackboxes.SpyServerBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.SpyServerBox</span></code></a> that logs all
+<p>For a server we use <code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.SpyServerBox</span></code> that logs all
 POSTed messages so we can assert a message was recieved.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">It’s possible to run both boxes on a single host and simplify the suite</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; Code to answer: How to test an installer?</span>
-
-<span class="sd">This Module includes the test suite that verifies the installer using the</span>
-<span class="sd">black box methodology.</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span>
-
-<span class="kn">import</span> <span class="nn">bbtest</span>
-
-
-<span class="k">class</span> <span class="nc">InstallerTest</span><span class="p">(</span><span class="n">bbtest</span><span class="o">.</span><span class="n">BBTestCase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;This test case test a simple installer.</span>
-
-<span class="sd">    Our sample installer gets one parameter - the server address - and</span>
-<span class="sd">    installs a scripts that posts the message &quot;Hello Sara&quot; to the server.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">LAB</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="p">,</span>
-            <span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">bbtest</span><span class="o">.</span><span class="n">HomeBox</span><span class="p">],</span>
-         <span class="p">},</span>
-        <span class="s1">&#39;server&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="p">,</span>
-            <span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">bbtest</span><span class="o">.</span><span class="n">SpyServerBox</span><span class="p">],</span>
-         <span class="p">},</span>
-    <span class="p">}</span>
-
-    <span class="n">FILENAME</span> <span class="o">=</span> <span class="s1">&#39;installer.sh&#39;</span>
-
-    <span class="k">def</span> <span class="nf">test_install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">server_box</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">bbtest</span><span class="o">.</span><span class="n">SpyServerBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">home_box</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">bbtest</span><span class="o">.</span><span class="n">HomeBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">host</span>        <span class="o">=</span> <span class="n">home_box</span><span class="o">.</span><span class="n">host</span>
-        <span class="n">src_path</span>    <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
-                                    <span class="bp">self</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">)</span>
-        <span class="n">home_box</span><span class="o">.</span><span class="n">run_file</span><span class="p">(</span><span class="n">src_path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="n">server_box</span><span class="o">.</span><span class="n">url</span><span class="p">])</span>
-
-        <span class="n">exec_path</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">home_box</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;bbtest.installer.example.sh&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">host</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">exec_path</span><span class="p">))</span>
-
-        <span class="n">home_box</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">exec_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">server_box</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Hello Sara!&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
 <div class="section" id="the-installer">
 <h2>The Installer<a class="headerlink" href="#the-installer" title="Permalink to this headline">¶</a></h2>
 <p>It is just a simple shell script:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
-<span class="n">echo</span> <span class="s1">&#39;#!/bin/sh&#39;</span> <span class="o">&gt;</span> <span class="o">./</span><span class="n">bbtest</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">sh</span> 
-<span class="n">echo</span> <span class="s2">&quot;curl --data &#39;Hello Sara!&#39; $1&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">./</span><span class="n">bbtest</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">sh</span> 
-<span class="n">chmod</span> <span class="o">+</span><span class="n">x</span> <span class="o">./</span><span class="n">bbtest</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">sh</span>
-</pre></div>
-</div>
 </div>
 </div>
 
@@ -174,7 +124,7 @@ POSTed messages so we can assert a message was recieved.</p>
       &copy;2018, Yoram Shamir & Benny Daon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -38,34 +39,47 @@
 
 <div class="viewcode-block" id="Lab"><a class="viewcode-back" href="../../API.html#bbtest.labs.Lab">[docs]</a><span class="k">class</span> <span class="nc">Lab</span><span class="p">():</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lab</span><span class="p">,</span> <span class="n">address_book</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topology</span><span class="o">=</span><span class="p">{},</span> <span class="n">address_book</span><span class="o">=</span><span class="p">{}):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param lab: a dictionary where each hostname has</span>
-<span class="sd">                    a dictionary with `image` &amp; `boxes`</span>
+<span class="sd">        :param topology: a dictionary representing the topology of the test setup.</span>
+<span class="sd">                         each hostname in the dictionary is a dictionary with `class` &amp; `boxes`</span>
 <span class="sd">        :param address_book: a dictionary where each hostname has</span>
 <span class="sd">                             a dictionary with ip, username &amp; password</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">host_name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">lab</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pip_index</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pip_index&#39;</span><span class="p">,</span> <span class="s1">&#39;https://pypi.org/simple&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;auth&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;hosts&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">topology</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">host_name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">topology</span><span class="p">[</span><span class="s1">&#39;hosts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="s1">&#39;class&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Host &#39;</span><span class="si">{host_name}</span><span class="s2">&#39; must have a `class` key&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;boxes&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Host &#39;</span><span class="si">{host_name}</span><span class="s2">&#39; must have a `boxes` key&quot;</span><span class="p">)</span>
             <span class="n">host_class</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">host</span> <span class="o">=</span> <span class="n">host_class</span><span class="p">(</span><span class="o">**</span><span class="n">address_book</span><span class="p">[</span><span class="n">host_name</span><span class="p">])</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="n">host_class</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">host_name</span><span class="p">,</span> <span class="n">pip_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pip_index</span><span class="p">,</span> <span class="o">**</span><span class="n">address_book</span><span class="p">[</span><span class="n">host_name</span><span class="p">])</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="c1"># TODO: allocate a host, use params[&#39;image&#39;]</span>
-                <span class="n">host</span> <span class="o">=</span> <span class="n">host_class</span><span class="p">()</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="n">host_class</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">host_name</span><span class="p">,</span> <span class="n">pip_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pip_index</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span><span class="p">[</span><span class="n">host_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">host</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span><span class="p">[</span><span class="n">host_name</span><span class="p">]</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;package&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
             <span class="c1"># let there be boxes!</span>
             <span class="k">for</span> <span class="n">box_class</span> <span class="ow">in</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;boxes&#39;</span><span class="p">]:</span>
-                <span class="n">new_box</span> <span class="o">=</span> <span class="n">box_class</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
-                <span class="n">new_box</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
-                <span class="n">box_name</span> <span class="o">=</span> <span class="n">new_box</span><span class="o">.</span><span class="n">NAME</span>
-                <span class="k">if</span> <span class="n">box_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">box_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_box</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">box_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_box</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_box</span><span class="p">(</span><span class="n">box_class</span><span class="p">,</span> <span class="n">host</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Lab.add_box"><a class="viewcode-back" href="../../API.html#bbtest.labs.Lab.add_box">[docs]</a>    <span class="k">def</span> <span class="nf">add_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box_class</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="n">new_box</span> <span class="o">=</span> <span class="n">box_class</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+        <span class="n">new_box</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+        <span class="n">box_name</span> <span class="o">=</span> <span class="n">new_box</span><span class="o">.</span><span class="n">NAME</span>
+        <span class="k">if</span> <span class="n">box_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">box_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_box</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">box_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_box</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">new_box</span></div>
 
 <div class="viewcode-block" id="Lab.flatten_boxes"><a class="viewcode-back" href="../../API.html#bbtest.labs.Lab.flatten_boxes">[docs]</a>    <span class="k">def</span> <span class="nf">flatten_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; an iterator returning  one box after the other &quot;&quot;&quot;</span>
@@ -78,7 +92,7 @@
         <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten_boxes</span><span class="p">():</span>
             <span class="n">box</span><span class="o">.</span><span class="n">uninstall</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">host</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+            <span class="n">host</span><span class="o">.</span><span class="n">uninstall</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">boxes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hosts</span> <span class="o">=</span> <span class="p">{}</span></div>
 
@@ -149,7 +163,7 @@
       &copy;2018, Yoram Shamir & Benny Daon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

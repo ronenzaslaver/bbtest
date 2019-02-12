@@ -13,6 +13,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Test a simple Installer" href="installer.html" />
@@ -75,91 +76,7 @@ Actions:
 </div>
 <p>To test this component we need to first code a class based on <a class="reference internal" href="../API.html#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a> that install,
 removes and runs the script.</p>
-<dl class="class">
-<dt id="examples.todo.tests.todo_box.ToDoBox">
-<em class="property">class </em><code class="descclassname">examples.todo.tests.todo_box.</code><code class="descname">ToDoBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/examples/todo/tests/todo_box.html#ToDoBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../API.html#bbtest.blackboxes.HomeBox" title="bbtest.blackboxes.HomeBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.HomeBox</span></code></a></p>
-<p>A black box wrapper for todo.sh.
-Like every black box, the todo box has the <cite>install</cite> and <cite>clean</cite>
-(TODO: uninstall?) methods. On top of that we have methods to be used
-by the test coders to poke the box and peek into it.</p>
-<dl class="attribute">
-<dt id="examples.todo.tests.todo_box.ToDoBox.NAME">
-<code class="descname">NAME</code><em class="property"> = 'todo'</em><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="examples.todo.tests.todo_box.ToDoBox.add">
-<code class="descname">add</code><span class="sig-paren">(</span><em>todo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/examples/todo/tests/todo_box.html#ToDoBox.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a to do.
-Add is a <em>Porceline method</em> - one that adds only a shining interface.
-The same function can be achived by using the low level, aka <cite>plumbing</cite>
-methods.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="examples.todo.tests.todo_box.ToDoBox.clean">
-<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/examples/todo/tests/todo_box.html#ToDoBox.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.clean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clean’s job is to wipe all data. In todo’s case, it’s just a file</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="examples.todo.tests.todo_box.ToDoBox.install">
-<code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/examples/todo/tests/todo_box.html#ToDoBox.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.install" title="Permalink to this definition">¶</a></dt>
-<dd><p>installing todo.txt
-First creates a temp dir on the host and then copies the assets
-in. On Linux, we need to make sure <cite>todo.sh</cite> is executable.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="examples.todo.tests.todo_box.ToDoBox.list">
-<code class="descname">list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/examples/todo/tests/todo_box.html#ToDoBox.list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of todos.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="examples.todo.tests.todo_box.ToDoBox.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/examples/todo/tests/todo_box.html#ToDoBox.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove our home directory</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="examples.todo.tests.todo_box.ToDoBox.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/examples/todo/tests/todo_box.html#ToDoBox.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#examples.todo.tests.todo_box.ToDoBox.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pass the args to a todo.sh running on the host. See <cite>todo.sh -h</cite>
-for more details.</p>
-</dd></dl>
-
-</dd></dl>
-
 <p>Using this component, we code a test suite :</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot; How to test a todo?</span>
-
-<span class="sd">This Module includes the test suite that verifies the todo component using</span>
-<span class="sd">a black box methodology.</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">bbtest</span>
-
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">ToDoBox</span>
-
-
-<span class="k">class</span> <span class="nc">ToDoTest</span><span class="p">(</span><span class="n">bbtest</span><span class="o">.</span><span class="n">BBTestCase</span><span class="p">):</span>
-
-    <span class="n">LAB</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;host1&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="p">,</span>
-            <span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">ToDoBox</span><span class="p">],</span>
-         <span class="p">},</span>
-    <span class="p">}</span>
-
-    <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">box</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lab</span><span class="o">.</span><span class="n">boxes</span><span class="p">[</span><span class="n">ToDoBox</span><span class="o">.</span><span class="n">NAME</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">box</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;Foo&quot;</span><span class="p">)</span>
-        <span class="n">todos</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">todos</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Foo&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
 </div>
 
 
@@ -228,7 +145,7 @@ for more details.</p>
       &copy;2018, Yoram Shamir & Benny Daon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

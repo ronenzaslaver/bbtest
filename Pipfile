@@ -19,6 +19,7 @@ rpyc = "*"
 pyyaml = "*"
 pexpect = "*"
 pytest = "*"
+pytest-xdist = "*"
 
 [requires]
 python_version = "3.7"
