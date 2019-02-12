@@ -33,13 +33,17 @@ class Lab():
             self.hosts[host_name] = host
             self.hosts[host_name].install(package=params.get('package', None))
             # let there be boxes!
-            for box_class in params['boxes']:
-                self.add_box(box_class, host)
+            for box_name, box_params in params['boxes'].items():
+                self.add_box(box_params['class'], host, box_name, box_params)
 
-    def add_box(self, box_class, host):
-        new_box = box_class(host)
+    def add_box(self, box_class, host, name, params={}):
+        """Adding a new box to the lab"""
+        new_box = box_class(host, **params)
         new_box.install()
-        box_name = new_box.NAME
+
+        box_name = name if name else new_box.NAME
+        new_box.name = box_name
+
         if box_name in self.boxes:
             self.boxes[box_name].append(new_box)
         else:

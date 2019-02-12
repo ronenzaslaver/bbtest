@@ -14,9 +14,9 @@ class BlackBox():
     A blackbox runs on a host and you can communicate with it using `host.run`
     """
 
-    def __init__(self, host, name=None):
+    def __init__(self, host, **kwargs):
         self.host = host
-        self.name = name if name else self.__class__.__name__[:-3].lower()
+        self.params = kwargs
 
     def install(self):
         """Installing the black box on `self.host`"""
