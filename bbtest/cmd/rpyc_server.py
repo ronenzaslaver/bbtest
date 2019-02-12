@@ -7,13 +7,13 @@ from rpyc.utils.server import ThreadedServer
 from rpyc.utils.classic import DEFAULT_SERVER_PORT, DEFAULT_SERVER_SSL_PORT
 from rpyc.utils.authenticators import SSLAuthenticator
 
-from bbtest.rpyc import BBtestService
+from bbtest.rpyc import BBTestService
 
 DEFAULT_RPYC_SERVER_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911)
 DEFAULT_RPYC_SERVER_SSL_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_SSL_PORT', 57911)
 
 
-class BBtestServer(cli.Application):
+class BBHost(cli.Application):
 
     host = cli.SwitchAttr(["--host"], str, default="127.0.0.1", group="Socket Options",
                           help="The host to bind to. Default is localhost")
@@ -47,12 +47,12 @@ class BBtestServer(cli.Application):
 
         setup_logger(self.quiet, self.logfile)
 
-        server = ThreadedServer(BBtestService, hostname=self.host, port=self.port, authenticator=self.authenticator)
+        server = ThreadedServer(BBTestService, hostname=self.host, port=self.port, authenticator=self.authenticator)
         server.start()
 
 
 def main():
-    BBtestServer().start()
+    BBHost().start()
 
 
 if __name__ == "__main__":

@@ -8,27 +8,27 @@ import win32service
 import win32event
 import servicemanager
 from rpyc.utils.server import ThreadedServer
-from bbtest.rpyc import BBtestService
+from bbtest.rpyc import BBTestService
 import shutil
 
 
 DEFAULT_RPYC_SERVER_PORT = os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911)
 
 
-class BBtestWinService(object):
+class BBTestWinService(object):
     """A container for an RPyC server serving our bbtest RPyC logic"""
     HOSTNAME = "0.0.0.0"
     SERVER_LOG_DIR = "C:\\Users\\bbtest\\logs"
-    SERVER_LOG_FILENAME = "BBtest_server_service.log"
+    SERVER_LOG_FILENAME = "BBTest_server_service.log"
     FALLBACK_LOG_DIR = "C:\\Temp"
 
     def __init__(self):
-        # this is the actual server of the underlying rpyc package
+        """The server of the underlying rpyc package"""
         self._rpyc_server = None
 
     def start_rpyc_server(self):
         self._init_logger()
-        self._rpyc_server = ThreadedServer(BBtestService, hostname=self.HOSTNAME, port=DEFAULT_RPYC_SERVER_PORT,
+        self._rpyc_server = ThreadedServer(BBTestService, hostname=self.HOSTNAME, port=DEFAULT_RPYC_SERVER_PORT,
                                            logger=self.logger)
         self._rpyc_server.start()
 
@@ -47,7 +47,10 @@ class BBtestWinService(object):
         self.logger.addHandler(handler)
 
     def _init_logger_dir(self):
-        # create log directory if needed, and in case of failure, fall back to an always-present directory
+        """Create log directory if needed.
+
+        In case of failure, fall back to an always-present directory
+        """
         if os.path.isdir(self.SERVER_LOG_DIR):
             self.log_dir = self.SERVER_LOG_DIR
         else:
@@ -60,17 +63,17 @@ class BBtestWinService(object):
                 self.log_dir = self.FALLBACK_LOG_DIR
 
 
-class BBtestWinServiceAdapter(win32serviceutil.ServiceFramework):
+class BBTestWinServiceAdapter(win32serviceutil.ServiceFramework):
     """Windows service implementing the Rpyc server"""
     # standard members
-    _svc_name_ = "BBtestServer"
-    _svc_display_name_ = "BBtest Server"
-    _svc_description = "BBtest server"
+    _svc_name_ = "BBTestServer"
+    _svc_display_name_ = "BBTest Server"
+    _svc_description = "BBTest server"
 
     def __init__(self, args):
         # no super - we inherit from an old-style class (yuck)
         win32serviceutil.ServiceFramework.__init__(self, args)
-        self.rpyc_server = BBtestWinService()
+        self.rpyc_server = BBTestWinService()
         self.stop_event = win32event.CreateEvent(None, 0, 0, None)
         socket.setdefaulttimeout(60)
 
@@ -104,7 +107,7 @@ def main():
     dst = os.path.join(os.path.join(site_packages, 'win32', 'pywintypes37.dll'))
     if not os.path.isfile(dst):
         shutil.copy(src, dst)
-    BBtestWinServiceAdapter.service_main()
+    BBTestWinServiceAdapter.service_main()
 
 
 if __name__ == '__main__':

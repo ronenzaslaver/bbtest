@@ -49,8 +49,8 @@ You can find some tips on FTP and Python installations in the [INSTALLATIONS.md]
 
 Once FTP and Python 3.7 are installed, download and start python RPyC server:
 ```bash
-$ pip3 install rpyc
-$ rpyc_classic.py --host 0.0.0.0
+$ pip3 install -i http://cyber-devpi.cyberdomain.local/root/cr --trusted-host cyber-devpi.cyberdomain.local bbtest
+$ bbhost --host 0.0.0.0
 ```
 
 Now it's time to install bbtest package and run tests. When you run tests, bbtest runner will need to update bbtest
