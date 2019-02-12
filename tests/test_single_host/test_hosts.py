@@ -12,7 +12,7 @@ import subprocess
 import os
 import pathlib
 
-from bbtest import RemoteHost, BBPytest, HomeBox
+from bbtest import RemoteHost, LocalHost, BBPytest, HomeBox
 from tests.test_utils import get_temp_dir
 from tests.mytodo_box import MyToDoBox
 
@@ -103,10 +103,13 @@ class TestHosts(BBPytest):
         else:
             self.host.modules.time.sleep(2)
 
-    def test_os_platform(self):
+    def test_host_properties(self):
         assert self.host.os in ['windows', 'linux']
         assert self.host.os_bits in [32, 64]
         assert self.host.platform in ['windows', 'debian', 'centos']
+        assert self.host.is_local is not self.host.is_remote
+        assert isinstance(self.host, LocalHost) != self.host.is_remote
+        assert isinstance(self.host, RemoteHost) != self.host.is_local
 
     def _create_temp_file(self):
         local_temp_file = os.path.join(get_temp_dir(), 'temp_file')
