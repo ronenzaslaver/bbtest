@@ -1,10 +1,24 @@
 
 import os
-import psutil
+import platform
 import time
+import psutil
+from psutil import NoSuchProcess
+
+from bbtest.target import subprocess_run
 
 
 PROCESS_TIMEOUT_RETRIES = os.environ.get('BBTEST_PROCESS_TIMEOUT_RETRIES', 1)
+
+
+def is_winodws():
+    return 'windows' in platform.system().lower()
+
+def is_linux():
+    return 'linux' in platform.system().lower()
+
+def is_mac():
+    return 'Darwin' in platform.system().lower()
 
 
 def is_process_running(id, timeout=PROCESS_TIMEOUT_RETRIES):
@@ -42,3 +56,18 @@ def find_process_by_name(name):
         if name == name_ or (cmdline and cmdline[0]) == name or os.path.basename(exe) == name:
             processes.append(name)
     return processes
+
+
+def is_service_running(name):
+    if is_winodws():
+        try:
+            return psutil.win_service_get(name).status() == 'running'
+        except NoSuchProcess:
+            return False
+    elif is_linux():
+        return True if os.system(f'service {name} status') == 0 else False
+    elif is_mac():
+        command = f'sudo launchctl list | awk \'$3=="{name}" {{ print $2 }}\''
+        return True if subprocess_run.target.run(command, shell=True)[0] == '0' else False
+    else:
+        raise NotImplementedError('Sorry, operating system is not suuported')

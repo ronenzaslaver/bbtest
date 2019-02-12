@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+* looking for a process that do exists
+* remove ftp from code, still in docs
+* fix comments on pull request #11
 * rpyc\_server entry point
 * set\_client\_timeout
 * first version of customized rpyc\_server.py
