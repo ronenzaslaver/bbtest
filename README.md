@@ -29,13 +29,17 @@ $ pipenv install --dev
 
 Make sure Python interpreter points to pipenv on your IDE.
 
-For PyCharm users:
-
-Go to File --> Settings --> Project Interpreter --> Click on Setting (top right, wheel icon)
---> Add --> Choose Pipenv Environment --> In Pipenv executable, point to pipenv.exe
-(Pycharm should auto detect). Default path: C:\Python37\Scripts\pipenv.exe
+For PyCharm users, Pycharm should auto detect pipenv (from Pycharm version 2018.2 and above).
 
 Note: If Pipenv Environment is missing, make sure your Pycharm version supports pipenv.
+
+If Pycharm not auto detecting, please add manually the following:
+
+Go to File --> Settings --> Project Interpreter --> Click on Setting (top right, wheel icon)
+--> Add --> Choose Pipenv Environment --> In Pipenv executable, point to pipenv.exe.
+Default path: C:\Python37\Scripts\pipenv.exe
+
+
 
 To run tests on local machine simply run
 ```bash
@@ -63,8 +67,15 @@ If you select to use pypi server you need to upload the new bbtest package to th
 [devpi](https://devpi.net/docs/devpi/devpi/stable/%2Bd/index.html) server to mirror PyPi and store bbtest package amd
 devpi package is installed as part of bbtest pipenv.
 
+On the runner machine:
+- Install devpi
+```bash
+$ pip install devpi
+```
+
 - Create user on devpi server:
-Cybereason pypi server is cyber-devpi.cyberdomain.local.
+Cybereason pypi server is "cyber-devpi.cyberdomain.local".
+
 Note: Sometimes the devpi command fails (fail to login, fail to use, etc.) in Windows Git Bash. If this happens, try 
 running the commands in native Windows CMD.
 ```bash
@@ -74,20 +85,21 @@ $ devpi login <your name> <your password>
 $ devpi index -c dev bases=root/pypi
 $ devpi use http://<devpi server>/<your name>/dev
 ```
- 
+
 - Upload
 ```bash
+$ cd <bbtest project root folder>
 $ devpi upload
 ```
 The upload command creates bbtest package under  dist/ folder (e.g. dist/bbtest-0.0.1.dev191.zip) and uploads the
-package to devpi server under http://<devpi server>/<your name>/dev index.
+package to devpi server under "http://<devpi_server>/<your_name>/dev" index.
 
 Note: The build above uses a `requirments.txt` file which need to be updated every time a new package is added. Just run
 `pipenv lock -r > requirments.txt` and don't forget to commit the change.
 
 Set the full path to this index as the pypi parameter to pyest
 ```bash
-$ pytest tests --pypi="-i http://<devpi server>/<your name>/dev --trusted-host <devpi server>" --<other remote host parames>
+$ pytest tests --pip-index="-i http://<devpi server>/<your name>/dev --trusted-host <devpi server>" --<other remote host parames>
 ```
 
 ### Install from local package
