@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>API &#8212; BBTest 0.2 documentation</title>
+    <title>API &#8212; BBTest 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -16,6 +16,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
     <link rel="prev" title="Installation" href="installation.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -143,7 +144,7 @@ Each test case can define a <cite>topo</cite> property used to setup a lab and s
 <p>To take part in a test a component needs to be wrapped in a BlackBox.</p>
 <dl class="class">
 <dt id="bbtest.blackboxes.BlackBox">
-<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">BlackBox</code><span class="sig-paren">(</span><em>host</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">BlackBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is an abstract class used to wrap a component in a black box.
 Black boxes can then be used to test the component itself and to verify
 it integrates well with other components.
@@ -175,7 +176,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 
 <dl class="class">
 <dt id="bbtest.blackboxes.HomeBox">
-<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">HomeBox</code><span class="sig-paren">(</span><em>host</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">HomeBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox" title="Permalink to this definition">¶</a></dt>
 <dd><p>A black box with a home folder</p>
 <dl class="attribute">
 <dt id="bbtest.blackboxes.HomeBox.NAME">
@@ -237,9 +238,8 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <em class="property">class </em><code class="descclassname">bbtest.labs.</code><code class="descname">Lab</code><span class="sig-paren">(</span><em>topology={}</em>, <em>address_book={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="bbtest.labs.Lab.add_box">
-<code class="descname">add_box</code><span class="sig-paren">(</span><em>box_class</em>, <em>host</em>, <em>name</em>, <em>params={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.add_box" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adding a new box to the lab</p>
-</dd></dl>
+<code class="descname">add_box</code><span class="sig-paren">(</span><em>box_class</em>, <em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.add_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="bbtest.labs.Lab.clean">
@@ -611,6 +611,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <li class="toctree-l2"><a class="reference internal" href="#module-bbtest.hosts">The Hosts</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 
 <div class="relations">
@@ -618,6 +619,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Contributing</a></li>
   </ul></li>
 </ul>
 </div>

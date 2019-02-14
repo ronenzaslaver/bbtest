@@ -32,6 +32,7 @@ We've extended pytest to include our own params:
 
    installation
    API
+   contributing
 
 
 Indices and tables

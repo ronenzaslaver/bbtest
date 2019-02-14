@@ -1,0 +1,180 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Contributing &#8212; BBTest 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API" href="API.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>We welcome contributors who want to extend or fix BBTest.
+First fork BBTest from
+<a class="reference external" href="https://github.com/cybereason-labs/bbtest">https://github.com/cybereason-labs/bbtest</a> and then:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> git clone git@github.com:&lt;your github username&gt;/bbtest.git
+<span class="gp">$</span> <span class="nb">cd</span> bbtest
+<span class="gp">$</span> pipenv install
+<span class="gp">$</span> pipenv install --dev
+<span class="gp">$</span> pipenv shell
+<span class="gp">$</span> pytest
+</pre></div>
+</div>
+<p>To test your code you will need to create and use your own pypi index:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> devpi use http://172.16.57.40
+<span class="gp">$</span> devpi user -c &lt;your username&gt; <span class="nv">password</span><span class="o">=</span>&lt;your password&gt;
+<span class="gp">$</span> devpi login &lt;your username&gt; &lt;your password&gt;
+<span class="gp">$</span> devpi index -c dev <span class="nv">bases</span><span class="o">=</span>root/cr
+<span class="gp">$</span> devpi use &lt;your name&gt;/dev
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In Windows Git Bash, <code class="docutils literal notranslate"><span class="pre">devpi</span></code> sometimes fails (fail to login, fail
+to use, etc.) If this happens, try running the commands in native Windows
+CMD.</p>
+</div>
+<p>If you’re unlucky and find yourself working on mutiple issues at the same time,
+you can create as many indexes as you want using: <code class="docutils literal notranslate"><span class="pre">devpi</span> <span class="pre">index</span> <span class="pre">-c</span> <span class="pre">&lt;branch</span> <span class="pre">name&gt;</span>
+<span class="pre">bases=root/cr</span></code>.</p>
+<p>Once you’ve coded and tested your changes you need to upload them to your index:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> devpi upload
+</pre></div>
+</div>
+<p>The upload command creates a BBTest package under  dist/ folder (e.g.
+dist/bbtest-0.0.1.dev191.zip) and uploads the package to devpi server under
+“<a class="reference external" href="http://172.16.57.40">http://172.16.57.40</a>/&lt;your_name&gt;/dev” index.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The build above uses a <code class="docutils literal notranslate"><span class="pre">requirments.txt</span></code> file which need to be
+updated every time a new package is added. Just run <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">lock</span> <span class="pre">-r</span> <span class="pre">&gt;</span>
+<span class="pre">requirments.txt</span></code> and don’t forget to commit the change.</p>
+</div>
+<p>To run you tests using your own version of Python go back to <code class="docutils literal notranslate"><span class="pre">probe-tests</span></code>
+home and use <code class="docutils literal notranslate"><span class="pre">--pip-index</span></code> switch to point bbtest at your index:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pytest --pip-index<span class="o">=</span>http://172.16.57.40/&lt;your username&gt;/dev
+</pre></div>
+</div>
+<div class="section" id="pipenv-integration">
+<h2>Pipenv Integration<a class="headerlink" href="#pipenv-integration" title="Permalink to this headline">¶</a></h2>
+<p>To get pipenv to use your index when installing packages:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">export</span> <span class="nv">PIPENV_PYPI_MIRROR</span><span class="o">=</span>http://172.16.57.40/benny/dev
+</pre></div>
+</div>
+<p>We found it usefull to add the export command to the bashrc.</p>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Our docs are located under the <code class="docutils literal notranslate"><span class="pre">docs</span></code> directory. We use Sphinx to extract
+documentation from the code and publish it as html (or latex if you need it).To generate and serve the documentation:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pipenv shell
+<span class="gp">$</span> <span class="nb">cd</span> docs
+<span class="gp">$</span> make html
+<span class="gp">$</span> python -m http.server -d build/html
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">BBTest</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pipenv-integration">Pipenv Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="API.html" title="previous chapter">API</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/contributing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
