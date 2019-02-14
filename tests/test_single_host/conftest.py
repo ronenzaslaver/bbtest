@@ -27,12 +27,9 @@ os_2_class = {'local': LocalHost,
 
 @pytest.fixture(scope='class')
 def topo(request):
-    request.cls.topo = {'pip_index': request.param.get('pip-index', None),
-                        'hosts': {'host1': {'class': os_2_class[request.param['os']],
-                                            'package': 'bbtest',
-                                            'boxes': []}}}
-    request.cls.address_book = {'host1': {'ip': request.param['ip'],
-                                          'auth': request.param.get('auth', None)}}
+    request.cls.topo['pip_index'] = request.param.get('pip-index', None)
+    request.cls.topo['hosts']['host1']['class'] = os_2_class[request.param['ep-os']]
+    request.cls.address_book['host1']['ip'] = request.param['ep-ip']
 
 
 def pytest_generate_tests(metafunc):
@@ -41,7 +38,6 @@ def pytest_generate_tests(metafunc):
             topos = yaml.safe_load(f)
     else:
         topos = [{'pip_index': metafunc.config.getoption('--pip-index'),
-                  'os': metafunc.config.getoption('--os'),
-                  'ip': metafunc.config.getoption('--ip'),
-                  'auth': (metafunc.config.getoption('--user'), metafunc.config.getoption('--password'))}]
+                  'os': metafunc.config.getoption('--ep-os'),
+                  'ip': metafunc.config.getoption('--ep-ip')}]
     metafunc.parametrize('topo', topos, indirect=True)

@@ -8,12 +8,9 @@
 #
 # Example:
 #-
-#  os: linux
-#  ip: <host ip>
+#  ep-os: linux
+#  ep-ip: <host ip>
 #  pip-index: <devpi ip>/<user name>/<index>/ --trusted-host <devpi ip>
-#  auth:
-#    - bbtest
-#    - bbtest
 #
 # NO NOT CHANGE THIS FILE as it is saved in github. Create your own copy of the file and make sure it is not pushed to
 # github. We recommend my_topo.yaml as it is already ignored in .gitignore.
@@ -21,5 +18,5 @@
 #
 
 -
-  os: local
-  ip: ''
+  ep-os: local
+  ep-ip:

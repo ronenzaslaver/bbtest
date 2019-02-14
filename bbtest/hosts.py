@@ -41,12 +41,15 @@ class BaseHost(object):
 
     SEP = '/'
 
-    def __init__(self, *args, **kwargs):
-        self.args = args
+    def __init__(self, name, **kwargs):
+        self.name_ = name
         self.params = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
-    def install(self, *args, **kwargs):
+    def __repr__(self):
+        return self.name_
+
+    def install(self, **kwargs):
         """ install host for bbtest
 
         We separate install from init so we can create an install hosts in different order.
@@ -160,8 +163,8 @@ class LocalHost(BaseHost):
     """Suppose to be an os-agnostic local host."""
     ip = '127.0.0.1'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.modules = rpyc.core.service.ModuleNamespace(getmodule)
 
     def put(self, local, remote):
@@ -243,17 +246,17 @@ class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
 
-    def __init__(self, ip=None, auth=None, *args, **kwargs):
+    def __init__(self, ip=None, auth=None, **kwargs):
         """ Initialise remote host - open rpyc connections.
 
         :param ip:
         :param auth:
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
         self.ip = str(ip)
         self.auth = auth
         rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
-        self._start_rpyc()
+        self._start_bbhost()
 
     def install(self, package=None, version=None):
         """ Install bbtes=Nonet tests package on remote host.
@@ -286,14 +289,16 @@ class RemoteHost(BaseHost):
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
         # update of bbtest on remote host.
         # todo: consider replace all code below with atomic commands directly over self.modeules
-        rc = self.run_python3(['-m', 'pip', 'install', '-U', '--no-cache-dir'] + bbtest_remote)
-        if self.is_linux:
-            try:
+        rc = self.run_python3(['-m', 'pip', 'install', '-I', '-U', '--no-cache-dir'] + bbtest_remote)
+        try:
+            if self.is_linux:
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
-            except Exception as _:
-                pass
-            time.sleep(INSTALL_RECONNECT_WAIT)
-            self._start_rpyc()
+            elif self.is_windows:
+                self.run(['bbhost_win_service.exe restart'])
+        except Exception as _:
+            pass
+        time.sleep(INSTALL_RECONNECT_WAIT)
+        self._start_bbhost()
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -327,7 +332,7 @@ class RemoteHost(BaseHost):
     def set_client_timeout(self, timeout):
         self._rpyc._config['sync_request_timeout'] = timeout
 
-    def _start_rpyc(self):
+    def _start_bbhost(self):
         port = self.params.get('port', DEFAULT_RPYC_SERVER_PORT)
         try:
             self._rpyc = rpyc.classic.connect(self.ip, port=port)

@@ -1,5 +1,8 @@
 
+from copy import deepcopy
+
 from .exceptions import ImproperlyConfigured
+from .blackboxes import BlackBox
 
 
 class Lab():
@@ -11,63 +14,76 @@ class Lab():
         :param address_book: a dictionary where each hostname has
                              a dictionary with ip, username & password
         """
-        self.boxes = {}
-        self.hosts = {}
-        self.pip_index = topology.get('pip_index', 'https://pypi.org/simple')
-        self.auth = topology.get('auth', None)
 
-        if 'hosts' not in topology:
+        self.topology = deepcopy(topology)
+
+        self.hosts = {}
+        self.pip_index = self.topology.get('pip_index', 'https://pypi.org/simple')
+        self.auth = self.topology.get('auth', None)
+
+        if 'hosts' not in self.topology:
             return
 
-        for host_name, params in topology['hosts'].items():
-            if 'class' not in params:
+        # let there be hosts!
+        for host_name, host_params in self.topology['hosts'].items():
+            if 'class' not in host_params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
-            if 'boxes' not in params:
-                raise ImproperlyConfigured(f"Host '{host_name}' must have a `boxes` key")
-            host_class = params['class']
-            try:
-                host = host_class(name=host_name, pip_index=self.pip_index, **address_book[host_name])
-            except KeyError:
-                # TODO: allocate a host, use params['image']
-                host = host_class(name=host_name, pip_index=self.pip_index)
-            self.hosts[host_name] = host
-            self.hosts[host_name].install(package=params.get('package', None))
-            # let there be boxes!
-            for box_name, box_params in params['boxes'].items():
-                self.add_box(box_params['class'], host, box_name, box_params)
+            host_address = address_book.get(host_name, {})
+            self.add_host(host_params.pop('class'), host_name, host_params, host_address)
+
+    def add_host(self, host_class, name, params={}, address_book={}):
+        """Adding a new host to the lab"""
+        boxes = params.pop('boxes', {})
+        try:
+            host = host_class(name=name, pip_index=self.pip_index, **{**params, **address_book})
+        except KeyError:
+            # TODO: allocate a host, use params
+            host = host_class(name=name, pip_index=self.pip_index, **params)
+        self.hosts[name] = host
+        self.hosts[name].install(package=params.get('package', None))
+
+        host.boxes = {}
+        if not boxes:
+            return
+
+        # let there be boxes!
+        for box_name, box_params in boxes.items():
+            if 'class' not in box_params:
+                raise ImproperlyConfigured(f"Box '{box_name}' must have a `class` key")
+            self.add_box(box_params['class'], host, box_name, box_params)
+
+        return self.hosts[name]
 
     def add_box(self, box_class, host, name, params={}):
         """Adding a new box to the lab"""
-        new_box = box_class(host, **params)
-        new_box.install()
+        box = box_class(name, host, **params)
+        box.install()
+        host.boxes[name] = box
+        return host.boxes[name]
 
-        box_name = name if name else new_box.NAME
-        new_box.name = box_name
+    @property
+    def boxes(self):
+        boxes = {}
+        for host in self.hosts.values():
+            for box in host.boxes.values():
+                boxes[f'{host}.{box}'] = box
+        return boxes
 
-        if box_name in self.boxes:
-            self.boxes[box_name].append(new_box)
-        else:
-            self.boxes[box_name] = [new_box]
-        return new_box
-
-    def flatten_boxes(self):
-        """ an iterator returning  one box after the other """
-        for boxes in self.boxes.values():
-            for box in boxes:
-                yield box
+    def class_boxes(self, box_class=BlackBox):
+        return {n: c for n, c in self.boxes.items() if isinstance(c, box_class)}
 
     def destroy(self):
         """Destroy lab altogether """
-        for box in self.flatten_boxes():
-            box.uninstall()
         for host in self.hosts.values():
+            for box in host.boxes.values():
+                box.uninstall()
+            host.boxes = {}
             host.uninstall()
-        self.boxes = {}
         self.hosts = {}
 
     def clean(self):
         """Restore the lab back to its original condition """
-        for box in self.flatten_boxes():
-            box.clean()
         for host in self.hosts.values():
+            for box in host.boxes.values():
+                box.clean()
             host.clean()

@@ -12,6 +12,6 @@ fi
 USER=$1
 PASSWORD=$2
 
-devpi use $PIPENV_PYPI_MIRROR
 devpi login $USER --password $PASSWORD
+devpi use $PIPENV_PYPI_MIRROR
 devpi upload

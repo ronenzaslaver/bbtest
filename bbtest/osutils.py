@@ -14,8 +14,10 @@ PROCESS_TIMEOUT_RETRIES = os.environ.get('BBTEST_PROCESS_TIMEOUT_RETRIES', 1)
 def is_winodws():
     return 'windows' in platform.system().lower()
 
+
 def is_linux():
     return 'linux' in platform.system().lower()
+
 
 def is_mac():
     return 'Darwin' in platform.system().lower()
@@ -65,7 +67,7 @@ def is_service_running(name):
         except NoSuchProcess:
             return False
     elif is_linux():
-        return True if os.system(f'service {name} status') == 0 else False
+        return subprocess_run(['systemctl', 'is-active', name]) == 'active'
     elif is_mac():
         command = f'sudo launchctl list | awk \'$3=="{name}" {{ print $2 }}\''
         return True if subprocess_run.target.run(command, shell=True)[0] == '0' else False
