@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>API &#8212; BBTest  documentation</title>
+    <title>API &#8212; BBTest 0.2 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -16,7 +16,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Test a simple Installer" href="examples/installer.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -143,9 +143,8 @@ Each test case can define a <cite>topo</cite> property used to setup a lab and s
 <p>To take part in a test a component needs to be wrapped in a BlackBox.</p>
 <dl class="class">
 <dt id="bbtest.blackboxes.BlackBox">
-<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">BlackBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is an abstract class used to wrap a component in a black box.
+<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">BlackBox</code><span class="sig-paren">(</span><em>host</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#BlackBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.BlackBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an abstract class used to wrap a component in a black box.
 Black boxes can then be used to test the component itself and to verify
 it integrates well with other components.
 A blackbox runs on a host and you can communicate with it using <cite>host.run</cite></p>
@@ -176,9 +175,8 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 
 <dl class="class">
 <dt id="bbtest.blackboxes.HomeBox">
-<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">HomeBox</code><span class="sig-paren">(</span><em>host</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.blackboxes.BlackBox" title="bbtest.blackboxes.BlackBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.blackboxes.BlackBox</span></code></a></p>
-<p>A black box with a home folder</p>
+<em class="property">class </em><code class="descclassname">bbtest.blackboxes.</code><code class="descname">HomeBox</code><span class="sig-paren">(</span><em>host</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/blackboxes.html#HomeBox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.blackboxes.HomeBox" title="Permalink to this definition">¶</a></dt>
+<dd><p>A black box with a home folder</p>
 <dl class="attribute">
 <dt id="bbtest.blackboxes.HomeBox.NAME">
 <code class="descname">NAME</code><em class="property"> = 'home'</em><a class="headerlink" href="#bbtest.blackboxes.HomeBox.NAME" title="Permalink to this definition">¶</a></dt>
@@ -237,11 +235,11 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.labs.Lab">
 <em class="property">class </em><code class="descclassname">bbtest.labs.</code><code class="descname">Lab</code><span class="sig-paren">(</span><em>topology={}</em>, <em>address_book={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
+<dd><dl class="method">
 <dt id="bbtest.labs.Lab.add_box">
-<code class="descname">add_box</code><span class="sig-paren">(</span><em>box_class</em>, <em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.add_box" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">add_box</code><span class="sig-paren">(</span><em>box_class</em>, <em>host</em>, <em>name</em>, <em>params={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/labs.html#Lab.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.labs.Lab.add_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adding a new box to the lab</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="bbtest.labs.Lab.clean">
@@ -270,8 +268,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.BaseHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">BaseHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#BaseHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.BaseHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>“A base host class</p>
+<dd><p>“A base host class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -398,15 +395,9 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.LinuxHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LinuxHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LinuxHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LinuxHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.RemoteHost" title="bbtest.hosts.RemoteHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.RemoteHost</span></code></a></p>
-<dl class="attribute">
+<dd><dl class="attribute">
 <dt id="bbtest.hosts.LinuxHost.ROOT_PATH">
 <code class="descname">ROOT_PATH</code><em class="property"> = '/tmp'</em><a class="headerlink" href="#bbtest.hosts.LinuxHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.LinuxHost.is_service_running">
-<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LinuxHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LinuxHost.is_service_running" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -414,8 +405,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.LocalHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
-<p>Suppose to be an os-agnostic local host.</p>
+<dd><p>Suppose to be an os-agnostic local host.</p>
 <dl class="method">
 <dt id="bbtest.hosts.LocalHost.get">
 <code class="descname">get</code><span class="sig-paren">(</span><em>remote</em>, <em>local</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalHost.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalHost.get" title="Permalink to this definition">¶</a></dt>
@@ -453,15 +443,9 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.LocalLinuxHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalLinuxHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalLinuxHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalLinuxHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.LocalHost" title="bbtest.hosts.LocalHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.LocalHost</span></code></a></p>
-<dl class="attribute">
+<dd><dl class="attribute">
 <dt id="bbtest.hosts.LocalLinuxHost.ROOT_PATH">
 <code class="descname">ROOT_PATH</code><em class="property"> = '/tmp'</em><a class="headerlink" href="#bbtest.hosts.LocalLinuxHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalLinuxHost.is_service_running">
-<em class="property">static </em><code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalLinuxHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalLinuxHost.is_service_running" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -469,10 +453,9 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.LocalOSXHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalOSXHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalOSXHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalOSXHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.LocalHost" title="bbtest.hosts.LocalHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.LocalHost</span></code></a></p>
-<dl class="method">
-<dt id="bbtest.hosts.LocalOSXHost.is_service_running">
-<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalOSXHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalOSXHost.is_service_running" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="bbtest.hosts.LocalOSXHost.ROOT_PATH">
+<code class="descname">ROOT_PATH</code><em class="property"> = '/tmp'</em><a class="headerlink" href="#bbtest.hosts.LocalOSXHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -480,8 +463,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.LocalWindowsHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">LocalWindowsHost</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.LocalHost" title="bbtest.hosts.LocalHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.LocalHost</span></code></a></p>
-<p>A collection of windows utilities and validators</p>
+<dd><p>A collection of windows utilities and validators</p>
 <dl class="attribute">
 <dt id="bbtest.hosts.LocalWindowsHost.ROOT_PATH">
 <code class="descname">ROOT_PATH</code><em class="property"> = 'c:/temp'</em><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
@@ -505,25 +487,14 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <em class="property">static </em><code class="descname">get_package_version</code><span class="sig-paren">(</span><em>package_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost.get_package_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.get_package_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
-<dt id="bbtest.hosts.LocalWindowsHost.is_service_running">
-<em class="property">static </em><code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#LocalWindowsHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.LocalWindowsHost.is_service_running" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="bbtest.hosts.OSXHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">OSXHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#OSXHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.OSXHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.RemoteHost" title="bbtest.hosts.RemoteHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.RemoteHost</span></code></a></p>
-<dl class="attribute">
+<dd><dl class="attribute">
 <dt id="bbtest.hosts.OSXHost.ROOT_PATH">
 <code class="descname">ROOT_PATH</code><em class="property"> = '/tmp'</em><a class="headerlink" href="#bbtest.hosts.OSXHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.OSXHost.is_service_running">
-<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#OSXHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.OSXHost.is_service_running" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -531,8 +502,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.RemoteHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">RemoteHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.BaseHost" title="bbtest.hosts.BaseHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.BaseHost</span></code></a></p>
-<p>A remote host using RPyC</p>
+<dd><p>A remote host using RPyC</p>
 <dl class="method">
 <dt id="bbtest.hosts.RemoteHost.get">
 <code class="descname">get</code><span class="sig-paren">(</span><em>remote</em>, <em>local</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#RemoteHost.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.RemoteHost.get" title="Permalink to this definition">¶</a></dt>
@@ -583,8 +553,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="class">
 <dt id="bbtest.hosts.WindowsHost">
 <em class="property">class </em><code class="descclassname">bbtest.hosts.</code><code class="descname">WindowsHost</code><span class="sig-paren">(</span><em>ip=None</em>, <em>auth=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#bbtest.hosts.RemoteHost" title="bbtest.hosts.RemoteHost"><code class="xref py py-class docutils literal notranslate"><span class="pre">bbtest.hosts.RemoteHost</span></code></a></p>
-<p>A remote windows host</p>
+<dd><p>A remote windows host</p>
 <dl class="attribute">
 <dt id="bbtest.hosts.WindowsHost.ROOT_PATH">
 <code class="descname">ROOT_PATH</code><em class="property"> = 'c:/temp'</em><a class="headerlink" href="#bbtest.hosts.WindowsHost.ROOT_PATH" title="Permalink to this definition">¶</a></dt>
@@ -598,11 +567,6 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <dl class="method">
 <dt id="bbtest.hosts.WindowsHost.get_package_version">
 <code class="descname">get_package_version</code><span class="sig-paren">(</span><em>package_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.get_package_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.get_package_version" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="bbtest.hosts.WindowsHost.is_service_running">
-<code class="descname">is_service_running</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bbtest/hosts.html#WindowsHost.is_service_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbtest.hosts.WindowsHost.is_service_running" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -640,7 +604,6 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-bbtest.testcases">The Test Case</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-bbtest.blackboxes">The Black Box</a></li>
@@ -654,7 +617,7 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="examples/installer.html" title="previous chapter">Test a simple Installer</a></li>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
   </ul></li>
 </ul>
 </div>
@@ -683,10 +646,10 @@ A blackbox runs on a host and you can communicate with it using <cite>host.run</
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Yoram Shamir & Benny Daon.
+      &copy;.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

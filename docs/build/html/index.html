@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>BBTest - black box testing &#8212; BBTest  documentation</title>
+    <title>BBTest - black box testing &#8212; BBTest 0.2 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -36,18 +36,35 @@
   <div class="section" id="bbtest-black-box-testing">
 <h1>BBTest - black box testing<a class="headerlink" href="#bbtest-black-box-testing" title="Permalink to this headline">¶</a></h1>
 <p>BBTest is a python based automation framework for black box testing. Tests are
-executed in a virtual lab, supporting multiple Hosts &amp; OSs and well as
-a flexible network.</p>
-<p>Our test case class inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code>,
-so you use <cite>setUp</cite> and <cite>destroy</cite> and <cite>test*</cite> methods.
-To run the tests you can use your favorite python tests runner (ours is
-pytest).</p>
+executed in a virtual lab, supporting multiple Hosts and the network
+connecting them.</p>
+<p>Our runner is based on <a class="reference external" href="http://docs.pytest.org">pytest</a> so we can use its
+switches, markers, switchs and plugins.  Here’s a shot list of our favorite
+switches:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-k &lt;regex&gt;         only run classes &amp; methods that match the regex</span>
+<span class="go">--lf               only run the last failure</span>
+<span class="go">--pdb              start the debugger on errors</span>
+<span class="go">-m &lt;markerex&gt;      only run test matching given marker expression</span>
+</pre></div>
+</div>
+<p>We’ve extended pytest to include our own params:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--pip-index &lt;url&gt;  url of python package index to use</span>
+<span class="go">--ep-ip &lt;ip&gt;       ip address of the endpoint to run tests one</span>
+<span class="go">--ep-os            win|linux|mac</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">–ep-os will be removed in version 0.3</p>
+</div>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/todo.html">A simple ToDo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/installer.html">A simple Installer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#get-the-code-and-dependencies">Get the Code and dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#ide-configuration">IDE Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#install-a-slave">Install a Slave</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#run-tests">Run Tests</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="API.html">API</a><ul>
@@ -88,7 +105,6 @@ pytest).</p>
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API.html">API</a></li>
 </ul>
 
@@ -125,10 +141,10 @@ pytest).</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Yoram Shamir & Benny Daon.
+      &copy;.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

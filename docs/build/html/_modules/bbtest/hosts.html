@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>bbtest.hosts &#8212; BBTest  documentation</title>
+    <title>bbtest.hosts &#8212; BBTest 0.2 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -46,8 +46,6 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">rpyc</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">psutil</span>
-<span class="kn">from</span> <span class="nn">psutil</span> <span class="k">import</span> <span class="n">NoSuchProcess</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">winreg</span> <span class="k">import</span> <span class="n">HKEY_LOCAL_MACHINE</span><span class="p">,</span> <span class="n">OpenKey</span><span class="p">,</span> <span class="n">EnumKey</span><span class="p">,</span> <span class="n">QueryValueEx</span>
@@ -254,13 +252,6 @@
         <span class="k">except</span> <span class="ne">WindowsError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Cybereason version not found&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LocalWindowsHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalWindowsHost.is_service_running">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="n">service_name</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">psutil</span><span class="o">.</span><span class="n">win_service_get</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span><span class="o">.</span><span class="n">status</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;running&#39;</span>
-        <span class="k">except</span> <span class="n">NoSuchProcess</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span></div>
-
 <div class="viewcode-block" id="LocalWindowsHost.get_active_macs"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalWindowsHost.get_active_macs">[docs]</a>    <span class="k">def</span> <span class="nf">get_active_macs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: list of MACs of all active NICs sorted by DeviceID</span>
@@ -275,21 +266,12 @@
 
 <div class="viewcode-block" id="LocalLinuxHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalLinuxHost">[docs]</a><span class="k">class</span> <span class="nc">LocalLinuxHost</span><span class="p">(</span><span class="n">LocalHost</span><span class="p">):</span>
 
-    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/tmp&#39;</span>
-
-<div class="viewcode-block" id="LocalLinuxHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalLinuxHost.is_service_running">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="n">service_name</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;service </span><span class="si">{service_name}</span><span class="s1"> status&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">False</span></div></div>
+    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/tmp&#39;</span></div>
 
 
 <div class="viewcode-block" id="LocalOSXHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalOSXHost">[docs]</a><span class="k">class</span> <span class="nc">LocalOSXHost</span><span class="p">(</span><span class="n">LocalHost</span><span class="p">):</span>
 
-<div class="viewcode-block" id="LocalOSXHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LocalOSXHost.is_service_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">):</span>
-        <span class="n">command</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;sudo launchctl list | awk </span><span class="se">\&#39;</span><span class="s1">$3==&quot;</span><span class="si">{service_name}</span><span class="s1">&quot; {{ print $2 }}</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span></div></div>
+    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/tmp&#39;</span></div>
 
 
 <div class="viewcode-block" id="RemoteHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.RemoteHost">[docs]</a><span class="k">class</span> <span class="nc">RemoteHost</span><span class="p">(</span><span class="n">BaseHost</span><span class="p">):</span>
@@ -400,26 +382,17 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalHost</span><span class="o">.</span><span class="n">open_key</span><span class="p">(</span><span class="n">parent_key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="WindowsHost.get_active_macs"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.get_active_macs">[docs]</a>    <span class="k">def</span> <span class="nf">get_active_macs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalWindowsHost</span><span class="p">()</span><span class="o">.</span><span class="n">get_active_macs</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="WindowsHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.WindowsHost.is_service_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalWindowsHost</span><span class="o">.</span><span class="n">is_service_running</span><span class="p">(</span><span class="n">service</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalWindowsHost</span><span class="p">()</span><span class="o">.</span><span class="n">get_active_macs</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="LinuxHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LinuxHost">[docs]</a><span class="k">class</span> <span class="nc">LinuxHost</span><span class="p">(</span><span class="n">RemoteHost</span><span class="p">):</span>
 
-    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/tmp&#39;</span>
-
-<div class="viewcode-block" id="LinuxHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.LinuxHost.is_service_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalLinuxHost</span><span class="o">.</span><span class="n">is_service_running</span><span class="p">(</span><span class="n">service</span><span class="p">)</span></div></div>
+    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/tmp&#39;</span></div>
 
 
 <div class="viewcode-block" id="OSXHost"><a class="viewcode-back" href="../../API.html#bbtest.hosts.OSXHost">[docs]</a><span class="k">class</span> <span class="nc">OSXHost</span><span class="p">(</span><span class="n">RemoteHost</span><span class="p">):</span>
 
-    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/tmp&#39;</span>
-
-<div class="viewcode-block" id="OSXHost.is_service_running"><a class="viewcode-back" href="../../API.html#bbtest.hosts.OSXHost.is_service_running">[docs]</a>    <span class="k">def</span> <span class="nf">is_service_running</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">bbtest</span><span class="o">.</span><span class="n">LocalOSXHost</span><span class="p">()</span><span class="o">.</span><span class="n">is_service_running</span><span class="p">(</span><span class="n">service</span><span class="p">)</span></div></div>
+    <span class="n">ROOT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/tmp&#39;</span></div>
 </pre></div>
 
           </div>
@@ -440,7 +413,6 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../API.html">API</a></li>
 </ul>
 
@@ -478,10 +450,10 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2018, Yoram Shamir & Benny Daon.
+      &copy;.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

@@ -14,7 +14,6 @@ The Black Box
 .. automodule:: bbtest.blackboxes
     :members:
     :undoc-members:
-    :show-inheritance:
 
 The Lab
 -------
@@ -22,14 +21,9 @@ The Lab
 .. automodule:: bbtest.labs
     :members:
     :undoc-members:
-    :show-inheritance:
 
 The Hosts
 ---------
 .. automodule:: bbtest.hosts
     :members:
     :undoc-members:
-    :show-inheritance:
-
-
-
