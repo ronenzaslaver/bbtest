@@ -1,9 +1,14 @@
 
 import os
+import re
 import platform
 import time
 import psutil
 from psutil import NoSuchProcess
+try:
+    from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
+except Exception:
+    pass
 
 from bbtest.target import subprocess_run
 
@@ -20,7 +25,7 @@ def is_linux():
 
 
 def is_mac():
-    return 'Darwin' in platform.system().lower()
+    return 'darwin' in platform.system().lower()
 
 
 def is_process_running(id, timeout=PROCESS_TIMEOUT_RETRIES):
@@ -67,9 +72,39 @@ def is_service_running(name):
         except NoSuchProcess:
             return False
     elif is_linux():
-        return subprocess_run(['systemctl', 'is-active', name]) == 'active'
+        return subprocess_run(['systemctl', 'is-active', name]).stdout.strip() == b'active'
     elif is_mac():
         command = f'sudo launchctl list | awk \'$3=="{name}" {{ print $2 }}\''
         return True if subprocess_run.target.run(command, shell=True)[0] == '0' else False
     else:
         raise NotImplementedError('Sorry, operating system is not suuported')
+
+
+try:
+    regedit_products = [OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')]
+    regedit_products.append(OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\WOW6432Node\CurrentVersion\Uninstall'))
+except Exception:
+    pass
+
+
+def get_package_version(name):
+    name_re = re.compile(name)
+    for products in regedit_products:
+        i = 0
+        while True:
+            product_key_name = EnumKey(products, i)
+            product_values = OpenKey(products, product_key_name)
+            try:
+                display_name = QueryValueEx(product_values, 'DisplayName')[0]
+                if name_re.findall(display_name):
+                    return QueryValueEx(product_values, 'DisplayVersion')[0]
+            except FileNotFoundError:
+                # product has no 'DisplayName' attribute
+                pass
+            i += 1
+    raise RuntimeError(f'Package {name} version not found')
+
+
+def open_key(parent_key, key):
+    parent = OpenKey(HKEY_LOCAL_MACHINE, parent_key)[0]
+    return QueryValueEx(parent, key)[0]

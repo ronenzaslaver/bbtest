@@ -97,6 +97,10 @@ class TestHosts(BBPytest):
         os.remove(local_temp_file)
         self.host.modules.os.remove(dest_temp_file)
 
+    def test_box_download_file(self):
+        """ todo Create blackbox.download_file() and test similar to box get/put. """
+        pass
+
     def test_timeout(self):
         # Test timeout on run command.
         self.host.run_python3(['-c', 'import time; time.sleep(2)'])

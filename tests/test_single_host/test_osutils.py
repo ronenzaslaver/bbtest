@@ -46,5 +46,11 @@ class TestHosts(BBPytest):
                 assert self.host.modules.bbtest.osutils.is_service_running('cron')
             else:
                 assert self.host.modules.bbtest.osutils.is_service_running('crond')
-        else:
+        elif self.host.is_windows:
             assert self.host.modules.bbtest.osutils.is_service_running('Appinfo')
+
+    def test_get_package_version(self):
+        if self.host.is_windows:
+            python_package = r'Python 3\.7\..* Core Interpreter \(.*-bit\)'
+            version = self.host.modules.bbtest.osutils.get_package_version(python_package)
+            assert version > '3.7'

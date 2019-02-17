@@ -12,10 +12,6 @@ import time
 import rpyc
 import glob
 import re
-try:
-    from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
-except Exception:
-    pass
 
 from .exceptions import ImproperlyConfigured
 
@@ -66,11 +62,15 @@ class BaseHost(object):
 
     @property
     def is_windows(self):
-        return 'windows' in self.os
+        return self.modules.bbtest.osutils.is_windows()
 
     @property
     def is_linux(self):
-        return 'linux' in self.os
+        return self.modules.bbtest.osutils.is_linux()
+
+    @property
+    def is_mac(self):
+        return self.modules.bbtest.osutils.is_mac()
 
     @property
     def os(self):
@@ -146,7 +146,7 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_windows else ['python' + str(version)]
+        args = ['py', '-' + str(version)] if self.is_windows else ['/opt/bbtest/python' + str(version)]
         args.extend(args_in)
         return self.run(args, **kwargs)
 
@@ -181,11 +181,6 @@ class LocalHost(BaseHost):
         return shutil.copyfile(self._relative_remote(remote), local)
 
     @staticmethod
-    def open_key(parent_key, key):
-        parent = OpenKey(HKEY_LOCAL_MACHINE, parent_key)
-        return QueryValueEx(parent, key)[0]
-
-    @staticmethod
     def untar_file(path):
         if path.endswith('tar.gz'):
             tar = tarfile.open(path, "r:gz")
@@ -204,24 +199,6 @@ class LocalWindowsHost(LocalHost):
 
     """A collection of windows utilities and validators """
     ROOT_PATH = 'c:/temp'
-
-    @staticmethod
-    def get_package_version(package_name):
-        products = OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
-        try:
-            i = 0
-            while True:
-                product_key_name = EnumKey(products, i)
-                product_values = OpenKey(products, product_key_name)
-                try:
-                    if QueryValueEx(product_values, 'DisplayName')[0] == package_name:
-                        return QueryValueEx(product_values, 'DisplayVersion')[0]
-                except FileNotFoundError:
-                    # product has no 'DisplayName' attribute
-                    pass
-                i = i+1
-        except WindowsError:
-            raise RuntimeError('Cybereason version not found')
 
     def get_active_macs(self):
         """
@@ -290,12 +267,12 @@ class RemoteHost(BaseHost):
                 bbtest_package = os.path.join(pip_index, package + '-' + version)
             bbtest_remote = [self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])]
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
-        # update of bbtest on remote host.
-        # todo: consider replace all code below with atomic commands directly over self.modeules
-        self.run_python3(['-m', 'pip', 'install', '-I', '-U', '--no-cache-dir'] + bbtest_remote)
+        # update of bbtest on remote host so we try to use atomic commands as possible.
+        py3 = ['py', '-3'] if 'windows' in self.modules.platform.system().lower() else ['/opt/bbtest/python3']
+        self.run(py3 + ['-m', 'pip', 'install', '-I', '-U', '--no-cache-dir'] + bbtest_remote)
         try:
             if self.is_linux:
-                self.run(['systemctl', 'restart', 'rpycserver.service'])
+                self.run(['systemctl', 'restart', 'bbhost.service'])
             elif self.is_windows:
                 self.run(['bbhost_win_service.exe', 'restart'])
         except Exception as _:
@@ -347,12 +324,6 @@ class RemoteHost(BaseHost):
 class WindowsHost(RemoteHost):
     """ A remote windows host """
     ROOT_PATH = 'c:/temp'
-
-    def get_package_version(self, package_name):
-        return self.modules.bbtest.LocalWindowsHost().get_package_version(package_name)
-
-    def open_key(self, parent_key, key):
-        return self.modules.bbtest.LocalHost.open_key(parent_key, key)
 
     def get_active_macs(self):
         return self.modules.bbtest.LocalWindowsHost().get_active_macs()
