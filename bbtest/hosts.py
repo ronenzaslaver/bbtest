@@ -22,7 +22,7 @@ from .exceptions import ImproperlyConfigured
 SYNC_REQUEST_TIMEOUT = 120
 DEFAULT_RPYC_SERVER_PORT = int(os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911))
 INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
-platform_shotname_re = re.compile('.*(windows|debian|centos).*')
+platform_shotname_re = re.compile('.*(windows|debian|centos|ubuntu).*')
 
 logger = logging.getLogger('bblog')
 
@@ -65,7 +65,7 @@ class BaseHost(object):
         pass
 
     @property
-    def is_winodws(self):
+    def is_windows(self):
         return 'windows' in self.os
 
     @property
@@ -84,7 +84,7 @@ class BaseHost(object):
 
     @property
     def platform(self):
-        """ Returns the platform short, beautify, name - windows/debian/fedora. """
+        """ Returns the platform short, beautify, name - windows/debian/centos. """
         return platform_shotname_re.findall(self.modules.platform.platform().lower())[0]
 
     @property
@@ -126,7 +126,10 @@ class BaseHost(object):
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
-        output = self.modules.bbtest.target.subprocess_run(args, **shutils_kwargs)
+        try:
+            output = self.modules.bbtest.target.subprocess_run(args, **shutils_kwargs)
+        except Exception as e:
+            raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target - {e}')
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -143,7 +146,7 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_winodws else ['python' + str(version)]
+        args = ['py', '-' + str(version)] if self.is_windows else ['python' + str(version)]
         args.extend(args_in)
         return self.run(args, **kwargs)
 
@@ -289,12 +292,12 @@ class RemoteHost(BaseHost):
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
         # update of bbtest on remote host.
         # todo: consider replace all code below with atomic commands directly over self.modeules
-        rc = self.run_python3(['-m', 'pip', 'install', '-I', '-U', '--no-cache-dir'] + bbtest_remote)
+        self.run_python3(['-m', 'pip', 'install', '-I', '-U', '--no-cache-dir'] + bbtest_remote)
         try:
             if self.is_linux:
                 self.run(['systemctl', 'restart', 'rpycserver.service'])
             elif self.is_windows:
-                self.run(['bbhost_win_service.exe restart'])
+                self.run(['bbhost_win_service.exe', 'restart'])
         except Exception as _:
             pass
         time.sleep(INSTALL_RECONNECT_WAIT)

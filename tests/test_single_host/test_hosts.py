@@ -41,7 +41,7 @@ class TestHosts(BBPytest):
     def test_builtin_command(self):
         kwargs = {}
         # todo move to hosts...
-        if self.host.is_winodws:
+        if self.host.is_windows:
             kwargs['shell'] = True
         assert self.box.run(['echo', 'Hello'], **kwargs) == ['Hello']
 
@@ -120,7 +120,7 @@ class TestHosts(BBPytest):
     def test_host_properties(self):
         assert self.host.os in ['windows', 'linux']
         assert self.host.os_bits in [32, 64]
-        assert self.host.platform in ['windows', 'debian', 'centos']
+        assert self.host.platform in ['windows', 'debian', 'centos', 'ubuntu']
         assert self.host.is_local is not self.host.is_remote
         assert isinstance(self.host, LocalHost) != self.host.is_remote
         assert isinstance(self.host, RemoteHost) != self.host.is_local

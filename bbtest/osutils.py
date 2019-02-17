@@ -11,7 +11,7 @@ from bbtest.target import subprocess_run
 PROCESS_TIMEOUT_RETRIES = os.environ.get('BBTEST_PROCESS_TIMEOUT_RETRIES', 1)
 
 
-def is_winodws():
+def is_windows():
     return 'windows' in platform.system().lower()
 
 
@@ -61,7 +61,7 @@ def find_process_by_name(name):
 
 
 def is_service_running(name):
-    if is_winodws():
+    if is_windows():
         try:
             return psutil.win_service_get(name).status() == 'running'
         except NoSuchProcess:

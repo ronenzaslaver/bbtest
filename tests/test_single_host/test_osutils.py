@@ -32,13 +32,19 @@ class TestHosts(BBPytest):
     def test_is_process_running(self):
         assert not self.host.modules.bbtest.osutils.is_process_running('no-such-process')
         if self.host.is_linux:
-            assert self.host.modules.bbtest.osutils.is_process_running('crond')
+            if self.host.platform in ['ubuntu', 'debian']:
+                assert self.host.modules.bbtest.osutils.is_process_running('cron')
+            else:
+                assert self.host.modules.bbtest.osutils.is_process_running('crond')
         else:
             assert self.host.modules.bbtest.osutils.is_process_running('svchost.exe')
 
     def test_is_service_running(self):
         assert not self.host.modules.bbtest.osutils.is_service_running('no-such-service')
         if self.host.is_linux:
-            assert self.host.modules.bbtest.osutils.is_service_running('crond')
+            if self.host.platform in ['ubuntu', 'debian']:
+                assert self.host.modules.bbtest.osutils.is_service_running('cron')
+            else:
+                assert self.host.modules.bbtest.osutils.is_service_running('crond')
         else:
             assert self.host.modules.bbtest.osutils.is_service_running('Appinfo')

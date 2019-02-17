@@ -29,7 +29,8 @@ class Lab():
             if 'class' not in host_params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
             host_address = address_book.get(host_name, {})
-            self.add_host(host_params.pop('class'), host_name, host_params, host_address)
+            host_class = host_params.pop('class')
+            self.add_host(host_class, host_name, host_params, host_address)
 
     def add_host(self, host_class, name, params={}, address_book={}):
         """Adding a new host to the lab"""
@@ -50,14 +51,17 @@ class Lab():
         for box_name, box_params in boxes.items():
             if 'class' not in box_params:
                 raise ImproperlyConfigured(f"Box '{box_name}' must have a `class` key")
-            self.add_box(box_params['class'], host, box_name, box_params)
+            box_class = box_params.pop('class')
+            self.add_box(box_class, host, box_name, params=box_params)
 
         return self.hosts[name]
 
     def add_box(self, box_class, host, name, params={}):
         """Adding a new box to the lab"""
         box = box_class(name, host, **params)
-        box.install()
+        install = params.get('install', True)
+        if install:
+            box.install()
         host.boxes[name] = box
         return host.boxes[name]
 
