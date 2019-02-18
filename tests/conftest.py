@@ -13,14 +13,10 @@ def pytest_addoption(parser):
                      help='url of python package index to use or full path to local directory')
     parser.addoption('--topo', action='store', default=os.environ.get('BBTEST_TOPO_YAML', ''),
                      help='path to bbtest lab topology file')
-    parser.addoption('--os', action='store', default='local',
+    parser.addoption('--ep-os', action='store', default='local',
                      help='OS of remote host - local, windows, linux oe mac')
-    parser.addoption('--ip', action='store', default='',
+    parser.addoption('--ep-ip', action='store', default='',
                      help='IP address of remote host')
-    parser.addoption('--user', action='store', default='',
-                     help='Username for remote host')
-    parser.addoption('--password', action='store', default='',
-                     help='Password for remote host')
 
 
 @pytest.fixture(scope='class', autouse=True)

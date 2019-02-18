@@ -29,7 +29,7 @@ def download_file(src_url, dst_path):
     :return: destination path
     """
     logger.info(f'Downloading file from: {src_url}')
-    with src_url.open(mode='rb') as in_file:
+    with src_url.open(mode='r') as in_file:
         with open(dst_path, 'wb') as out_file:
             out_file.write(in_file.read())
     logger.info(f'Downloaded file path on disk: {dst_path}')
