@@ -27,9 +27,12 @@ os_2_class = {'local': LocalHost,
 
 @pytest.fixture(scope='class')
 def topo(request):
-    request.cls.topo['pip_index'] = request.param.get('pip-index', None)
-    request.cls.topo['hosts']['host1']['class'] = os_2_class[request.param['ep-os']]
-    request.cls.address_book['host1']['ip'] = request.param['ep-ip']
+    ep_os = request.param.get('ep-os', 'local')
+    ep_ip = request.param.get('ep-ip', 'localhost')
+    pip_index = request.param.get('pip-index', None)
+    request.cls.topo['hosts']['host1']['class'] = os_2_class[ep_os]
+    request.cls.address_book['host1']['ip'] = ep_ip
+    request.cls.topo['pip_index'] = pip_index
 
 
 def pytest_generate_tests(metafunc):
