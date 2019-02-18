@@ -38,12 +38,12 @@ class BaseHost(object):
     SEP = '/'
 
     def __init__(self, name, **kwargs):
-        self.name_ = name
+        self.name = name
         self.params = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
     def __repr__(self):
-        return self.name_
+        return self.name
 
     def install(self, **kwargs):
         """ install host for bbtest
@@ -90,10 +90,6 @@ class BaseHost(object):
     @property
     def hostname(self):
         return self.modules.socket.gethostname()
-
-    @property
-    def name(self):
-        return self.params.get('name', self.hostname)
 
     @property
     def is_local(self):
@@ -275,6 +271,7 @@ class RemoteHost(BaseHost):
                 self.run(['systemctl', 'restart', 'bbhost.service'])
             elif self.is_windows:
                 self.run(['bbhost_win_service.exe', 'restart'])
+        # Once restart the connection is closed by the remote host - ignore and reconnect.
         except subprocess.SubprocessError as e:
             if 'closed by the remote host' not in repr(e):
                 raise e

@@ -1,16 +1,9 @@
 # List of single host topologies to run tests on.
 #
 # os: the OS of the host - local, win, linux or osx
+# ip: IP address of host
 # pip-index: pypi server IP and arguments 'http://172.16.57.40/yoram/dev/ --trusted-host 172.16.57.40' or full path to
 #            package location on disk.
-# ip: IP address of host
-# auth: list of (FTP user, FTP password) leave empty for anonymous
-#
-# Example:
-#-
-#  ep-os: linux
-#  ep-ip: <host ip>
-#  pip-index: <devpi ip>/<user name>/<index>/ --trusted-host <devpi ip>
 #
 # NO NOT CHANGE THIS FILE as it is saved in github. Create your own copy of the file and make sure it is not pushed to
 # github. We recommend my_topo.yaml as it is already ignored in .gitignore.
@@ -20,3 +13,4 @@
 -
   ep-os: local
   ep-ip:
+  pip-index: https://pypi.org/simple

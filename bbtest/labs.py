@@ -15,6 +15,7 @@ class Lab():
                              a dictionary with ip, username & password
         """
 
+        # todo: fix the lab setup so it doesn't change topology
         self.topology = deepcopy(topology)
 
         self.hosts = {}
@@ -29,14 +30,14 @@ class Lab():
             if 'class' not in host_params:
                 raise ImproperlyConfigured(f"Host '{host_name}' must have a `class` key")
             host_address = address_book.get(host_name, {})
-            host_class = host_params.pop('class')
-            self.add_host(host_class, host_name, host_params, host_address)
+            self.add_host(host_params['class'], host_name, host_params, host_address)
 
     def add_host(self, host_class, name, params={}, address_book={}):
         """Adding a new host to the lab"""
-        boxes = params.pop('boxes', {})
+        boxes = params.get('boxes', {})
         try:
-            host = host_class(name=name, pip_index=self.pip_index, **{**params, **address_book})
+            kwargs = {**params, **address_book}
+            host = host_class(name=name, pip_index=self.pip_index, **kwargs)
         except KeyError:
             # TODO: allocate a host, use params
             host = host_class(name=name, pip_index=self.pip_index, **params)
@@ -51,8 +52,7 @@ class Lab():
         for box_name, box_params in boxes.items():
             if 'class' not in box_params:
                 raise ImproperlyConfigured(f"Box '{box_name}' must have a `class` key")
-            box_class = box_params.pop('class')
-            self.add_box(box_class, host, box_name, params=box_params)
+            self.add_box(box_params['class'], host, box_name, params=box_params)
 
         return self.hosts[name]
 

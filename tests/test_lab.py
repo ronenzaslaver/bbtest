@@ -13,11 +13,11 @@ from bbtest.exceptions import ImproperlyConfigured
 
 
 class EmptyBox(BlackBox):
-    NAME = 'empty'
+    pass
 
 
 class YetAnotherEmptyBox(BlackBox):
-    NAME = 'yetanotherempty'
+    pass
 
 
 class TestNoLab(BBPytest):
@@ -59,7 +59,7 @@ class TestBaseHost(BBPytest):
 
     def test_host_name_and_params(self):
         host = self.lab.hosts['host1']
-        assert host.name_ == 'host1'
+        assert host.name == 'host1'
         assert str(host) == 'host1'
         assert host.ip == '127.0.0.1'
         assert host.params['yet_another_param'] == 'yet_another_value'
@@ -88,15 +88,15 @@ class TestMultiHosts(BBPytest):
             'host1': {
                 'class': LocalHost,
                 'boxes': {
-                    'homebox0': {'class': HomeBox},
-                    'homebox1': {'class': EmptyBox}
+                    'homebox': {'class': HomeBox},
+                    'emptybox': {'class': EmptyBox}
                 }
             },
             'host2': {
                 'class': LocalHost,
                 'boxes': {
-                    'homebox0': {'class': HomeBox},
-                    'homebox1': {'class': EmptyBox}
+                    'homebox': {'class': HomeBox},
+                    'emptybox': {'class': EmptyBox}
                 }
             }
         }
@@ -105,7 +105,7 @@ class TestMultiHosts(BBPytest):
     def test_multi_boxes(self):
         assert len(self.lab.hosts) == 2
         assert len(self.lab.boxes) == 4
-        assert self.lab.hosts['host1'].boxes['homebox0'] == self.lab.boxes['host1.homebox0']
+        assert self.lab.hosts['host1'].boxes['homebox'] == self.lab.boxes['host1.homebox']
         assert len(self.lab.class_boxes(HomeBox)) == 2
 
 
@@ -132,7 +132,7 @@ class TestBBTestCase(BBTestCase):
 
     def test_host_name_and_params(self):
         host = self.lab.hosts['host1']
-        assert host.name_ == 'host1'
+        assert host.name == 'host1'
         assert str(host) == 'host1'
         assert host.ip == '127.0.0.1'
         assert host.params['yet_another_param'] == 'yet_another_value'
@@ -157,7 +157,7 @@ class TestHomeBox(BBPytest):
 
     def test_box_name_and_params(self):
         empty_box_0 = self.lab.boxes['host1.homebox0']
-        assert empty_box_0.name_ == 'homebox0'
+        assert empty_box_0.name == 'homebox0'
         assert str(empty_box_0) == 'homebox0'
         assert type(empty_box_0.host) == LocalHost
         assert empty_box_0.params['yet_another_param'] == 'yet_another_value_0'

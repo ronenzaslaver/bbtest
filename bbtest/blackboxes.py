@@ -15,12 +15,12 @@ class BlackBox():
     """
 
     def __init__(self, name, host, **kwargs):
-        self.name_ = name
+        self.name = name
         self.host = host
         self.params = kwargs
 
     def __repr__(self):
-        return self.name_
+        return self.name
 
     def install(self):
         """Installing the black box on `self.host`"""
@@ -35,7 +35,7 @@ class BlackBox():
 
     def mkdtemp(self, **kwagrs):
         """Create a temp directory"""
-        temp = self.host.mkdtemp(prefix=f"blackbox_{self.name_}_")
+        temp = self.host.mkdtemp(prefix=f"blackbox_{self.name}_")
         self.host.chmod_777(temp)
         return temp
 
