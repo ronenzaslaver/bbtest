@@ -88,6 +88,8 @@ class TestHosts(BBPytest):
         self.box.rmfile('temp_file')
         assert not self.box.isfile('temp_file')
 
+    @pytest.mark.xfail
+    # Download is for URL downloads? need to better define the download_file and then better test.
     def test_download_files(self):
         local_temp_file = self._create_temp_file()
         dest_temp_file = os.path.join(self.host.root_path, 'temp_file')

@@ -43,6 +43,10 @@ class BlackBox():
 class HomeBox(BlackBox):
     """A black box with a home folder"""
 
+    def __init__(self, name, host, **kwargs):
+        super().__init__(name, host, **kwargs)
+        self.path = None
+
     def install(self):
         """Create a temp dir and store it in `self.path`"""
         super().install()
@@ -52,7 +56,8 @@ class HomeBox(BlackBox):
     def uninstall(self):
         """Remove the home path"""
         try:
-            self.host.modules.shutil.rmtree(self.path)
+            if self.path:
+                self.host.modules.shutil.rmtree(self.path)
         except OSError:
             pass
         super().uninstall()

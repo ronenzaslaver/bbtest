@@ -67,6 +67,11 @@ class Lab():
 
     @property
     def boxes(self):
+        """ Returns flat list of all boxes in the lab.
+
+        :return: dictionary of boxes indexed by 'host name.box name'.
+        :rtype: dict(str, BlackBox)
+        """
         boxes = {}
         for host in self.hosts.values():
             for box in host.boxes.values():
@@ -74,7 +79,13 @@ class Lab():
         return boxes
 
     def class_boxes(self, box_class=BlackBox):
-        return {n: c for n, c in self.boxes.items() if isinstance(c, box_class)}
+        """ Returns list of all boxes of the requested class.
+
+        :param box_class: requested box class.
+        :return: list of boxes.
+        :rtype: list(BlackBox)
+        """
+        return [c for c in self.boxes.values() if isinstance(c, box_class)]
 
     def destroy(self):
         """Destroy lab altogether """

@@ -275,8 +275,9 @@ class RemoteHost(BaseHost):
                 self.run(['systemctl', 'restart', 'bbhost.service'])
             elif self.is_windows:
                 self.run(['bbhost_win_service.exe', 'restart'])
-        except Exception as _:
-            pass
+        except subprocess.SubprocessError as e:
+            if 'closed by the remote host' not in repr(e):
+                raise e
         time.sleep(INSTALL_RECONNECT_WAIT)
         self._start_bbhost()
 
