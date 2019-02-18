@@ -12,17 +12,13 @@ import time
 import rpyc
 import glob
 import re
-try:
-    from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, QueryValueEx
-except Exception:
-    pass
 
 from .exceptions import ImproperlyConfigured
 
 SYNC_REQUEST_TIMEOUT = 120
 DEFAULT_RPYC_SERVER_PORT = int(os.environ.get('BBTEST_DEFAULT_RPYC_SERVER_PORT', 57911))
 INSTALL_RECONNECT_WAIT = os.environ.get('BBTEST_INSTALL_RECONNECT_WAIT', 1)
-platform_shotname_re = re.compile('.*(windows|debian|centos).*')
+platform_shotname_re = re.compile('.*(windows|debian|centos|ubuntu).*')
 
 logger = logging.getLogger('bblog')
 
@@ -41,12 +37,15 @@ class BaseHost(object):
 
     SEP = '/'
 
-    def __init__(self, *args, **kwargs):
-        self.args = args
+    def __init__(self, name, **kwargs):
+        self.name = name
         self.params = kwargs
         self.root_path = getattr(self, 'ROOT_PATH', tempfile.gettempdir())
 
-    def install(self, *args, **kwargs):
+    def __repr__(self):
+        return self.name
+
+    def install(self, **kwargs):
         """ install host for bbtest
 
         We separate install from init so we can create an install hosts in different order.
@@ -62,12 +61,16 @@ class BaseHost(object):
         pass
 
     @property
-    def is_winodws(self):
-        return 'windows' in self.os
+    def is_windows(self):
+        return self.modules.bbtest.osutils.is_windows()
 
     @property
     def is_linux(self):
-        return 'linux' in self.os
+        return self.modules.bbtest.osutils.is_linux()
+
+    @property
+    def is_mac(self):
+        return self.modules.bbtest.osutils.is_mac()
 
     @property
     def os(self):
@@ -81,16 +84,12 @@ class BaseHost(object):
 
     @property
     def platform(self):
-        """ Returns the platform short, beautify, name - windows/debian/fedora. """
+        """ Returns the platform short, beautify, name - windows/debian/centos. """
         return platform_shotname_re.findall(self.modules.platform.platform().lower())[0]
 
     @property
     def hostname(self):
         return self.modules.socket.gethostname()
-
-    @property
-    def name(self):
-        return self.params.get('name', self.hostname)
 
     @property
     def is_local(self):
@@ -123,7 +122,10 @@ class BaseHost(object):
     def run(self, args, **kwargs):
         logger.debug(f'{self.__class__.__name__} run command: {args} {kwargs}')
         shutils_kwargs = {k: v for k, v in kwargs.items() if k not in rpyc.core.protocol.DEFAULT_CONFIG}
-        output = self.modules.bbtest.target.subprocess_run(args, **shutils_kwargs)
+        try:
+            output = self.modules.bbtest.target.subprocess_run(args, **shutils_kwargs)
+        except Exception as e:
+            raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target - {e}')
         if output.returncode > 0:
             raise subprocess.SubprocessError(f'subprocess run "{args} {kwargs}" failed on target\n'
                                              f'stdout = {output.stdout}\n'
@@ -140,7 +142,7 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_winodws else ['python' + str(version)]
+        args = ['py', '-' + str(version)] if self.is_windows else ['/opt/bbtest/python' + str(version)]
         args.extend(args_in)
         return self.run(args, **kwargs)
 
@@ -160,8 +162,8 @@ class LocalHost(BaseHost):
     """Suppose to be an os-agnostic local host."""
     ip = '127.0.0.1'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.modules = rpyc.core.service.ModuleNamespace(getmodule)
 
     def put(self, local, remote):
@@ -173,11 +175,6 @@ class LocalHost(BaseHost):
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
-
-    @staticmethod
-    def open_key(parent_key, key):
-        parent = OpenKey(HKEY_LOCAL_MACHINE, parent_key)
-        return QueryValueEx(parent, key)[0]
 
     @staticmethod
     def untar_file(path):
@@ -198,24 +195,6 @@ class LocalWindowsHost(LocalHost):
 
     """A collection of windows utilities and validators """
     ROOT_PATH = 'c:/temp'
-
-    @staticmethod
-    def get_package_version(package_name):
-        products = OpenKey(HKEY_LOCAL_MACHINE, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall')
-        try:
-            i = 0
-            while True:
-                product_key_name = EnumKey(products, i)
-                product_values = OpenKey(products, product_key_name)
-                try:
-                    if QueryValueEx(product_values, 'DisplayName')[0] == package_name:
-                        return QueryValueEx(product_values, 'DisplayVersion')[0]
-                except FileNotFoundError:
-                    # product has no 'DisplayName' attribute
-                    pass
-                i = i+1
-        except WindowsError:
-            raise RuntimeError('Cybereason version not found')
 
     def get_active_macs(self):
         """
@@ -243,17 +222,17 @@ class RemoteHost(BaseHost):
     """A remote host using RPyC
     """
 
-    def __init__(self, ip=None, auth=None, *args, **kwargs):
+    def __init__(self, ip=None, auth=None, **kwargs):
         """ Initialise remote host - open rpyc connections.
 
         :param ip:
         :param auth:
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
         self.ip = str(ip)
         self.auth = auth
         rpyc.core.protocol.DEFAULT_CONFIG['sync_request_timeout'] = SYNC_REQUEST_TIMEOUT
-        self._start_rpyc()
+        self._start_bbhost()
 
     def install(self, package=None, version=None):
         """ Install bbtes=Nonet tests package on remote host.
@@ -284,16 +263,20 @@ class RemoteHost(BaseHost):
                 bbtest_package = os.path.join(pip_index, package + '-' + version)
             bbtest_remote = [self.put(bbtest_package, bbtest_package.replace('\\', '/').split('/')[-1])]
         # it is problematic to rely on bbtest operations to install bbtest because if they change it requires manual\
-        # update of bbtest on remote host.
-        # todo: consider replace all code below with atomic commands directly over self.modeules
-        rc = self.run_python3(['-m', 'pip', 'install', '-U', '--no-cache-dir'] + bbtest_remote)
-        if self.is_linux:
-            try:
-                self.run(['systemctl', 'restart', 'rpycserver.service'])
-            except Exception as _:
-                pass
-            time.sleep(INSTALL_RECONNECT_WAIT)
-            self._start_rpyc()
+        # update of bbtest on remote host so we try to use atomic commands as possible.
+        py3 = ['py', '-3'] if 'windows' in self.modules.platform.system().lower() else ['/opt/bbtest/python3']
+        self.run(py3 + ['-m', 'pip', 'install', '-I', '-U', '--no-cache-dir'] + bbtest_remote)
+        try:
+            if self.is_linux:
+                self.run(['systemctl', 'restart', 'bbhost.service'])
+            elif self.is_windows:
+                self.run(['bbhost_win_service.exe', 'restart'])
+        # Once restart the connection is closed by the remote host - ignore and reconnect.
+        except subprocess.SubprocessError as e:
+            if 'closed by the remote host' not in repr(e):
+                raise e
+        time.sleep(INSTALL_RECONNECT_WAIT)
+        self._start_bbhost()
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -327,7 +310,7 @@ class RemoteHost(BaseHost):
     def set_client_timeout(self, timeout):
         self._rpyc._config['sync_request_timeout'] = timeout
 
-    def _start_rpyc(self):
+    def _start_bbhost(self):
         port = self.params.get('port', DEFAULT_RPYC_SERVER_PORT)
         try:
             self._rpyc = rpyc.classic.connect(self.ip, port=port)
@@ -339,12 +322,6 @@ class RemoteHost(BaseHost):
 class WindowsHost(RemoteHost):
     """ A remote windows host """
     ROOT_PATH = 'c:/temp'
-
-    def get_package_version(self, package_name):
-        return self.modules.bbtest.LocalWindowsHost().get_package_version(package_name)
-
-    def open_key(self, parent_key, key):
-        return self.modules.bbtest.LocalHost.open_key(parent_key, key)
 
     def get_active_macs(self):
         return self.modules.bbtest.LocalWindowsHost().get_active_macs()

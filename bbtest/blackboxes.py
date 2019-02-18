@@ -14,9 +14,13 @@ class BlackBox():
     A blackbox runs on a host and you can communicate with it using `host.run`
     """
 
-    def __init__(self, host, name=None):
+    def __init__(self, name, host, **kwargs):
+        self.name = name
         self.host = host
-        self.name = name if name else self.__class__.__name__[:-3].lower()
+        self.params = kwargs
+
+    def __repr__(self):
+        return self.name
 
     def install(self):
         """Installing the black box on `self.host`"""
@@ -31,7 +35,7 @@ class BlackBox():
 
     def mkdtemp(self, **kwagrs):
         """Create a temp directory"""
-        temp = self.host.mkdtemp(prefix=f"blackbox_{self.NAME}_")
+        temp = self.host.mkdtemp(prefix=f"blackbox_{self.name}_")
         self.host.chmod_777(temp)
         return temp
 
@@ -39,7 +43,9 @@ class BlackBox():
 class HomeBox(BlackBox):
     """A black box with a home folder"""
 
-    NAME = 'home'
+    def __init__(self, name, host, **kwargs):
+        super().__init__(name, host, **kwargs)
+        self.path = None
 
     def install(self):
         """Create a temp dir and store it in `self.path`"""
@@ -50,7 +56,8 @@ class HomeBox(BlackBox):
     def uninstall(self):
         """Remove the home path"""
         try:
-            self.host.modules.shutil.rmtree(self.path)
+            if self.path:
+                self.host.modules.shutil.rmtree(self.path)
         except OSError:
             pass
         super().uninstall()
