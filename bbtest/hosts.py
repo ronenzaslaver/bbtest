@@ -6,7 +6,6 @@ import os
 import stat
 import subprocess
 import shutil
-import tarfile
 import tempfile
 import time
 import rpyc
@@ -176,16 +175,6 @@ class LocalHost(BaseHost):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
 
-    @staticmethod
-    def untar_file(path):
-        if path.endswith('tar.gz'):
-            tar = tarfile.open(path, "r:gz")
-            tar.extractall(path=os.path.dirname(path))
-            tar.close()
-        else:
-            # todo add the actual file extension to exception
-            raise NotImplementedError('File extension is not supported')
-
     def set_client_timeout(self, timeout):
         # todo implement so users can set upper timeout (no need increase, just limit)
         pass
@@ -303,9 +292,6 @@ class RemoteHost(BaseHost):
         finally:
             self.set_client_timeout(SYNC_REQUEST_TIMEOUT)
         return output
-
-    def untar_file(self, path):
-        return self.modules.bbtest.LocalHost().untar_file(path)
 
     def set_client_timeout(self, timeout):
         self._rpyc._config['sync_request_timeout'] = timeout
