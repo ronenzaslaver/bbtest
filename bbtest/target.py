@@ -1,6 +1,8 @@
 
 import subprocess
 import logging
+import tarfile
+import os
 
 logger = logging.getLogger('bblog')
 
@@ -34,3 +36,13 @@ def download_file(src_url, dst_path):
             out_file.write(in_file.read())
     logger.info(f'Downloaded file path on disk: {dst_path}')
     return dst_path
+
+
+def untar_file(path):
+    if path.endswith('tar.gz'):
+        tar = tarfile.open(path, "r:gz")
+        tar.extractall(path=os.path.dirname(path))
+        tar.close()
+    else:
+        # todo add the actual file extension to exception
+        raise NotImplementedError('File extension is not supported')

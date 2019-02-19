@@ -6,7 +6,6 @@ import os
 import stat
 import subprocess
 import shutil
-import tarfile
 import tempfile
 import time
 import rpyc
@@ -142,7 +141,10 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_windows else ['/opt/bbtest/python' + str(version)]
+        if version == 2:
+            args = ['py', '-2'] if self.is_windows else ['python2']
+        else:
+            args = [self.python3_exec]
         args.extend(args_in)
         return self.run(args, **kwargs)
 
@@ -165,6 +167,7 @@ class LocalHost(BaseHost):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.modules = rpyc.core.service.ModuleNamespace(getmodule)
+        self.python3_exec = self.modules.sys.executable
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -175,16 +178,6 @@ class LocalHost(BaseHost):
     def get(self, remote, local):
         """ Get file from target host relative to root path. """
         return shutil.copyfile(self._relative_remote(remote), local)
-
-    @staticmethod
-    def untar_file(path):
-        if path.endswith('tar.gz'):
-            tar = tarfile.open(path, "r:gz")
-            tar.extractall(path=os.path.dirname(path))
-            tar.close()
-        else:
-            # todo add the actual file extension to exception
-            raise NotImplementedError('File extension is not supported')
 
     def set_client_timeout(self, timeout):
         # todo implement so users can set upper timeout (no need increase, just limit)
@@ -304,9 +297,6 @@ class RemoteHost(BaseHost):
             self.set_client_timeout(SYNC_REQUEST_TIMEOUT)
         return output
 
-    def untar_file(self, path):
-        return self.modules.bbtest.LocalHost().untar_file(path)
-
     def set_client_timeout(self, timeout):
         self._rpyc._config['sync_request_timeout'] = timeout
 
@@ -317,6 +307,7 @@ class RemoteHost(BaseHost):
         except Exception as e:
             raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} port {port} - {e}')
         self.modules = self._rpyc.modules
+        self.python3_exec = self.modules.sys.executable
 
 
 class WindowsHost(RemoteHost):
