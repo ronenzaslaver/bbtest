@@ -141,7 +141,10 @@ class BaseHost(object):
         return self._run_python(3, args_in, **kwargs)
 
     def _run_python(self, version, args_in, **kwargs):
-        args = ['py', '-' + str(version)] if self.is_windows else ['/opt/bbtest/python' + str(version)]
+        if version == 2:
+            args = ['py', '-2'] if self.is_windows else ['python2']
+        else:
+            args = [self.python3_exec]
         args.extend(args_in)
         return self.run(args, **kwargs)
 
@@ -164,6 +167,7 @@ class LocalHost(BaseHost):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.modules = rpyc.core.service.ModuleNamespace(getmodule)
+        self.python3_exec = self.modules.sys.executable
 
     def put(self, local, remote):
         """ Put file on target host relative to root path. """
@@ -303,6 +307,7 @@ class RemoteHost(BaseHost):
         except Exception as e:
             raise ConnectionError(f'Failed to connect to RPyC server on host {self.ip} port {port} - {e}')
         self.modules = self._rpyc.modules
+        self.python3_exec = self.modules.sys.executable
 
 
 class WindowsHost(RemoteHost):
