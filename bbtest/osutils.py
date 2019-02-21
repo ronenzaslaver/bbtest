@@ -56,7 +56,7 @@ def find_process_by_name(name):
             name_ = process.name()
             cmdline = process.cmdline()
             exe = process.exe()
-        except (psutil.AccessDenied, psutil.ZombieProcess):
+        except (psutil.AccessDenied, psutil.ZombieProcess, OSError) as e:
             pass
         except psutil.NoSuchProcess:
             continue
@@ -92,7 +92,10 @@ def get_package_version(name):
     for products in regedit_products:
         i = 0
         while True:
-            product_key_name = EnumKey(products, i)
+            try:
+                product_key_name = EnumKey(products, i)
+            except OSError as e:
+                break
             product_values = OpenKey(products, product_key_name)
             try:
                 display_name = QueryValueEx(product_values, 'DisplayName')[0]
